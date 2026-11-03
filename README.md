@@ -24,6 +24,8 @@ JDK 17 and Android SDK 35 are required.
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest
 ./gradlew lintDebug
+./gradlew ktlintCheck
+./gradlew detekt
 ./gradlew check
 ```
 
@@ -31,4 +33,4 @@ API base URL is `BuildConfig.API_BASE_URL` in `:app`.
 
 ## Contributor workflow
 
-Plan in `docs/` first, write `docs/tasks/NNN-*.md` and commit it before code, add tests for every change, and keep commits small and single-purpose. See [docs/PLAN.md](docs/PLAN.md).
+Read [AGENTS.md](AGENTS.md). Plan in `docs/` first, write `docs/tasks/NNN-*.md` and commit it before code, add tests for every change, and keep commits small and single-purpose (Conventional Commits). See [docs/PLAN.md](docs/PLAN.md).
