@@ -32,7 +32,7 @@ Do not duplicate long policy in every file. Rules and templates should point at 
 - `config/detekt/detekt.yml`
 - ktlint/detekt plugins in the version catalog and root `build.gradle.kts`
 - `.github/workflows/ci.yml` (extend)
-- `commitlint.config.js` (or equivalent) for commit-message lint
+- `commitlint.config.mjs` for commit-message lint
 - `.github/dependabot.yml`
 - `README.md` (link `AGENTS.md`)
 
