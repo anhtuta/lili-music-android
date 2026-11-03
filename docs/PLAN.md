@@ -38,12 +38,14 @@ All listed endpoints are public (`Access-Control-Allow-Origin: *`). No auth requ
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| `GET` | `/api/song/all?sortBy=&sortOrder=` | Unpaged JSON **array** of songs. Live count ~152. |
-| `GET` | `/api/song/file?file=` | Audio (`audio/mp3`). Supports `Accept-Ranges: bytes`. |
-| `GET` | `/api/lyric?file=` | Plain text when present (`text/plain`). Missing: HTTP **200**, body `Lyric doesn't exist!`, `Content-Type: text/html`. |
-| `PUT` | `/api/song/listens?path=` | Count a listen. Web fires this **60s after play starts from position 0**, only if still on the same song `path`. |
+| `GET` | `/api/song/all?sortBy=&sortOrder=` | Unpaged JSON **array** of songs. Live count ~152. Default `sortBy=title`, `sortOrder=ASC`. Invalid `sortBy` → HTTP **500** — send only the whitelist below. `page` / `per_page` / combined `sort=` are ignored (`sortBy` wins). |
+| `GET` | `/api/song/file?file=` | Audio (`audio/mp3`). Supports `Accept-Ranges: bytes`. Missing file → **404** JSON `Song doesn't exist!`. |
+| `GET` | `/api/lyric?file=` | Plain text when present (`text/plain`). Missing: HTTP **200**, body `Lyric doesn't exist!`, `Content-Type: text/html`. `file` may be repeated; first existing file wins. |
+| `PUT` | `/api/song/listens?path=` | Count a listen. Web fires this **60s after play starts from position 0**, only if still on the same song `path`. Legacy `?file=` still works; Android should use `path`. |
 | `GET` | `/api/song/picture?file=` | Cover image (used when `image_url` is a relative picture path). |
-| `GET` | `/api/song/album?file=` | Alternate cover path used by some songs. |
+| `GET` | `/api/song/album?file=` | Alternate cover path still present on some `image_url`s; resolve whatever relative URL the song has. |
+
+Do **not** call `/api/zing/mp3/streaming`. `GET /api/song/type/all` is public but unused in v1 (type is already on each song). Admin/auth routes stay unused.
 
 ### Song JSON fields (live)
 
@@ -67,9 +69,11 @@ Playable filter: `file_name` is a non-empty string. Zing-only songs have `file_n
 | Type | `type` | `ASC` |
 | Date | `createdDate` | `DESC` |
 
-Web sends query params `sortBy` and `sortOrder` (and also a combined `sort` / `page` leftover that the backend appears to ignore). Persist last sort in DataStore.
+`createdDate` and `created_date` both work. Persist last sort in DataStore. Never send an unknown `sortBy`.
 
 Local search is client-side substring match on title/artist (web filters the Song column).
+
+The **web** prefers `zing_id` over `file_name` when both exist. **Android v1 does the opposite of that streaming path:** hide any song without a non-empty `file_name`, including Zing-only rows.
 
 ### Audio URL
 
@@ -103,7 +107,7 @@ Meta tags: `offset`, `by` / deprecated `author`, `date` / deprecated `createdDat
 
 Countdown dots: on empty words, if gap ≥5s show dots in the last 5s, or if gap ≥3s show dots in the last 3s (`•`…`•••••` from `setBulletText`).
 
-Karaoke: fill the current word left-to-right as `(now - start) / (end - start)`.
+Karaoke: fill the current word left-to-right as `(now - start) / (end - start)`. Web default is **on** (`karaoke-mode` on the lyric container). Light fill `#2199F9`, dark fill `#FC0`.
 
 Tick interval on web is 30ms; Android can use a ~16–50ms frame loop tied to player position.
 
@@ -113,13 +117,15 @@ Missing lyric body equals `Lyric doesn't exist!` or empty `lyric` field → show
 
 Lyric playground: `lyricAlign` (left/center/right), lyric theme `dark` | `light` | `picture-bg`, `karaokeMode`, `blurMode`, `giganticLine`, `wordAppear`, `lineAppear`, `translate`, `speed`.
 
-App chrome theme: `appTheme` light/dark (`SETTING_APP_THEME`).
+Web defaults when a key is missing: `playType` = `SEQUENCE`, `speed` = `1.0`, `karaokeMode` = **true**, lyric theme = **`picture-bg`**, `appTheme` = **light**, `blurMode` / `giganticLine` / `wordAppear` / `lineAppear` / `translate` = off. User lyric offset is session-only.
+
+App chrome theme: `appTheme` light/dark (`SETTING_APP_THEME`). Separate from the lyric playground theme.
 
 Skip `showWaveform`, `flipWaveform`, `fullscreen` as product requirements. Do not request `RECORD_AUDIO`.
 
 ### Cover colour
 
-Web averages cover RGB (`getAverageRGB`, brightness 1.6) for the spinning-art background. Android: Coil load → Palette (dominant / vibrant) → player background gradient. `picture-bg` theme uses the cover as a blurred backdrop.
+Web `getAverageRGB` (brightness 1.6) tints **waveform bars**, which we are not porting. `picture-bg` uses the cover as a full-bleed lyric backdrop. Android v1 still delivers “cover-art colour background” via Coil + Palette on the now-playing chrome, plus `picture-bg` using the cover as a blurred backdrop.
 
 ### Lyric card
 
