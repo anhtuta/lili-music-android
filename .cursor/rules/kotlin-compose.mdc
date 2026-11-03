@@ -1,0 +1,7 @@
+---
+description: Kotlin and Jetpack Compose style
+globs: **/*.{kt,kts}
+alwaysApply: false
+---
+
+Official Kotlin style plus ktlint Android mode. Compose + Material 3. Immutable UI state (`data class` + `StateFlow` / `composeState`). No wildcard imports. Trailing commas on multi-line lists. User-facing text in string resources. URL-encode API `file`/`path` query params. Never add RECORD_AUDIO or Zing streaming. Format with `./gradlew ktlintFormat`. See AGENTS.md.

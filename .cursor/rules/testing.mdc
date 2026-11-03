@@ -1,0 +1,7 @@
+---
+description: Testing requirements for this project
+globs: **/*.{kt,kts}
+alwaysApply: false
+---
+
+Every production change needs tests. Prefer JVM unit tests; use MockWebServer for HTTP, in-memory Room for DAOs, Turbine/coroutines-test for ViewModels, and Compose UI tests for interactions. Robolectric only when Android types are required. A task is not done until `./gradlew check` passes. See AGENTS.md.
