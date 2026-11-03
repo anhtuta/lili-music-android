@@ -1,0 +1,24 @@
+name: Task
+description: An implementation task that should get a docs/tasks plan before code.
+labels: [task]
+body:
+  - type: markdown
+    attributes:
+      value: After triage, an agent or human writes `docs/tasks/NNN-short-name.md` from the [template](../../blob/main/docs/tasks/TEMPLATE.md) and commits it **before** coding. See [AGENTS.md](../../blob/main/AGENTS.md).
+  - type: input
+    id: plan-id
+    attributes:
+      label: Plan task ID
+      description: Number from docs/PLAN.md if known (e.g. 041).
+      placeholder: "041"
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Modules, API endpoints, or fixtures involved.
