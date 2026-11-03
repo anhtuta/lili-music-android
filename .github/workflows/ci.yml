@@ -34,7 +34,11 @@ jobs:
           cache: gradle
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          # v3 defaults to `tools platform-tools`. Google removed `tools`,
+          # so sdkmanager exits 1. v4 installs platform-tools only.
+          packages: platform-tools
 
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
