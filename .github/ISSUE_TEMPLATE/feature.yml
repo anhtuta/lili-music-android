@@ -1,0 +1,31 @@
+name: Feature
+description: Propose a listener-facing feature that fits v1 or a later phase.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Check [docs/PLAN.md](../../blob/main/docs/PLAN.md) first. Implementation still needs a `docs/tasks/NNN-*.md` committed before code.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What should the listener be able to do?
+    validations:
+      required: true
+  - type: textarea
+    id: web
+    attributes:
+      label: Web player behaviour
+      description: How the React player does this today (file/feature names if known).
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Admin, login, waveform, Zing streaming, and backend changes are not v1.
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests
+      description: How we will know it works.
+    validations:
+      required: true

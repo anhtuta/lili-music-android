@@ -1,0 +1,8 @@
+---
+description: Conventional Commits and small pull-request workflow
+alwaysApply: true
+---
+
+Commits must be small and do one thing. Use Conventional Commits: `type(scope): summary` with types feat, fix, docs, test, chore, refactor, ci, style.
+
+PRs must link the task plan (`docs/tasks/NNN-*.md`), include tests, and pass `./gradlew check`. Do not mix unrelated refactors with feature work. See AGENTS.md.

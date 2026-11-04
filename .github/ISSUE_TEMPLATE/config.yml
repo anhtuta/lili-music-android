@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Architecture and v1 scope
+    url: https://github.com/anhtuta/lili-music-android/blob/main/docs/PLAN.md
+    about: Read the plan before opening a feature request.

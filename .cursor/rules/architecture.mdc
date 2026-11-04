@@ -1,0 +1,7 @@
+---
+description: Module boundaries and Hilt/data-layer rules
+globs: **/*.{kt,kts}
+alwaysApply: false
+---
+
+`feature:*` depends on `core:*`, never the reverse. `:app` wires navigation and Hilt; new screens belong in a feature module. `core:playback` and `core:lyrics` must stay Compose-free. Inject network, database, DataStore, and ExoPlayer with Hilt. Backend base URL is `BuildConfig.API_BASE_URL`; do not change the Lumen API. Hide songs without `file_name`. See AGENTS.md and docs/PLAN.md.

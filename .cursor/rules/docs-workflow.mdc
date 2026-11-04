@@ -1,0 +1,6 @@
+---
+description: Docs-first task workflow (plan, per-task doc, then code)
+alwaysApply: true
+---
+
+Follow AGENTS.md. Before implementing any task, write `docs/tasks/NNN-short-name.md` from `docs/tasks/TEMPLATE.md` and commit that file alone. Update `docs/PLAN.md` if scope changes. Do not start coding in the same commit as the task plan.
