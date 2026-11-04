@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_placeholder_title">Now playing</string>
+    <string name="player_placeholder_body">Playback for song %1$d is coming in a later phase.</string>
+    <string name="player_placeholder_back">Back</string>
+</resources>
