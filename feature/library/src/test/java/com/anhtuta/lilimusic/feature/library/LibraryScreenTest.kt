@@ -124,4 +124,25 @@ class LibraryScreenTest {
 
         composeRule.onNodeWithTag(LibraryTestTags.LOADING).assertIsDisplayed()
     }
+
+    @Test
+    fun settingsActionFiresCallback() {
+        var settings = 0
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                    onSettingsClick = { settings++ },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.SETTINGS).performClick()
+        assertThat(settings).isEqualTo(1)
+    }
 }

@@ -50,11 +50,22 @@ fun LibraryScreen(
     onRefresh: () -> Unit,
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
+    onSettingsClick: () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.library_title)) })
+            TopAppBar(
+                title = { Text(stringResource(R.string.library_title)) },
+                actions = {
+                    TextButton(
+                        onClick = onSettingsClick,
+                        modifier = Modifier.testTag(LibraryTestTags.SETTINGS),
+                    ) {
+                        Text(stringResource(R.string.library_settings))
+                    }
+                },
+            )
         },
     ) { innerPadding ->
         PullToRefreshBox(
