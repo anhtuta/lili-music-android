@@ -33,4 +33,4 @@ API base URL is `BuildConfig.API_BASE_URL` in `:app`.
 
 ## Contributor workflow
 
-Read [AGENTS.md](AGENTS.md). Plan in `docs/` first, write `docs/tasks/NNN-*.md` and commit it before code, add tests for every change, and keep commits small and single-purpose (Conventional Commits). See [docs/PLAN.md](docs/PLAN.md).
+Read [AGENTS.md](AGENTS.md). Plan in `docs/` first, write `docs/tasks/NNN-*.md` and commit it before code, add tests for every change, and keep commits small and single-purpose (Conventional Commits). See [docs/PLAN.md](docs/PLAN.md). Java/React → Android/Kotlin walkthrough of merged phases: [docs/learning/README.md](docs/learning/README.md).
