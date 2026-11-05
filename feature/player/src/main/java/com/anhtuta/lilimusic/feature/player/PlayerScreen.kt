@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.PlayMode
+import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,9 +49,14 @@ fun PlayerScreen(
     callbacks: PlayerCallbacks,
     modifier: Modifier = Modifier,
     lyrics: @Composable () -> Unit = {},
+    coverPaletteOverride: CoverPaletteColors? = null,
 ) {
+    val loadedPalette = rememberCoverPalette(state.song?.imageUrl)
+    val palette = coverPaletteOverride ?: loadedPalette
     Scaffold(
         modifier = modifier.testTag(PlayerTestTags.SCREEN),
+        containerColor = palette?.background ?: MaterialTheme.colorScheme.background,
+        contentColor = palette?.onBackground ?: MaterialTheme.colorScheme.onBackground,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.player_title)) },
@@ -62,15 +68,33 @@ fun PlayerScreen(
                         Text(stringResource(R.string.player_back))
                     }
                 },
+                actions = {
+                    TextButton(
+                        onClick = callbacks.onSettings,
+                        modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
+                    ) {
+                        Text(stringResource(R.string.player_settings))
+                    }
+                },
             )
         },
     ) { innerPadding ->
-        PlayerBody(
-            state = state,
-            callbacks = callbacks,
-            lyrics = lyrics,
-            modifier = Modifier.padding(innerPadding),
-        )
+        Box(
+            modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+        ) {
+            if (palette != null) {
+                Box(modifier = Modifier.testTag(PlayerTestTags.PALETTE))
+            }
+            PlayerBody(
+                state = state,
+                callbacks = callbacks,
+                lyrics = lyrics,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
 

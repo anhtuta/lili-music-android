@@ -22,4 +22,6 @@ object PlayerTestTags {
     const val MINI_BAR = "mini-player"
     const val MINI_TITLE = "mini-player-title"
     const val MINI_PLAY_PAUSE = "mini-player-play-pause"
+    const val SETTINGS = "player-settings"
+    const val PALETTE = "player-palette"
 }

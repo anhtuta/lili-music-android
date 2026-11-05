@@ -10,4 +10,5 @@ data class PlayerCallbacks(
     val onToggleRepeatOne: () -> Unit,
     val onIncreaseSpeed: () -> Unit,
     val onDecreaseSpeed: () -> Unit,
+    val onSettings: () -> Unit = {},
 )
