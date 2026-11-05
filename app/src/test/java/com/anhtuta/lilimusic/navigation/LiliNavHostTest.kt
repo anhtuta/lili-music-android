@@ -43,7 +43,7 @@ class LiliNavHostTest {
     }
 
     @Test
-    fun navigatingToPlayerShowsPlaceholderRoute() {
+    fun navigatingToPlayerUsesSongPathSlug() {
         lateinit var navController: NavHostController
         composeRule.setContent {
             navController = rememberNavController()
@@ -52,17 +52,17 @@ class LiliNavHostTest {
                 libraryContent = {
                     Text("Library screen")
                 },
-                playerContent = { songId, _ ->
-                    Text("Player for $songId", modifier = Modifier.testTag("player-destination"))
+                playerContent = { path, _ ->
+                    Text("Player for $path", modifier = Modifier.testTag("player-destination"))
                 },
             )
             LaunchedEffect(Unit) {
-                navController.navigate(PlayerDestination(songId = 99L))
+                navController.navigate(PlayerDestination(path = "hello-artist"))
             }
         }
 
         composeRule.onNodeWithTag("player-destination").assertIsDisplayed()
-        composeRule.onNodeWithText("Player for 99").assertIsDisplayed()
+        composeRule.onNodeWithText("Player for hello-artist").assertIsDisplayed()
         composeRule.runOnIdle {
             assertThat(navController.currentDestination?.hasRoute<PlayerDestination>()).isTrue()
         }
