@@ -8,6 +8,7 @@ import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongCatalog
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
+import com.anhtuta.lilimusic.core.playback.PlayerController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ class LibraryViewModel
     constructor(
         private val songRepository: SongRepository,
         private val sortPreferences: SortPreferences,
+        private val playerController: PlayerController,
     ) : ViewModel() {
         private val query = MutableStateFlow("")
         private val isRefreshing = MutableStateFlow(false)
@@ -70,6 +72,10 @@ class LibraryViewModel
 
         fun onRefresh() {
             refresh()
+        }
+
+        fun onSongClick(song: Song) {
+            playerController.play(uiState.value.songs, song.path)
         }
 
         private fun refresh() {

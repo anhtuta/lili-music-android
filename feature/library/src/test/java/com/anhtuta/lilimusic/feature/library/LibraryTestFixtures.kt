@@ -8,13 +8,14 @@ fun libraryTestSong(
     title: String = "Hello",
     artist: String = "Artist",
     listens: Int = 10,
+    path: String = "hello-$id",
 ): Song =
     Song(
         id = id,
         title = title,
         artist = artist,
         album = "Album",
-        path = "hello-$id",
+        path = path,
         type = "Vietnam",
         listens = listens,
         fileName = "hello-$id.mp3",
