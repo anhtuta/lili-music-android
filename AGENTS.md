@@ -6,7 +6,7 @@ Instructions for AI coding agents and humans working in this repository. Tool-sp
 
 Lili Music is a native Android **listener-only** client for the existing Lumen catalog API. Backend `https://blog.nenmongvietnam.com/laravel/public` must stay unchanged. v1: Play Store, no admin/login, no waveform/`RECORD_AUDIO`, play only songs with a non-empty `file_name`, hide Zing-only tracks.
 
-Full scope, API contract, phases, and risks: [docs/PLAN.md](docs/PLAN.md).
+Full scope, API contract, phases, and risks: [docs/PLAN.md](docs/PLAN.md). Owner-oriented Android/Kotlin notes (Java/web analogies): [docs/learning/README.md](docs/learning/README.md).
 
 Package: `com.anhtuta.lilimusic`. minSdk 26, compileSdk 37, targetSdk 35, JDK 17.
 
@@ -70,6 +70,7 @@ Do not start the Gradle daemon in CI (`--no-daemon` is already in the workflow).
 
    Examples: `feat(lyrics): parse xlrc translations`, `test(playback): shuffle keeps current song first`.
 5. Finish only when `./gradlew check` passes.
+6. After every phase/task, append a section to the [learning guide](docs/learning/README.md): what was built, new Android/Kotlin terms with Java/web analogies, and code to focus on. Commit that append **alone**.
 
 ## Code style
 
