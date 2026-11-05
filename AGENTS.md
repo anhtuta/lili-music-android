@@ -8,7 +8,7 @@ Lili Music is a native Android **listener-only** client for the existing Lumen c
 
 Full scope, API contract, phases, and risks: [docs/PLAN.md](docs/PLAN.md).
 
-Package: `com.nenmongvietnam.lilimusic`. minSdk 26, compileSdk/targetSdk 35, JDK 17.
+Package: `com.anhtuta.lilimusic`. minSdk 26, compileSdk/targetSdk 35, JDK 17.
 
 ## Architecture / modules
 
@@ -54,7 +54,7 @@ Run from the repo root. JDK 17.
 One test class:
 
 ```bash
-./gradlew :app:testDebugUnitTest --tests com.nenmongvietnam.lilimusic.BuildConfigTest
+./gradlew :app:testDebugUnitTest --tests com.anhtuta.lilimusic.BuildConfigTest
 ```
 
 Do not start the Gradle daemon in CI (`--no-daemon` is already in the workflow). Locally the daemon is fine.

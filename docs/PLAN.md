@@ -163,7 +163,7 @@ Single-activity Jetpack Compose app, unidirectional data flow, Hilt, now-in-andr
 
 Dependency rule: `feature:*` → `core:*` → never the reverse. `core:playback` does not depend on Compose. `core:lyrics` is pure Kotlin so parser tests stay JVM.
 
-Package: `com.nenmongvietnam.lilimusic`.
+Package: `com.anhtuta.lilimusic`.
 
 minSdk 26, compileSdk/targetSdk 35, JVM 17.
 

@@ -14,7 +14,7 @@ Scaffold a buildable Kotlin Android app so later feature tasks have a place to l
 - Android `.gitignore`, human README, GitHub Actions: assemble, unit tests, Android Lint.
 - One trivial JVM unit test so the test task is proven.
 
-minSdk 26, compileSdk/targetSdk 35, namespace `com.nenmongvietnam.lilimusic`.
+minSdk 26, compileSdk/targetSdk 35, namespace `com.anhtuta.lilimusic`.
 
 ## Files
 
