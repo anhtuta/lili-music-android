@@ -56,6 +56,19 @@ class SongDaoTest {
         }
 
     @Test
+    fun observeByPathEmitsMatchingSong() =
+        runTest(UnconfinedTestDispatcher()) {
+            songDao.insertAll(listOf(entity(id = 1, title = "A"), entity(id = 2, title = "B")))
+
+            songDao.observeByPath("path-2").test {
+                val song = awaitItem()
+                assertThat(song?.id).isEqualTo(2L)
+                assertThat(song?.title).isEqualTo("B")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun replaceAllClearsPreviousRows() =
         runTest(UnconfinedTestDispatcher()) {
             val local = RoomSongLocalDataSource(database, songDao)

@@ -14,6 +14,9 @@ interface SongDao {
     @Query("SELECT * FROM songs WHERE id = :id")
     fun observeById(id: Long): Flow<SongEntity?>
 
+    @Query("SELECT * FROM songs WHERE path = :path LIMIT 1")
+    fun observeByPath(path: String): Flow<SongEntity?>
+
     @Query("DELETE FROM songs")
     suspend fun deleteAll()
 
