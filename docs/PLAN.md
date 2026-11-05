@@ -165,7 +165,7 @@ Dependency rule: `feature:*` → `core:*` → never the reverse. `core:playback`
 
 Package: `com.nenmongvietnam.lilimusic`.
 
-minSdk 26, compileSdk/targetSdk 35, JVM 17.
+minSdk 26, compileSdk 37, targetSdk 35, JVM 17.
 
 ### Stack (pinned in `gradle/libs.versions.toml`)
 
