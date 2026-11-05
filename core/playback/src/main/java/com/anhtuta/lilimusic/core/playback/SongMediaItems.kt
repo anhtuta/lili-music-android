@@ -1,8 +1,11 @@
+@file:OptIn(UnstableApi::class)
+
 package com.anhtuta.lilimusic.core.playback
 
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.util.UnstableApi
 import com.anhtuta.lilimusic.core.model.Song
 
 object SongMediaItems {

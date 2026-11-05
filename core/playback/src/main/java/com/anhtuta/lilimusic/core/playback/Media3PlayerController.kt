@@ -1,3 +1,5 @@
+@file:OptIn(UnstableApi::class)
+
 package com.anhtuta.lilimusic.core.playback
 
 import android.content.ComponentName
@@ -6,13 +8,14 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.anhtuta.lilimusic.core.datastore.PlaybackPreferences
 import com.anhtuta.lilimusic.core.model.PlayMode
+import com.anhtuta.lilimusic.core.model.PlayQueue
 import com.anhtuta.lilimusic.core.model.PlaybackQueueState
 import com.anhtuta.lilimusic.core.model.PlaybackSpeed
-import com.anhtuta.lilimusic.core.model.PlayQueue
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.playback.di.PlaybackScope
 import dagger.hilt.android.qualifiers.ApplicationContext

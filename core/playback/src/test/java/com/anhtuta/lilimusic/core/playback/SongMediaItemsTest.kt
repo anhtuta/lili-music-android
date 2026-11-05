@@ -1,5 +1,8 @@
+@file:OptIn(UnstableApi::class)
+
 package com.anhtuta.lilimusic.core.playback
 
+import androidx.media3.common.util.UnstableApi
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

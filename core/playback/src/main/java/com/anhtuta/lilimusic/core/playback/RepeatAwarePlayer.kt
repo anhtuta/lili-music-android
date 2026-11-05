@@ -1,7 +1,10 @@
+@file:OptIn(UnstableApi::class)
+
 package com.anhtuta.lilimusic.core.playback
 
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 
 internal class RepeatAwarePlayer(
     player: Player,

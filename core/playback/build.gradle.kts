@@ -30,6 +30,7 @@ android {
         abortOnError = true
         disable += "GradleDependency"
         disable += "AndroidGradlePluginVersion"
+        lintConfig = file("lint.xml")
     }
 }
 

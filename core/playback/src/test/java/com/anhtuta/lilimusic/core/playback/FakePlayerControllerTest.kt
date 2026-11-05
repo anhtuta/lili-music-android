@@ -41,7 +41,10 @@ class FakePlayerControllerTest {
 
             controller.prepare(songs, "gamma")
 
-            assertThat(controller.state.value.currentSong?.path).isEqualTo("gamma")
+            assertThat(
+                controller.state.value.currentSong
+                    ?.path,
+            ).isEqualTo("gamma")
             assertThat(controller.state.value.isPlaying).isFalse()
             assertThat(scheduler.decisions.last().schedulePath).isNull()
         }
@@ -54,7 +57,10 @@ class FakePlayerControllerTest {
 
         assertThat(controller.state.value.isPlaying).isFalse()
         assertThat(controller.state.value.reachedEnd).isTrue()
-        assertThat(controller.state.value.currentSong?.path).isEqualTo("gamma")
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("gamma")
     }
 
     @Test
@@ -63,7 +69,10 @@ class FakePlayerControllerTest {
         controller.play(songs, "beta")
         controller.skipToNext()
 
-        assertThat(controller.state.value.currentSong?.path).isEqualTo("beta")
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("beta")
         assertThat(controller.state.value.positionMs).isEqualTo(0L)
     }
 
@@ -73,7 +82,11 @@ class FakePlayerControllerTest {
         controller.play(songs, "gamma")
         controller.setPlayMode(PlayMode.SHUFFLE)
 
-        assertThat(controller.state.value.queue.first().path).isEqualTo("gamma")
+        assertThat(
+            controller.state.value.queue
+                .first()
+                .path,
+        ).isEqualTo("gamma")
         assertThat(controller.state.value.playMode).isEqualTo(PlayMode.SHUFFLE)
     }
 

@@ -1,8 +1,11 @@
+@file:OptIn(UnstableApi::class)
+
 package com.anhtuta.lilimusic.core.playback
 
 import android.content.Context
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
