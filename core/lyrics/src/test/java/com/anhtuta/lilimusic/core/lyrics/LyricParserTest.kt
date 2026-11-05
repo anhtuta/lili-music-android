@@ -17,11 +17,21 @@ class LyricParserTest {
         assertThat(parsed.meta.date).isEqualTo("2021-06-28")
         assertThat(parsed.meta.source).isEqualTo("manual")
         assertThat(parsed.lines).hasSize(5)
-        assertThat(parsed.lines[0].words.single().text).isEqualTo("Intro title")
+        assertThat(
+            parsed.lines[0]
+                .words
+                .single()
+                .text,
+        ).isEqualTo("Intro title")
         assertThat(parsed.lines[1].isEmpty).isTrue()
         assertThat(parsed.lines[1].startMs).isEqualTo(2_000L)
         assertThat(parsed.lines[1].endMs).isEqualTo(7_500L)
-        assertThat(parsed.lines[2].words.single().text).isEqualTo("First sung line")
+        assertThat(
+            parsed.lines[2]
+                .words
+                .single()
+                .text,
+        ).isEqualTo("First sung line")
         assertThat(parsed.lines.last().startMs).isEqualTo(60_500L)
         assertThat(parsed.lines.last().endMs).isNull()
     }
@@ -31,9 +41,24 @@ class LyricParserTest {
         val parsed = LyricParser.parse(fixture("duplicates.lrc"), "chorus.lrc")
 
         assertThat(parsed.lines.map { it.startMs }).containsExactly(28_130L, 32_000L, 113_410L).inOrder()
-        assertThat(parsed.lines[0].words.single().text).isEqualTo("Người theo hương hoa")
-        assertThat(parsed.lines[2].words.single().text).isEqualTo("Người theo hương hoa")
-        assertThat(parsed.lines[1].words.single().text).isEqualTo("Only once")
+        assertThat(
+            parsed.lines[0]
+                .words
+                .single()
+                .text,
+        ).isEqualTo("Người theo hương hoa")
+        assertThat(
+            parsed.lines[2]
+                .words
+                .single()
+                .text,
+        ).isEqualTo("Người theo hương hoa")
+        assertThat(
+            parsed.lines[1]
+                .words
+                .single()
+                .text,
+        ).isEqualTo("Only once")
         assertThat(parsed.meta.by).isEqualTo("Old Author")
     }
 
@@ -51,8 +76,17 @@ class LyricParserTest {
         assertThat(hours.lines.map { it.startMs }).containsExactly(1_500L, 3_825_320L).inOrder()
 
         val unknown = LyricParser.parse(fixture("unknown-meta.lrc"), "song.lrc")
-        assertThat(unknown.meta).isEqualTo(com.anhtuta.lilimusic.core.model.LyricMeta())
-        assertThat(unknown.lines.single().words.single().text).isEqualTo("轻轻贴近你的耳朵")
+        assertThat(unknown.meta).isEqualTo(
+            com.anhtuta.lilimusic.core.model
+                .LyricMeta(),
+        )
+        assertThat(
+            unknown.lines
+                .single()
+                .words
+                .single()
+                .text,
+        ).isEqualTo("轻轻贴近你的耳朵")
     }
 
     @Test
@@ -70,7 +104,12 @@ class LyricParserTest {
         assertThat(parsed.format).isEqualTo(LyricFormat.XLRC)
         assertThat(parsed.lines[0].translations.map { it.tag }).containsExactly("tran1", "tran2")
         assertThat(parsed.lines[0].translations[0].text).isEqualTo("qīng qīng tiē jìn nǐ de ěr duǒ")
-        assertThat(parsed.lines[1].translations.single().text).isEqualTo("shā lǎng hēi yō")
+        assertThat(
+            parsed.lines[1]
+                .translations
+                .single()
+                .text,
+        ).isEqualTo("shā lǎng hēi yō")
 
         val shared = parsed.lines.filter { it.words.single().text == "Shared chorus" }
         assertThat(shared).hasSize(2)
