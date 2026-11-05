@@ -1,7 +1,7 @@
 package com.anhtuta.lilimusic.feature.lyrics
 
-import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -83,7 +83,7 @@ class LyricsPaneTest {
         assertThat(nudged).isEqualTo(100L)
         composeRule.onNodeWithTag(LyricsTestTags.OFFSET_EARLIER).performClick()
         assertThat(nudged).isEqualTo(-100L)
-        composeRule.onNodeWithText("Primero").assertDoesNotExist()
+        assertThat(composeRule.onAllNodesWithText("Primero").fetchSemanticsNodes()).isEmpty()
     }
 
     @Test
@@ -142,7 +142,7 @@ class LyricsPaneTest {
         composeRule.onNodeWithTag(LyricsTestTags.WORD_APPEAR).assertExists()
         composeRule.onNodeWithTag(LyricsTestTags.LINE_APPEAR).assertExists()
         composeRule.onNodeWithText("First").assertExists()
-        composeRule.onNodeWithText("Second").assertDoesNotExist()
+        assertThat(composeRule.onAllNodesWithText("Second").fetchSemanticsNodes()).isEmpty()
     }
 
     @Test

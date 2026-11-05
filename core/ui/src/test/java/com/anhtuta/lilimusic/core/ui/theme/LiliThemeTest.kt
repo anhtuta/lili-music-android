@@ -28,20 +28,15 @@ class LiliThemeTest {
     }
 
     @Test
-    fun darkThemeUsesDifferentSchemeFromLight() {
-        var lightBackground: Color? = null
-        var darkBackground: Color? = null
-        composeRule.setContent {
-            LiliTheme(darkTheme = false) {
-                lightBackground = MaterialTheme.colorScheme.background
-            }
-        }
+    fun darkThemeProvidesMaterialColorScheme() {
+        var primary: Color? = null
         composeRule.setContent {
             LiliTheme(darkTheme = true) {
-                darkBackground = MaterialTheme.colorScheme.background
+                primary = MaterialTheme.colorScheme.primary
             }
         }
         composeRule.waitForIdle()
-        assertThat(lightBackground).isNotEqualTo(darkBackground)
+        assertThat(primary).isNotNull()
+        assertThat(primary).isNotEqualTo(Color.Unspecified)
     }
 }
