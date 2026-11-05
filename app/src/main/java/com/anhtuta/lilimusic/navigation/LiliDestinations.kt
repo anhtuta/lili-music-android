@@ -11,3 +11,6 @@ data object LibraryDestination
 data class PlayerDestination(
     val path: String,
 )
+
+@Serializable
+data object SettingsDestination

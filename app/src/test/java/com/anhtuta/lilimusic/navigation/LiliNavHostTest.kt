@@ -29,10 +29,11 @@ class LiliNavHostTest {
             navController = rememberNavController()
             LiliNavHost(
                 navController = navController,
-                libraryContent = {
+                libraryContent = { _, _ ->
                     Text("Library screen", modifier = Modifier.testTag("library-destination"))
                 },
-                playerContent = { _, _ -> Text("Player screen") },
+                playerContent = { _, _, _ -> Text("Player screen") },
+                settingsContent = { Text("Settings screen") },
             )
         }
 
@@ -49,12 +50,13 @@ class LiliNavHostTest {
             navController = rememberNavController()
             LiliNavHost(
                 navController = navController,
-                libraryContent = {
+                libraryContent = { _, _ ->
                     Text("Library screen")
                 },
-                playerContent = { path, _ ->
+                playerContent = { path, _, _ ->
                     Text("Player for $path", modifier = Modifier.testTag("player-destination"))
                 },
+                settingsContent = { Text("Settings screen") },
             )
             LaunchedEffect(Unit) {
                 navController.navigate(PlayerDestination(path = "hello-artist"))
@@ -65,6 +67,30 @@ class LiliNavHostTest {
         composeRule.onNodeWithText("Player for hello-artist").assertIsDisplayed()
         composeRule.runOnIdle {
             assertThat(navController.currentDestination?.hasRoute<PlayerDestination>()).isTrue()
+        }
+    }
+
+    @Test
+    fun navigatingToSettingsShowsSettingsContent() {
+        lateinit var navController: NavHostController
+        composeRule.setContent {
+            navController = rememberNavController()
+            LiliNavHost(
+                navController = navController,
+                libraryContent = { _, _ -> Text("Library screen") },
+                playerContent = { _, _, _ -> Text("Player screen") },
+                settingsContent = {
+                    Text("Settings screen", modifier = Modifier.testTag("settings-destination"))
+                },
+            )
+            LaunchedEffect(Unit) {
+                navController.navigate(SettingsDestination)
+            }
+        }
+
+        composeRule.onNodeWithTag("settings-destination").assertIsDisplayed()
+        composeRule.runOnIdle {
+            assertThat(navController.currentDestination?.hasRoute<SettingsDestination>()).isTrue()
         }
     }
 }
