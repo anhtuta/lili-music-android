@@ -26,4 +26,22 @@ class LiliThemeTest {
         assertThat(primary).isNotNull()
         assertThat(primary).isNotEqualTo(Color.Unspecified)
     }
+
+    @Test
+    fun darkThemeUsesDifferentSchemeFromLight() {
+        var lightBackground: Color? = null
+        var darkBackground: Color? = null
+        composeRule.setContent {
+            LiliTheme(darkTheme = false) {
+                lightBackground = MaterialTheme.colorScheme.background
+            }
+        }
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                darkBackground = MaterialTheme.colorScheme.background
+            }
+        }
+        composeRule.waitForIdle()
+        assertThat(lightBackground).isNotEqualTo(darkBackground)
+    }
 }
