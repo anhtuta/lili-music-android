@@ -4,10 +4,10 @@
 
 **What was built.** Pure-Kotlin parsers for `.lrc`, `.xlrc` (`[tranN]` translations), and `.trc` (word durations). `GET /api/lyric?file=` treats HTTP 200 body `Lyric doesn't exist!` as missing. Room caches lyric *text* for offline replay. The now-playing screen shows a synced pane: current line highlighted and auto-scrolled, karaoke fill, countdown dots in long empty gaps, translation lines, session-only ±100ms offset. Tap a line seeks (web does not; Android extra).
 
-**Status:** This PR.
+**Status:** Merged ([PR #17](https://github.com/anhtuta/lili-music-android/pull/17)).
 
 > [!NOTE]
-> **User offset is not saved.** Same as the web player: ±100ms lives in the ViewModel and resets when the song changes. File `[offset:]` still applies. Lyric *themes* / blur / gigantic line stay Phase 5. Media3 downloads of lyric *files* stay Phase 6.
+> **User offset is not saved.** Same as the web player: ±100ms lives in the ViewModel and resets when the song changes. File `[offset:]` still applies. Lyric *themes* / blur / gigantic line / translation toggle landed in [Phase 5](07-player-visuals.md). Media3 downloads of lyric *files* stay Phase 6.
 
 ## New terms
 
