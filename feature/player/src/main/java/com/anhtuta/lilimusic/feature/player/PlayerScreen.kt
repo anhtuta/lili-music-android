@@ -47,6 +47,7 @@ fun PlayerScreen(
     state: PlayerUiState,
     callbacks: PlayerCallbacks,
     modifier: Modifier = Modifier,
+    lyrics: @Composable () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier.testTag(PlayerTestTags.SCREEN),
@@ -67,6 +68,7 @@ fun PlayerScreen(
         PlayerBody(
             state = state,
             callbacks = callbacks,
+            lyrics = lyrics,
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -76,6 +78,7 @@ fun PlayerScreen(
 private fun PlayerBody(
     state: PlayerUiState,
     callbacks: PlayerCallbacks,
+    lyrics: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val song = state.song
@@ -136,6 +139,15 @@ private fun PlayerBody(
             speed = state.speed,
             callbacks = callbacks,
         )
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .padding(top = 16.dp),
+        ) {
+            lyrics()
+        }
     }
 }
 
