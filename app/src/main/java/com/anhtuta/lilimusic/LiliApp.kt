@@ -17,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.anhtuta.lilimusic.feature.library.LibraryRoute
+import com.anhtuta.lilimusic.feature.lyrics.LyricsRoute
 import com.anhtuta.lilimusic.feature.player.MiniPlayerBar
 import com.anhtuta.lilimusic.feature.player.PlayerRoute
 import com.anhtuta.lilimusic.feature.player.PlayerViewModel
@@ -45,6 +46,7 @@ fun LiliApp(playerViewModel: PlayerViewModel = hiltViewModel()) {
                         path = path,
                         onBack = onBack,
                         viewModel = playerViewModel,
+                        lyrics = { LyricsRoute() },
                     )
                 },
             )

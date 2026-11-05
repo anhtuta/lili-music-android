@@ -11,6 +11,7 @@ fun PlayerRoute(
     path: String,
     onBack: () -> Unit,
     viewModel: PlayerViewModel = hiltViewModel(),
+    lyrics: @Composable () -> Unit = {},
 ) {
     LaunchedEffect(path) {
         viewModel.ensurePlaying(path)
@@ -30,5 +31,6 @@ fun PlayerRoute(
                 onIncreaseSpeed = viewModel::increaseSpeed,
                 onDecreaseSpeed = viewModel::decreaseSpeed,
             ),
+        lyrics = lyrics,
     )
 }

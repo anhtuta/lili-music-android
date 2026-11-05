@@ -18,4 +18,9 @@ interface LumenApi {
     suspend fun recordListen(
         @Query("path") path: String,
     ): Response<ResponseBody>
+
+    @GET("api/lyric")
+    suspend fun getLyric(
+        @Query("file") file: String,
+    ): Response<ResponseBody>
 }

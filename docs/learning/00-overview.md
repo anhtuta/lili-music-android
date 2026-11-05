@@ -15,11 +15,12 @@ Multi-module layout: `feature:*` screens, `core:*` plumbing, `:app` for Hilt, na
 | `:core:datastore` | Sort / play mode / speed prefs | localStorage |
 | `:core:data` | Repositories | Service owning cache + API |
 | `:core:playback` | Media3 ExoPlayer + session | Audio engine (no UI) |
-| `:core:lyrics` | Lyric parsers (stub until Phase 4) | Pure JVM parser lib |
+| `:core:lyrics` | LRC / XLRC / TRC parser + karaoke timing | Pure JVM parser lib |
 | `:core:ui` | Material 3 theme | Shared design system |
 | `:feature:library` | List, sort, search | Catalog page |
 | `:feature:player` | Now-playing + mini-player | Player page / sticky bar |
-| `:feature:lyrics` / `:feature:settings` / `:feature:downloads` | Later phases | Future routes |
+| `:feature:lyrics` | Synced lyric pane on now-playing | Lyrics column on the player page |
+| `:feature:settings` / `:feature:downloads` | Later phases | Future routes |
 
 Song flow: API → Retrofit → Room → Repository → ViewModel → Compose → Media3. See [PR #15 Play](04-playback.md) for `FakePlayerController` and listen policy.
 

@@ -22,4 +22,6 @@ After playback: tap a song → mini-player; try shuffle / repeat-one / speed. Lo
 
 ---
 
-Next append after the following merge: Phase 4 lyrics (`.lrc` / `.xlrc` / `.trc`). Same structure — built, terms, files. See [docs/PLAN.md](../PLAN.md) Phase 4 and [After a later phase](README.md#after-a-later-phase).
+After playback: tap a song → full player; lyrics should highlight with the seek bar. Try ±100ms if a line feels early/late.
+
+Next append after the following merge: Phase 5 player visuals / settings (lyric themes, alignment, Palette). Same structure — built, terms, files. See [docs/PLAN.md](../PLAN.md) Phase 5 and [After a later phase](README.md#after-a-later-phase).

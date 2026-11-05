@@ -3,6 +3,10 @@ package com.anhtuta.lilimusic.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.anhtuta.lilimusic.core.database.LiliMusicDatabase
+import com.anhtuta.lilimusic.core.database.LyricDao
+import com.anhtuta.lilimusic.core.database.LyricLocalDataSource
+import com.anhtuta.lilimusic.core.database.MIGRATION_1_2
+import com.anhtuta.lilimusic.core.database.RoomLyricLocalDataSource
 import com.anhtuta.lilimusic.core.database.RoomSongLocalDataSource
 import com.anhtuta.lilimusic.core.database.SongDao
 import com.anhtuta.lilimusic.core.database.SongLocalDataSource
@@ -27,10 +31,14 @@ object DatabaseModule {
                 context,
                 LiliMusicDatabase::class.java,
                 "lili-music.db",
-            ).build()
+            ).addMigrations(MIGRATION_1_2)
+            .build()
 
     @Provides
     fun provideSongDao(database: LiliMusicDatabase): SongDao = database.songDao()
+
+    @Provides
+    fun provideLyricDao(database: LiliMusicDatabase): LyricDao = database.lyricDao()
 }
 
 @Module
@@ -38,4 +46,7 @@ object DatabaseModule {
 abstract class DatabaseBindModule {
     @Binds
     abstract fun bindSongLocalDataSource(impl: RoomSongLocalDataSource): SongLocalDataSource
+
+    @Binds
+    abstract fun bindLyricLocalDataSource(impl: RoomLyricLocalDataSource): LyricLocalDataSource
 }

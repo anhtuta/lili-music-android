@@ -136,6 +136,57 @@ class LumenApiTest {
         }
 
     @Test
+    fun getLyricEncodesFileAndReturnsPlainText() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(HttpURLConnection.HTTP_OK)
+                    .setHeader("Content-Type", "text/plain;charset=UTF-8")
+                    .setBody("[00:01.00]Hello"),
+            )
+
+            val result = dataSource.getLyric("123我愛你.xlrc")
+
+            assertThat(result).isEqualTo(LyricNetworkResult.Body("[00:01.00]Hello"))
+            val request = server.takeRequest()
+            assertThat(request.method).isEqualTo("GET")
+            assertThat(request.path).isEqualTo("/api/lyric?file=123%E6%88%91%E6%84%9B%E4%BD%A0.xlrc")
+        }
+
+    @Test
+    fun getLyricTreatsWebMissingSentinelAsMissing() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(HttpURLConnection.HTTP_OK)
+                    .setHeader("Content-Type", "text/html; charset=UTF-8")
+                    .setBody("Lyric doesn't exist!"),
+            )
+
+            val result = dataSource.getLyric("gone.lrc")
+
+            assertThat(result).isEqualTo(LyricNetworkResult.Missing)
+        }
+
+    @Test
+    fun getLyricHttpErrorSurfacesAsHttpException() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                    .setBody("SQLSTATE"),
+            )
+
+            val thrown =
+                runCatching {
+                    dataSource.getLyric("song.lrc")
+                }.exceptionOrNull()
+
+            assertThat(thrown).isInstanceOf(HttpException::class.java)
+            assertThat((thrown as HttpException).code()).isEqualTo(500)
+        }
+
+    @Test
     fun httpErrorSurfacesAsHttpException() =
         runTest {
             server.enqueue(

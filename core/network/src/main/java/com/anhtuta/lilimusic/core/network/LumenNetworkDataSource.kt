@@ -1,5 +1,6 @@
 package com.anhtuta.lilimusic.core.network
 
+import com.anhtuta.lilimusic.core.model.LyricFormat
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
 import com.anhtuta.lilimusic.core.network.model.NetworkSong
@@ -14,6 +15,8 @@ interface LumenNetworkDataSource {
     ): List<NetworkSong>
 
     suspend fun recordListen(path: String)
+
+    suspend fun getLyric(fileName: String): LyricNetworkResult
 }
 
 @Singleton
@@ -31,6 +34,19 @@ class RetrofitLumenNetworkDataSource
             val response = lumenApi.recordListen(path)
             if (!response.isSuccessful) {
                 throw HttpException(response)
+            }
+        }
+
+        override suspend fun getLyric(fileName: String): LyricNetworkResult {
+            val response = lumenApi.getLyric(fileName)
+            if (!response.isSuccessful) {
+                throw HttpException(response)
+            }
+            val text = response.body()?.string().orEmpty()
+            return if (LyricFormat.isMissingBody(text)) {
+                LyricNetworkResult.Missing
+            } else {
+                LyricNetworkResult.Body(text)
             }
         }
     }

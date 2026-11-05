@@ -1,5 +1,8 @@
 package com.anhtuta.lilimusic.feature.player
 
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -101,5 +104,39 @@ class PlayerScreenTest {
 
         composeRule.onNodeWithTag(PlayerTestTags.COVER_PLACEHOLDER).assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.END_OF_QUEUE).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun lyricsSlotIsComposedOnNowPlaying() {
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                        ),
+                    lyrics = {
+                        Text(
+                            text = "Lyric slot",
+                            modifier = Modifier.testTag("lyric-slot"),
+                        )
+                    },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("lyric-slot").performScrollTo().assertIsDisplayed()
     }
 }
