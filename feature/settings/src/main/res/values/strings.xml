@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_lyric_align">Lyric alignment</string>
+    <string name="settings_align_left">Left</string>
+    <string name="settings_align_center">Center</string>
+    <string name="settings_align_right">Right</string>
+    <string name="settings_lyric_theme">Lyric theme</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_picture_bg">Picture background</string>
+    <string name="settings_mode">Mode</string>
+    <string name="settings_karaoke">Karaoke</string>
+    <string name="settings_blur">Blur glow</string>
+    <string name="settings_word_appear">Word appear</string>
+    <string name="settings_line_appear">Line appear</string>
+    <string name="settings_gigantic">Gigantic line</string>
+    <string name="settings_translate">Show translation</string>
+    <string name="settings_app_theme">App theme</string>
+    <string name="settings_app_light">Light</string>
+    <string name="settings_app_dark">Dark</string>
+    <string name="settings_speed">Speed</string>
+    <string name="settings_speed_up">Faster</string>
+    <string name="settings_speed_down">Slower</string>
+    <string name="settings_speed_value">%1$s×</string>
+</resources>
