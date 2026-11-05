@@ -259,7 +259,7 @@ class Media3PlayerController
             positionJob =
                 scope.launch {
                     while (true) {
-                        delay(250)
+                        delay(POSITION_TICK_MS)
                         val mediaController = controller
                         if (mediaController != null && mediaController.isPlaying) {
                             _state.value =
@@ -294,5 +294,9 @@ class Media3PlayerController
                 controller?.let { return it }
             }
             return controller
+        }
+
+        companion object {
+            const val POSITION_TICK_MS = 50L
         }
     }
