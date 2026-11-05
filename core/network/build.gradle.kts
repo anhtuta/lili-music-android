@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nenmongvietnam.lilimusic.core.network"
+    namespace = "com.anhtuta.lilimusic.core.network"
     compileSdk = 35
 
     defaultConfig {

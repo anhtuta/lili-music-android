@@ -1,0 +1,38 @@
+package com.anhtuta.lilimusic.core.model
+
+fun testSong(
+    id: Long = 1L,
+    title: String = "Hello",
+    artist: String = "Artist",
+    album: String? = "Album",
+    path: String = "hello-artist",
+    type: String? = "Vietnam",
+    listens: Int = 10,
+    fileName: String = "hello.mp3",
+    imageName: String? = "hello.jpg",
+    imageUrl: String? = "https://example.com/hello.jpg",
+    lyric: LyricRef? = LyricRef("hello.lrc"),
+    zingId: String? = null,
+    songOfTheYear: Int? = null,
+    createdDate: String? = "2021-06-09T12:21:29.000000Z",
+    formatCreatedDate: String? = "2021/06/09",
+    streamUrl: String = "https://example.com/api/song/file?file=hello.mp3",
+): Song =
+    Song(
+        id = id,
+        title = title,
+        artist = artist,
+        album = album,
+        path = path,
+        type = type,
+        listens = listens,
+        fileName = fileName,
+        imageName = imageName,
+        imageUrl = imageUrl,
+        lyric = lyric,
+        zingId = zingId,
+        songOfTheYear = songOfTheYear,
+        createdDate = createdDate,
+        formatCreatedDate = formatCreatedDate,
+        streamUrl = streamUrl,
+    )

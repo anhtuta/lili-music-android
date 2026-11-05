@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nenmongvietnam.lilimusic.feature.settings"
+    namespace = "com.anhtuta.lilimusic.feature.settings"
     compileSdk = 35
 
     defaultConfig {

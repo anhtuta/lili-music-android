@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nenmongvietnam.lilimusic"
+    namespace = "com.anhtuta.lilimusic"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.nenmongvietnam.lilimusic"
+        applicationId = "com.anhtuta.lilimusic"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
