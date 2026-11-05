@@ -102,6 +102,40 @@ class LumenApiTest {
         }
 
     @Test
+    fun recordListenSendsEncodedPathAndAcceptsEmptyBody() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(HttpURLConnection.HTTP_OK)
+                    .setBody(""),
+            )
+
+            dataSource.recordListen("123 我愛你")
+
+            val request = server.takeRequest()
+            assertThat(request.method).isEqualTo("PUT")
+            assertThat(request.path).isEqualTo("/api/song/listens?path=123%20%E6%88%91%E6%84%9B%E4%BD%A0")
+        }
+
+    @Test
+    fun recordListenHttpErrorSurfacesAsHttpException() =
+        runTest {
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
+                    .setBody("Song doesn't exist!"),
+            )
+
+            val thrown =
+                runCatching {
+                    dataSource.recordListen("missing")
+                }.exceptionOrNull()
+
+            assertThat(thrown).isInstanceOf(HttpException::class.java)
+            assertThat((thrown as HttpException).code()).isEqualTo(404)
+        }
+
+    @Test
     fun httpErrorSurfacesAsHttpException() =
         runTest {
             server.enqueue(
