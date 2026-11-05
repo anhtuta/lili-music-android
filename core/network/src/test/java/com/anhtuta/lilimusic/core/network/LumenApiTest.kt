@@ -1,9 +1,9 @@
 package com.anhtuta.lilimusic.core.network
 
-import com.google.common.truth.Truth.assertThat
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
+import com.google.common.truth.Truth.assertThat
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest

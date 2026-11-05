@@ -3,9 +3,9 @@ package com.anhtuta.lilimusic.core.datastore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.test.core.app.ApplicationProvider
 import app.cash.turbine.test
-import com.google.common.truth.Truth.assertThat
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
+import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

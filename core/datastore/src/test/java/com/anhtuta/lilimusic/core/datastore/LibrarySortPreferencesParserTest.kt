@@ -1,8 +1,8 @@
 package com.anhtuta.lilimusic.core.datastore
 
-import com.google.common.truth.Truth.assertThat
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class LibrarySortPreferencesParserTest {

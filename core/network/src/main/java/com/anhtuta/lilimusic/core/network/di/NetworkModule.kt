@@ -1,9 +1,9 @@
 package com.anhtuta.lilimusic.core.network.di
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.anhtuta.lilimusic.core.network.LumenApi
 import com.anhtuta.lilimusic.core.network.LumenNetworkDataSource
 import com.anhtuta.lilimusic.core.network.RetrofitLumenNetworkDataSource
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

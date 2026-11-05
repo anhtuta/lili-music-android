@@ -1,8 +1,8 @@
 package com.anhtuta.lilimusic.core.network
 
-import com.google.common.truth.Truth.assertThat
 import com.anhtuta.lilimusic.core.network.model.NetworkSong
 import com.anhtuta.lilimusic.core.network.model.toPlayableSong
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class NetworkSongMapperTest {
