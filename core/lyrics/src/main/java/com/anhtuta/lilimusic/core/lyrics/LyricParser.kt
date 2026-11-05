@@ -99,37 +99,43 @@ object LyricParser {
             val times = timeTag.findAll(line).map { it.value }.toList()
             if (times.isEmpty()) {
                 meta = readMeta(line, meta)
-                continue
+            } else {
+                parseTrcTimedLine(line, times.first())?.let { parsedLines += it }
             }
-            val startLine = LyricTimeDecoder.decode(times.first())
-            val rest = line.substring(times.first().length)
-            val wordTokens = trcWord.findAll(rest).map { it.value }.toList()
-            if (wordTokens.isEmpty()) continue
-
-            var startWord = startLine
-            val words = mutableListOf<LyricWord>()
-            for (token in wordTokens) {
-                val durationMs = digits.find(token)?.value?.toLongOrNull() ?: 0L
-                val endWord = startWord + durationMs
-                val wordText = token.replace(Regex("""<\d+>"""), "")
-                val isEmpty = wordText.trim().isEmpty()
-                words +=
-                    LyricWord(
-                        startMs = startWord,
-                        endMs = endWord,
-                        text = if (isEmpty) "" else wordText,
-                        isEmpty = isEmpty,
-                    )
-                startWord = endWord
-            }
-            parsedLines +=
-                LyricLine(
-                    startMs = words.first().startMs,
-                    endMs = words.last().endMs,
-                    words = words,
-                )
         }
         return ParsedLyric(format = LyricFormat.TRC, meta = meta, lines = parsedLines)
+    }
+
+    private fun parseTrcTimedLine(
+        line: String,
+        timeStamp: String,
+    ): LyricLine? {
+        val startLine = LyricTimeDecoder.decode(timeStamp)
+        val rest = line.substring(timeStamp.length)
+        val wordTokens = trcWord.findAll(rest).map { it.value }.toList()
+        if (wordTokens.isEmpty()) return null
+
+        var startWord = startLine
+        val words = mutableListOf<LyricWord>()
+        for (token in wordTokens) {
+            val durationMs = digits.find(token)?.value?.toLongOrNull() ?: 0L
+            val endWord = startWord + durationMs
+            val wordText = token.replace(Regex("""<\d+>"""), "")
+            val isEmpty = wordText.trim().isEmpty()
+            words +=
+                LyricWord(
+                    startMs = startWord,
+                    endMs = endWord,
+                    text = if (isEmpty) "" else wordText,
+                    isEmpty = isEmpty,
+                )
+            startWord = endWord
+        }
+        return LyricLine(
+            startMs = words.first().startMs,
+            endMs = words.last().endMs,
+            words = words,
+        )
     }
 
     private fun readMeta(

@@ -107,24 +107,33 @@ object LyricSynchronizer {
             mid = (lo + hi) / 2
             val start = words[mid].startMs + offsetMs
             val end = words[mid].endMs + offsetMs
-            if (start <= positionMs && positionMs <= end) {
-                val next = mid + 1
-                if (next <= words.lastIndex) {
-                    val nextStart = words[next].startMs + offsetMs
-                    val nextEnd = words[next].endMs + offsetMs
-                    if (nextStart <= positionMs && positionMs <= nextEnd) {
-                        return next
-                    }
-                }
-                return mid
-            } else if (start > positionMs) {
-                hi = mid - 1
-            } else {
-                lo = mid + 1
+            when {
+                contains(start, end, positionMs) -> return preferLaterOverlap(words, mid, positionMs, offsetMs)
+                start > positionMs -> hi = mid - 1
+                else -> lo = mid + 1
             }
         }
         return if (mid == 0 || mid == words.lastIndex) -1 else mid
     }
+
+    private fun preferLaterOverlap(
+        words: List<TimedWord>,
+        index: Int,
+        positionMs: Long,
+        offsetMs: Long,
+    ): Int {
+        val next = index + 1
+        if (next > words.lastIndex) return index
+        val nextStart = words[next].startMs + offsetMs
+        val nextEnd = words[next].endMs + offsetMs
+        return if (contains(nextStart, nextEnd, positionMs)) next else index
+    }
+
+    private fun contains(
+        startMs: Long,
+        endMs: Long,
+        positionMs: Long,
+    ): Boolean = startMs <= positionMs && positionMs <= endMs
 
     internal fun countdownDots(
         startMs: Long,
