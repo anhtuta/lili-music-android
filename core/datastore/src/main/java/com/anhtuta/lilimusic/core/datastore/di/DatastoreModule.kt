@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.anhtuta.lilimusic.core.datastore.PlaybackPreferences
 import com.anhtuta.lilimusic.core.datastore.PlaybackPreferencesDataSource
+import com.anhtuta.lilimusic.core.datastore.SettingsPreferences
+import com.anhtuta.lilimusic.core.datastore.SettingsPreferencesDataSource
 import com.anhtuta.lilimusic.core.datastore.SortPreferences
 import com.anhtuta.lilimusic.core.datastore.SortPreferencesDataSource
 import dagger.Binds
@@ -40,4 +42,7 @@ abstract class DatastoreBindModule {
 
     @Binds
     abstract fun bindPlaybackPreferences(impl: PlaybackPreferencesDataSource): PlaybackPreferences
+
+    @Binds
+    abstract fun bindSettingsPreferences(impl: SettingsPreferencesDataSource): SettingsPreferences
 }
