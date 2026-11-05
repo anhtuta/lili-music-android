@@ -9,6 +9,7 @@ class FakeLumenNetworkDataSource : LumenNetworkDataSource {
     var songs: List<NetworkSong> = emptyList()
     var error: Throwable? = null
     val requests = mutableListOf<Pair<SongSort, SortOrder>>()
+    val recordedPaths = mutableListOf<String>()
 
     override suspend fun getSongs(
         sort: SongSort,
@@ -17,5 +18,10 @@ class FakeLumenNetworkDataSource : LumenNetworkDataSource {
         requests += sort to order
         error?.let { throw it }
         return songs
+    }
+
+    override suspend fun recordListen(path: String) {
+        recordedPaths += path
+        error?.let { throw it }
     }
 }

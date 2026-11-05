@@ -13,6 +13,8 @@ class FakeSongLocalDataSource : SongLocalDataSource {
 
     override fun observeSong(id: Long): Flow<SongEntity?> = songs.map { list -> list.find { it.id == id } }
 
+    override fun observeSongByPath(path: String): Flow<SongEntity?> = songs.map { list -> list.find { it.path == path } }
+
     override suspend fun replaceAll(songs: List<SongEntity>) {
         this.songs.value = songs
     }

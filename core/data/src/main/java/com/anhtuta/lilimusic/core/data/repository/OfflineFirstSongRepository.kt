@@ -28,6 +28,8 @@ class OfflineFirstSongRepository
     ) : SongRepository {
         override fun observePlayableSongs(): Flow<List<Song>> = local.observeSongs().map { entities -> entities.map { it.toSong() } }
 
+        override fun observeSongByPath(path: String): Flow<Song?> = local.observeSongByPath(path).map { entity -> entity?.toSong() }
+
         override suspend fun refresh(
             sort: SongSort,
             order: SortOrder,
@@ -36,6 +38,13 @@ class OfflineFirstSongRepository
                 runCatching {
                     val playable = network.getSongs(sort, order).mapNotNull { it.toPlayableSong(baseUrl) }
                     local.replaceAll(playable.map { it.toEntity() })
+                }
+            }
+
+        override suspend fun recordListen(path: String): Result<Unit> =
+            withContext(ioDispatcher) {
+                runCatching {
+                    network.recordListen(path)
                 }
             }
     }
