@@ -251,23 +251,25 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 
 Also in 006 (pulled forward from later phases because playback needs them): persist play mode / last song / speed; in-app `bai-hat/{path}` route; `POST_NOTIFICATIONS` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK`. HTTPS App Links and the rest of Play Store packaging stay 063–064.
 
-### Phase 4 — Lyrics engine
+### Phase 4 — Lyrics engine *(task 008)*
 
-| ID | Task |
-| --- | --- |
-| 040 | Time decoder + meta tags (`offset`, `ti`, `ar`, `by`, `date`, `source`) |
-| 041 | `.lrc` parser |
-| 042 | `.xlrc` `[tranN]` parser |
-| 043 | `.trc` word-level parser |
-| 044 | Karaoke fill + empty-word countdown dots |
-| 045 | User ±100ms offset combined with file offset |
-| 046 | Fetch lyric (treat `Lyric doesn't exist!` as missing) |
+| ID | Task | Status |
+| --- | --- | --- |
+| 040 | Time decoder + meta tags (`offset`, `ti`, `ar`, `by`, `date`, `source`) | Done in 008 |
+| 041 | `.lrc` parser | Done in 008 |
+| 042 | `.xlrc` `[tranN]` parser | Done in 008 |
+| 043 | `.trc` word-level parser | Done in 008 |
+| 044 | Karaoke fill + empty-word countdown dots | Done in 008 |
+| 045 | User ±100ms offset combined with file offset | Done in 008 (session-only, matches web) |
+| 046 | Fetch lyric (treat `Lyric doesn't exist!` as missing) | Done in 008 |
+
+Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): synced lyric list on the player (highlight, autoscroll, karaoke, countdown, `.xlrc` translations). Alignment / gigantic line / word-appear / line-appear / blur / lyric themes stay **050–051**. Room caches lyric *bodies* for offline replay; Media3 file downloads stay **060**. Tap-a-line-to-seek is an Android extra (web does not seek from lyric taps).
 
 ### Phase 5 — Player visuals
 
 | ID | Task |
 | --- | --- |
-| 050 | Synced lyric list UI (alignment, gigantic line, word/line appear, translation, blur) |
+| 050 | Synced lyric list UI (alignment, gigantic line, word/line appear, translation, blur). Highlight/autoscroll/karaoke/countdown/translations done in **008**; remaining visual toggles stay here |
 | 051 | Lyric themes (dark / light / picture-bg) |
 | 052 | Cover-art Palette background |
 | 053 | Settings screen persistence |
@@ -308,4 +310,4 @@ Also in 006 (pulled forward from later phases because playback needs them): pers
 
 ## 9. This-run deliverable
 
-Task **006** (`docs/tasks/006-playback.md`): Media3 playback service, now-playing + mini-player, sequence/shuffle/repeat-one, speed, listen counting, and restored play mode / last song. Lyrics, downloads, settings, and HTTPS App Links remain later phases.
+Task **008** (`docs/tasks/008-synced-lyrics.md`): LRC/XLRC/TRC parser, `GET /api/lyric`, Room body cache, and a synced lyrics pane on now-playing (karaoke, countdown, translations, session ±100ms). Settings screen, lyric themes, downloads, sleep timer, and HTTPS App Links remain later phases.
