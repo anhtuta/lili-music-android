@@ -59,10 +59,8 @@ kotlin {
     jvmToolchain(17)
 }
 
-androidComponents {
-    beforeVariants(selector().withBuildType("release")) { builder ->
-        builder.enableUnitTest = false
-    }
+tasks.matching { it.name == "testReleaseUnitTest" }.configureEach {
+    enabled = false
 }
 
 dependencies {
