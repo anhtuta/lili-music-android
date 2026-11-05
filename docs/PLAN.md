@@ -223,7 +223,7 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 | ID | Task | Status |
 | --- | --- | --- |
 | 010 | `Song` / `LyricRef` models; playable filter (`file_name`); image URL absolutizing | Done in 003 |
-| 011 | Retrofit API (`song/all`); MockWebServer tests. Stream URL is built, not fetched. Lyric + listens clients are **deferred** | Partial (003) |
+| 011 | Retrofit API (`song/all`); MockWebServer tests. Stream URL is built, not fetched. Lyric client deferred. Listens client in **006** | Partial (003 + 006) |
 | 012 | Room library cache + DataStore **sort** keys. Full settings keys deferred | Partial (003) |
 | 013 | `SongRepository`: fetch, cache, filter Zing, sort, local search | Done in 003 |
 | 014 | Hilt modules wiring network/db/datastore | Done in 003 |
@@ -238,16 +238,18 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 | 023 | Local search | Done in 003 |
 | 024 | Empty / error / offline-cached states; pull to refresh | Done in 003 |
 
-### Phase 3 — Playback
+### Phase 3 — Playback *(task 006)*
 
-| ID | Task |
-| --- | --- |
-| 030 | Media3 `MediaSessionService` + notification/lock screen |
-| 031 | Play from library; audio URL; placeholder art |
-| 032 | Sequence / shuffle (current first) / repeat-one |
-| 033 | Playback speed |
-| 034 | Listen count after 60s (WorkManager, same-path guard) |
-| 035 | Mini-player + now-playing controls |
+| ID | Task | Status |
+| --- | --- | --- |
+| 030 | Media3 `MediaSessionService` + notification/lock screen | Done in 006 |
+| 031 | Play from library; audio URL; placeholder art | Done in 006 |
+| 032 | Sequence / shuffle (current first) / repeat-one | Done in 006 |
+| 033 | Playback speed | Done in 006 |
+| 034 | Listen count after 60s (WorkManager, same-path guard) | Done in 006 |
+| 035 | Mini-player + now-playing controls | Done in 006 |
+
+Also in 006 (pulled forward from later phases because playback needs them): persist play mode / last song / speed; in-app `bai-hat/{path}` route; `POST_NOTIFICATIONS` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK`. HTTPS App Links and the rest of Play Store packaging stay 063–064.
 
 ### Phase 4 — Lyrics engine
 
@@ -306,4 +308,4 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 
 ## 9. This-run deliverable
 
-Task **003** (`docs/tasks/003-data-layer-library.md`): offline-first catalog (model, Retrofit `/api/song/all`, Room, sort DataStore, `SongRepository`) and the library screen as the Navigation Compose start destination. Playback, lyric fetch, listen counting, and downloads remain later phases.
+Task **006** (`docs/tasks/006-playback.md`): Media3 playback service, now-playing + mini-player, sequence/shuffle/repeat-one, speed, listen counting, and restored play mode / last song. Lyrics, downloads, settings, and HTTPS App Links remain later phases.
