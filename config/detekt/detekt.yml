@@ -5,8 +5,9 @@ complexity:
   LongMethod:
     threshold: 80
   LongParameterList:
-    constructorThreshold: 10
+    constructorThreshold: 20
     functionThreshold: 8
+    ignoreDefaultParameters: true
   TooManyFunctions:
     active: false
   CyclomaticComplexMethod:

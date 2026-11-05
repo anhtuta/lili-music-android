@@ -163,7 +163,7 @@ Single-activity Jetpack Compose app, unidirectional data flow, Hilt, now-in-andr
 
 Dependency rule: `feature:*` → `core:*` → never the reverse. `core:playback` does not depend on Compose. `core:lyrics` is pure Kotlin so parser tests stay JVM.
 
-Package: `com.nenmongvietnam.lilimusic`.
+Package: `com.anhtuta.lilimusic`.
 
 minSdk 26, compileSdk 37, targetSdk 35, JVM 17.
 
@@ -218,25 +218,25 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 | --- | --- |
 | 002 | `AGENTS.md` + tool pointers, Cursor rules, task template, GitHub PR/issue templates, `.editorconfig`, ktlint + detekt, CI gates, Dependabot |
 
-### Phase 1 — Domain + network + cache
+### Phase 1 — Domain + network + cache *(task 003)*
 
-| ID | Task |
-| --- | --- |
-| 010 | `Song` / `LyricRef` models; playable filter (`file_name`); image URL absolutizing |
-| 011 | Retrofit API (`song/all`, `song/file`, `lyric`, `listens`); MockWebServer tests; missing-lyric 200 handling |
-| 012 | Room library cache + DataStore sort/settings keys |
-| 013 | `SongRepository`: fetch, cache, filter Zing, sort, local search |
-| 014 | Hilt modules wiring network/db/datastore |
+| ID | Task | Status |
+| --- | --- | --- |
+| 010 | `Song` / `LyricRef` models; playable filter (`file_name`); image URL absolutizing | Done in 003 |
+| 011 | Retrofit API (`song/all`); MockWebServer tests. Stream URL is built, not fetched. Lyric + listens clients are **deferred** | Partial (003) |
+| 012 | Room library cache + DataStore **sort** keys. Full settings keys deferred | Partial (003) |
+| 013 | `SongRepository`: fetch, cache, filter Zing, sort, local search | Done in 003 |
+| 014 | Hilt modules wiring network/db/datastore | Done in 003 |
 
-### Phase 2 — Library UI
+### Phase 2 — Library UI *(task 003)*
 
-| ID | Task |
-| --- | --- |
-| 020 | Navigation shell + Material 3 theme (light/dark) |
-| 021 | Library list UI (title, artist, cover, listens, SOY, type, date) |
-| 022 | Sort controls matching web columns/orders; persist sort |
-| 023 | Local search |
-| 024 | Empty / error / offline-cached states |
+| ID | Task | Status |
+| --- | --- | --- |
+| 020 | Navigation shell + Material 3 theme (light/dark); library start destination; placeholder player route | Done in 003 |
+| 021 | Library list UI (title, artist, cover). Listens / SOY / type / date as list columns deferred | Partial (003) |
+| 022 | Sort controls matching web columns/orders; persist sort | Done in 003 |
+| 023 | Local search | Done in 003 |
+| 024 | Empty / error / offline-cached states; pull to refresh | Done in 003 |
 
 ### Phase 3 — Playback
 
@@ -306,4 +306,4 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 
 ## 9. This-run deliverable
 
-Only tasks **001** and **002**: repo skeleton that `./gradlew check` passes, plus agent/tooling files. No player features yet.
+Task **003** (`docs/tasks/003-data-layer-library.md`): offline-first catalog (model, Retrofit `/api/song/all`, Room, sort DataStore, `SongRepository`) and the library screen as the Navigation Compose start destination. Playback, lyric fetch, listen counting, and downloads remain later phases.
