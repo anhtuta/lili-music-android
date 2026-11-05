@@ -6,7 +6,12 @@ plugins {
 
 android {
     namespace = "com.anhtuta.lilimusic.feature.player"
-    compileSdk = 35
+    compileSdk {
+        version =
+            release(37) {
+                minorApiLevel = 2
+            }
+    }
 
     defaultConfig {
         minSdk = 26
