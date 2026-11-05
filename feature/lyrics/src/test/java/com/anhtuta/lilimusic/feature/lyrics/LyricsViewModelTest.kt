@@ -3,6 +3,9 @@ package com.anhtuta.lilimusic.feature.lyrics
 import app.cash.turbine.test
 import com.anhtuta.lilimusic.core.data.repository.LyricLoadResult
 import com.anhtuta.lilimusic.core.lyrics.LyricSynchronizer
+import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricTheme
+import com.anhtuta.lilimusic.core.model.PlayerSettings
 import com.anhtuta.lilimusic.core.playback.FakePlayerController
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
@@ -22,7 +25,7 @@ class LyricsViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakeLyricRepository(LyricLoadResult.Ready(sampleParsedLyric()))
-            val viewModel = LyricsViewModel(controller, repository)
+            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
 
             controller.play(listOf(song), "alpha")
 
@@ -47,7 +50,7 @@ class LyricsViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakeLyricRepository(LyricLoadResult.Ready(sampleParsedLyric()))
-            val viewModel = LyricsViewModel(controller, repository)
+            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
             controller.play(listOf(song), "alpha")
 
             controller.advancePosition(1_200L)
@@ -69,7 +72,7 @@ class LyricsViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakeLyricRepository(LyricLoadResult.Ready(sampleParsedLyric()))
-            val viewModel = LyricsViewModel(controller, repository)
+            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
             controller.play(listOf(song, other), "alpha")
 
             viewModel.nudgeOffset(LyricSynchronizer.USER_OFFSET_STEP_MS)
@@ -92,7 +95,7 @@ class LyricsViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakeLyricRepository(LyricLoadResult.Ready(sampleParsedLyric()))
-            val viewModel = LyricsViewModel(controller, repository)
+            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
             controller.play(listOf(song), "alpha")
             controller.advancePosition(50L)
 
@@ -106,7 +109,7 @@ class LyricsViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakeLyricRepository(LyricLoadResult.Missing)
-            val viewModel = LyricsViewModel(controller, repository)
+            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
             controller.play(listOf(lyricsTestSong(lyricFileName = null)), "alpha")
 
             viewModel.uiState.test {
@@ -121,12 +124,41 @@ class LyricsViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakeLyricRepository(LyricLoadResult.Error(IOException("offline")))
-            val viewModel = LyricsViewModel(controller, repository)
+            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
             controller.play(listOf(song), "alpha")
 
             viewModel.uiState.test {
                 val state = awaitItemUntil { it.errorMessage != null }
                 assertThat(state.errorMessage).isEqualTo("offline")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun settingsAndCoverUrlFollowRepositoryAndSong() =
+        runTest {
+            val controller = FakePlayerController()
+            val repository = FakeLyricRepository(LyricLoadResult.Ready(sampleParsedLyric()))
+            val settingsRepository =
+                FakeSettingsRepository(
+                    PlayerSettings(translate = true, lyricAlign = LyricAlign.LEFT),
+                )
+            val viewModel = LyricsViewModel(controller, repository, settingsRepository)
+            val covered = lyricsTestSong(imageUrl = "https://example.com/cover.jpg")
+            controller.play(listOf(covered), "alpha")
+
+            viewModel.uiState.test {
+                val loaded = awaitItemUntil { it.frame != null && it.coverUrl != null }
+                assertThat(loaded.settings.translate).isTrue()
+                assertThat(loaded.settings.lyricAlign).isEqualTo(LyricAlign.LEFT)
+                assertThat(loaded.coverUrl).isEqualTo("https://example.com/cover.jpg")
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            settingsRepository.emit(PlayerSettings(translate = false, lyricTheme = LyricTheme.DARK))
+            viewModel.uiState.test {
+                val updated = awaitItemUntil { !it.settings.translate && it.settings.lyricTheme == LyricTheme.DARK }
+                assertThat(updated.settings.translate).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }
