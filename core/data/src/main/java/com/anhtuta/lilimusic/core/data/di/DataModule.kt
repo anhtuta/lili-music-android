@@ -1,5 +1,7 @@
 package com.anhtuta.lilimusic.core.data.di
 
+import com.anhtuta.lilimusic.core.data.repository.LyricRepository
+import com.anhtuta.lilimusic.core.data.repository.OfflineFirstLyricRepository
 import com.anhtuta.lilimusic.core.data.repository.OfflineFirstSongRepository
 import com.anhtuta.lilimusic.core.data.repository.SongRepository
 import dagger.Binds
@@ -25,4 +27,7 @@ object DispatchersModule {
 abstract class DataBindModule {
     @Binds
     abstract fun bindSongRepository(impl: OfflineFirstSongRepository): SongRepository
+
+    @Binds
+    abstract fun bindLyricRepository(impl: OfflineFirstLyricRepository): LyricRepository
 }
