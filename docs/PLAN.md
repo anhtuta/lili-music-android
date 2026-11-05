@@ -265,14 +265,16 @@ Also in 006 (pulled forward from later phases because playback needs them): pers
 
 Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): synced lyric list on the player (highlight, autoscroll, karaoke, countdown, `.xlrc` translations). Alignment / gigantic line / word-appear / line-appear / blur / lyric themes stay **050–051**. Room caches lyric *bodies* for offline replay; Media3 file downloads stay **060**. Tap-a-line-to-seek is an Android extra (web does not seek from lyric taps).
 
-### Phase 5 — Player visuals
+### Phase 5 — Player visuals *(task 009)*
 
-| ID | Task |
-| --- | --- |
-| 050 | Synced lyric list UI (alignment, gigantic line, word/line appear, translation, blur). Highlight/autoscroll/karaoke/countdown/translations done in **008**; remaining visual toggles stay here |
-| 051 | Lyric themes (dark / light / picture-bg) |
-| 052 | Cover-art Palette background |
-| 053 | Settings screen persistence |
+| ID | Task | Status |
+| --- | --- | --- |
+| 050 | Synced lyric list UI (alignment, gigantic line, word/line appear, translation, blur). Highlight/autoscroll/karaoke/countdown done in **008**; remaining visual toggles here | Done in 009 |
+| 051 | Lyric themes (dark / light / picture-bg) | Done in 009 |
+| 052 | Cover-art Palette background | Done in 009 |
+| 053 | Settings screen persistence | Done in 009 |
+
+`.xlrc` translations are gated by the `translate` setting (default **off**, matching web). Speed ±0.1× stays on the player and is also on Settings (already persisted in **006**). In-app volume, waveform, lyric-card export, downloads, and sleep timer stay later / out of v1.
 
 ### Phase 6 — Offline, share, deep links, store
 
@@ -310,4 +312,4 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 
 ## 9. This-run deliverable
 
-Task **008** (`docs/tasks/008-synced-lyrics.md`): LRC/XLRC/TRC parser, `GET /api/lyric`, Room body cache, and a synced lyrics pane on now-playing (karaoke, countdown, translations, session ±100ms). Settings screen, lyric themes, downloads, sleep timer, and HTTPS App Links remain later phases.
+Task **009** (`docs/tasks/009-player-visuals.md`): Settings screen + DataStore persistence, lyric visual toggles/themes, cover Palette on now-playing, `appTheme` light/dark. Downloads, lyric-card export, sleep timer, and HTTPS App Links remain later phases.
