@@ -8,7 +8,7 @@ Lili Music is a native Android **listener-only** client for the existing Lumen c
 
 Full scope, API contract, phases, and risks: [docs/PLAN.md](docs/PLAN.md).
 
-Package: `com.anhtuta.lilimusic`. minSdk 26, compileSdk/targetSdk 35, JDK 17.
+Package: `com.anhtuta.lilimusic`. minSdk 26, compileSdk 37, targetSdk 35, JDK 17.
 
 ## Architecture / modules
 

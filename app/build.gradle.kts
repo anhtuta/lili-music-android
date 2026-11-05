@@ -9,12 +9,7 @@ plugins {
 
 android {
     namespace = "com.anhtuta.lilimusic"
-    compileSdk {
-        version =
-            release(37) {
-                minorApiLevel = 2
-            }
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.anhtuta.lilimusic"

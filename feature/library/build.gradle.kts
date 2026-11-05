@@ -8,12 +8,7 @@ plugins {
 
 android {
     namespace = "com.anhtuta.lilimusic.feature.library"
-    compileSdk {
-        version =
-            release(37) {
-                minorApiLevel = 2
-            }
-    }
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
