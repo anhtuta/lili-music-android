@@ -6,12 +6,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 
 @Composable
 fun LiliNavHost(
-    libraryContent: @Composable (onSongClick: (Long) -> Unit) -> Unit,
-    playerContent: @Composable (songId: Long, onBack: () -> Unit) -> Unit,
+    libraryContent: @Composable (onSongClick: (String) -> Unit) -> Unit,
+    playerContent: @Composable (path: String, onBack: () -> Unit) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
@@ -21,13 +22,18 @@ fun LiliNavHost(
         modifier = modifier,
     ) {
         composable<LibraryDestination> {
-            libraryContent { songId ->
-                navController.navigate(PlayerDestination(songId))
+            libraryContent { path ->
+                navController.navigate(PlayerDestination(path))
             }
         }
-        composable<PlayerDestination> { entry ->
+        composable<PlayerDestination>(
+            deepLinks =
+                listOf(
+                    navDeepLink { uriPattern = "lilimusic://bai-hat/{path}" },
+                ),
+        ) { entry ->
             val destination = entry.toRoute<PlayerDestination>()
-            playerContent(destination.songId) {
+            playerContent(destination.path) {
                 navController.popBackStack()
             }
         }

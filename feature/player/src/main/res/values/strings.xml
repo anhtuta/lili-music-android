@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="player_placeholder_title">Now playing</string>
-    <string name="player_placeholder_body">Playback for song %1$d is coming in a later phase.</string>
-    <string name="player_placeholder_back">Back</string>
+    <string name="player_title">Now playing</string>
+    <string name="player_back">Back</string>
+    <string name="player_play">Play</string>
+    <string name="player_pause">Pause</string>
+    <string name="player_next">Next</string>
+    <string name="player_previous">Previous</string>
+    <string name="player_shuffle">Shuffle</string>
+    <string name="player_repeat_one">Repeat one</string>
+    <string name="player_speed_up">Faster</string>
+    <string name="player_speed_down">Slower</string>
+    <string name="player_speed_value">%1$s×</string>
+    <string name="player_cover_cd">Cover art for %1$s</string>
+    <string name="player_cover_placeholder_cd">No cover art for %1$s</string>
+    <string name="player_end_of_queue">Reached the end of the list</string>
+    <string name="player_empty">Song unavailable</string>
+    <string name="mini_player_cd">Now playing %1$s</string>
 </resources>

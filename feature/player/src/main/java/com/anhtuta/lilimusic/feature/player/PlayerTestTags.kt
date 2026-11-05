@@ -1,6 +1,25 @@
 package com.anhtuta.lilimusic.feature.player
 
 object PlayerTestTags {
-    const val SCREEN = "player-placeholder"
-    const val BACK = "player-placeholder-back"
+    const val SCREEN = "player-screen"
+    const val BACK = "player-back"
+    const val TITLE = "player-title"
+    const val ARTIST = "player-artist"
+    const val COVER = "player-cover"
+    const val COVER_PLACEHOLDER = "player-cover-placeholder"
+    const val SEEK = "player-seek"
+    const val POSITION = "player-position"
+    const val DURATION = "player-duration"
+    const val PLAY_PAUSE = "player-play-pause"
+    const val NEXT = "player-next"
+    const val PREVIOUS = "player-previous"
+    const val SHUFFLE = "player-shuffle"
+    const val REPEAT_ONE = "player-repeat-one"
+    const val SPEED_UP = "player-speed-up"
+    const val SPEED_DOWN = "player-speed-down"
+    const val SPEED_VALUE = "player-speed-value"
+    const val END_OF_QUEUE = "player-end-of-queue"
+    const val MINI_BAR = "mini-player"
+    const val MINI_TITLE = "mini-player-title"
+    const val MINI_PLAY_PAUSE = "mini-player-play-pause"
 }

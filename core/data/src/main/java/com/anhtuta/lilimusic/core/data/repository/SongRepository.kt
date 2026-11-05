@@ -8,8 +8,12 @@ import kotlinx.coroutines.flow.Flow
 interface SongRepository {
     fun observePlayableSongs(): Flow<List<Song>>
 
+    fun observeSongByPath(path: String): Flow<Song?>
+
     suspend fun refresh(
         sort: SongSort = SongSort.TITLE,
         order: SortOrder = sort.defaultOrder,
     ): Result<Unit>
+
+    suspend fun recordListen(path: String): Result<Unit>
 }

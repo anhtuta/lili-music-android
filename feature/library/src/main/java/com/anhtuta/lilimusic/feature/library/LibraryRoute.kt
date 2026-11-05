@@ -18,6 +18,9 @@ fun LibraryRoute(
         onSortSelected = viewModel::onSortSelected,
         onSortOrderToggle = viewModel::onSortOrderToggle,
         onRefresh = viewModel::onRefresh,
-        onSongClick = onSongClick,
+        onSongClick = { song ->
+            viewModel.onSongClick(song)
+            onSongClick(song)
+        },
     )
 }

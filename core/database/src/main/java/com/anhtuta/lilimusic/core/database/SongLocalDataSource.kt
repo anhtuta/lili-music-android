@@ -10,6 +10,8 @@ interface SongLocalDataSource {
 
     fun observeSong(id: Long): Flow<SongEntity?>
 
+    fun observeSongByPath(path: String): Flow<SongEntity?>
+
     suspend fun replaceAll(songs: List<SongEntity>)
 }
 
@@ -23,6 +25,8 @@ class RoomSongLocalDataSource
         override fun observeSongs(): Flow<List<SongEntity>> = songDao.observeAll()
 
         override fun observeSong(id: Long): Flow<SongEntity?> = songDao.observeById(id)
+
+        override fun observeSongByPath(path: String): Flow<SongEntity?> = songDao.observeByPath(path)
 
         override suspend fun replaceAll(songs: List<SongEntity>) {
             database.withTransaction {

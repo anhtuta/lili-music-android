@@ -117,6 +117,36 @@ class OfflineFirstSongRepositoryTest {
             }
         }
 
+    @Test
+    fun observeSongByPathEmitsCachedMatch() =
+        runTest {
+            local.seed(listOf(cachedEntity(id = 1, title = "Cached")))
+
+            repository.observeSongByPath("path").test {
+                assertThat(awaitItem()?.title).isEqualTo("Cached")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun recordListenForwardsPath() =
+        runTest {
+            val result = repository.recordListen("hello artist")
+
+            assertThat(result.isSuccess).isTrue()
+            assertThat(network.recordedPaths).containsExactly("hello artist")
+        }
+
+    @Test
+    fun recordListenFailureSurfaces() =
+        runTest {
+            network.error = IOException("offline")
+
+            val result = repository.recordListen("hello")
+
+            assertThat(result.isFailure).isTrue()
+        }
+
     private fun cachedEntity(
         id: Long,
         title: String,
