@@ -24,7 +24,8 @@ fun rememberCoverPalette(imageUrl: String?): CoverPaletteColors? {
             return@LaunchedEffect
         }
         val request =
-            ImageRequest.Builder(context)
+            ImageRequest
+                .Builder(context)
                 .data(imageUrl)
                 .allowHardware(false)
                 .build()
