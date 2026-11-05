@@ -1,4 +1,4 @@
-# 004 — Rename application package to com.anhtuta.lilimusic
+# 005 — Rename application package to com.anhtuta.lilimusic
 
 ## Goal
 
