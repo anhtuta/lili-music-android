@@ -7,6 +7,8 @@ object LyricsTestTags {
     const val PANE = "lyrics-pane"
     const val FETCHING = "lyrics-fetching"
     const val MISSING = "lyrics-missing"
+    const val MISSING_MAIL = "lyrics-missing-mail"
+    const val MISSING_FB = "lyrics-missing-fb"
     const val ERROR = "lyrics-error"
     const val LINE = "lyrics-line"
     const val ACTIVE_LINE = "lyrics-active-line"

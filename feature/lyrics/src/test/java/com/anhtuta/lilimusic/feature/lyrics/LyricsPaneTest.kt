@@ -37,8 +37,10 @@ class LyricsPaneTest {
         }
 
         composeRule.onNodeWithTag(LyricsTestTags.MISSING).assertIsDisplayed()
-        composeRule.onNodeWithText("Mail").assertIsDisplayed().assertHasClickAction()
-        composeRule.onNodeWithText("FB").assertIsDisplayed().assertHasClickAction()
+        composeRule.onNodeWithTag(LyricsTestTags.MISSING_MAIL).assertIsDisplayed().assertHasClickAction()
+        composeRule.onNodeWithTag(LyricsTestTags.MISSING_FB).assertIsDisplayed().assertHasClickAction()
+        composeRule.onNodeWithText("Mail").assertIsDisplayed()
+        composeRule.onNodeWithText("FB").assertIsDisplayed()
     }
 
     @Test

@@ -28,18 +28,15 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.lyrics.LyricLineFrame
@@ -188,37 +185,48 @@ private fun LyricsBody(
 
 @Composable
 private fun MissingLyricMessage(style: LyricVisualStyle) {
+    val uriHandler = LocalUriHandler.current
     val intro = stringResource(R.string.lyrics_missing_intro)
     val mail = stringResource(R.string.lyrics_missing_mail)
     val fb = stringResource(R.string.lyrics_missing_fb)
     val mailUri = stringResource(R.string.lyrics_missing_mail_uri)
     val fbUri = stringResource(R.string.lyrics_missing_fb_uri)
-    val linkStyle = SpanStyle(color = style.colors.karaokeFill, textDecoration = TextDecoration.Underline)
-    val message =
-        buildAnnotatedString {
-            append(intro)
-            append("\n")
-            withLink(LinkAnnotation.Url(mailUri)) {
-                pushStyle(linkStyle)
-                append(mail)
-                pop()
-            }
-            append("\n")
-            withLink(LinkAnnotation.Url(fbUri)) {
-                pushStyle(linkStyle)
-                append(fb)
-                pop()
-            }
-        }
-    Text(
-        text = message,
-        color = style.colors.text,
-        textAlign = style.textAlign,
+    Column(
         modifier =
             Modifier
                 .padding(24.dp)
+                .fillMaxWidth()
                 .testTag(LyricsTestTags.MISSING),
-    )
+    ) {
+        Text(
+            text = intro,
+            color = style.colors.text,
+            textAlign = style.textAlign,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = mail,
+            color = style.colors.karaokeFill,
+            textAlign = style.textAlign,
+            textDecoration = TextDecoration.Underline,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .testTag(LyricsTestTags.MISSING_MAIL)
+                    .clickable { uriHandler.openUri(mailUri) },
+        )
+        Text(
+            text = fb,
+            color = style.colors.karaokeFill,
+            textAlign = style.textAlign,
+            textDecoration = TextDecoration.Underline,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .testTag(LyricsTestTags.MISSING_FB)
+                    .clickable { uriHandler.openUri(fbUri) },
+        )
+    }
 }
 
 @Composable
