@@ -55,7 +55,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.palette)
 
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    testImplementation(libs.androidx.compose.ui.test.manifest)
 
     testImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.junit)
