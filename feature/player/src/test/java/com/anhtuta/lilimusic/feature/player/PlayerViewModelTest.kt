@@ -24,7 +24,7 @@ class PlayerViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakePlayerSongRepository().apply { emit(songs) }
-            val viewModel = PlayerViewModel(controller, repository, FakePlaybackPreferences())
+            val viewModel = playerViewModel(controller, repository)
 
             viewModel.ensurePlaying("beta")
 
@@ -49,7 +49,7 @@ class PlayerViewModelTest {
                     ),
                 )
 
-            val viewModel = PlayerViewModel(controller, repository, prefs)
+            val viewModel = playerViewModel(controller, repository, prefs)
 
             viewModel.uiState.test {
                 val state = awaitItemUntil { it.song?.path == "alpha" }
@@ -65,7 +65,7 @@ class PlayerViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakePlayerSongRepository().apply { emit(songs) }
-            val viewModel = PlayerViewModel(controller, repository, FakePlaybackPreferences())
+            val viewModel = playerViewModel(controller, repository)
             viewModel.ensurePlaying("alpha")
 
             viewModel.playPause()
@@ -90,14 +90,70 @@ class PlayerViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakePlayerSongRepository().apply { emit(songs) }
-            val viewModel = PlayerViewModel(controller, repository, FakePlaybackPreferences())
+            val viewModel = playerViewModel(controller, repository)
             viewModel.ensurePlaying("alpha")
 
             viewModel.seekTo(12_000L)
 
             assertThat(controller.state.value.positionMs).isEqualTo(12_000L)
         }
+
+    @Test
+    fun ensurePlayingSkipsUnavailableOfflineSong() =
+        runTest {
+            val controller = FakePlayerController()
+            val repository = FakePlayerSongRepository().apply { emit(songs) }
+            val viewModel =
+                playerViewModel(
+                    controller,
+                    repository,
+                    network = FakeNetworkMonitor(initiallyOnline = false),
+                )
+
+            viewModel.ensurePlaying("alpha")
+
+            assertThat(controller.state.value.currentSong).isNull()
+        }
+
+    @Test
+    fun downloadActionEnqueuesCurrentSong() =
+        runTest {
+            val controller = FakePlayerController()
+            val repository = FakePlayerSongRepository().apply { emit(songs) }
+            val downloads = FakeDownloadRepository()
+            val viewModel = playerViewModel(controller, repository, downloads = downloads)
+            viewModel.ensurePlaying("alpha")
+
+            viewModel.onDownloadAction()
+
+            assertThat(downloads.downloaded).containsExactly("alpha")
+        }
+
+    @Test
+    fun uiStateUsesLocalCoverUri() =
+        runTest {
+            val controller = FakePlayerController()
+            val repository = FakePlayerSongRepository().apply { emit(songs) }
+            val downloads = FakeDownloadRepository()
+            downloads.emit(playerTestDownload(path = "alpha", coverLocalUri = "file:///covers/alpha.jpg"))
+            val viewModel = playerViewModel(controller, repository, downloads = downloads)
+            viewModel.ensurePlaying("alpha")
+
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.song?.path == "alpha" && it.downloadStatus.name == "COMPLETED" }
+                assertThat(state.song?.imageUrl).isEqualTo("file:///covers/alpha.jpg")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }
+
+private fun playerViewModel(
+    controller: FakePlayerController,
+    repository: FakePlayerSongRepository,
+    prefs: FakePlaybackPreferences = FakePlaybackPreferences(),
+    downloads: FakeDownloadRepository = FakeDownloadRepository(),
+    network: FakeNetworkMonitor = FakeNetworkMonitor(),
+) = PlayerViewModel(controller, repository, prefs, downloads, network)
 
 private suspend fun app.cash.turbine.ReceiveTurbine<PlayerUiState>.awaitItemUntil(predicate: (PlayerUiState) -> Boolean): PlayerUiState {
     while (true) {
