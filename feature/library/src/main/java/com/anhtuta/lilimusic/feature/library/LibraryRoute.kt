@@ -10,6 +10,7 @@ import com.anhtuta.lilimusic.core.model.Song
 fun LibraryRoute(
     onSongClick: (Song) -> Unit,
     viewModel: LibraryViewModel = hiltViewModel(),
+    onSettingsClick: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LibraryScreen(
@@ -22,5 +23,6 @@ fun LibraryRoute(
             viewModel.onSongClick(song)
             onSongClick(song)
         },
+        onSettingsClick = onSettingsClick,
     )
 }

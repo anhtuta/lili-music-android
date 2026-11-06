@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.player
 
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.anhtuta.lilimusic.core.model.PlayMode
+import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -138,5 +140,42 @@ class PlayerScreenTest {
         }
 
         composeRule.onNodeWithTag("lyric-slot").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun paletteOverrideTintsChromeAndSettingsFires() {
+        var settings = 0
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                            onSettings = { settings++ },
+                        ),
+                    coverPaletteOverride =
+                        CoverPaletteColors(
+                            background = Color(0xFF112233),
+                            onBackground = Color.White,
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.PALETTE).assertExists()
+        composeRule.onNodeWithTag(PlayerTestTags.SETTINGS).performClick()
+        assertThat(settings).isEqualTo(1)
     }
 }

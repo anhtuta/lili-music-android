@@ -16,6 +16,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [04 — PR #15 Play](04-playback.md) | Media3, queue, listen counting, player UI |
 | [05 — How to run](05-how-to-run.md) | Android Studio, Gradle commands, smoke checks |
 | [06 — Synced lyrics](06-synced-lyrics.md) | LRC/XLRC/TRC parser, fetch, Room cache, player pane |
+| [07 — Player visuals](07-player-visuals.md) | Settings, lyric themes, Palette, app light/dark |
 
 ## Status of phases
 
@@ -24,7 +25,8 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 - [x] [PR #14](https://github.com/anhtuta/lili-music-android/pull/14) — Data layer + library + package rename (merged)
 - [x] [PR #15](https://github.com/anhtuta/lili-music-android/pull/15) — Playback (Media3, queue, listens) (merged to main)
 - [x] [PR #16](https://github.com/anhtuta/lili-music-android/pull/16) — Learning guide (merged to main)
-- [ ] This PR — lyrics engine (Phase 4) (task 008)
+- [x] [PR #17](https://github.com/anhtuta/lili-music-android/pull/17) — Synced lyrics (Phase 4) (merged to main)
+- [ ] This PR — player visuals / settings (Phase 5) (task 009)
 
 ## After a later phase
 

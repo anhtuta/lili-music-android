@@ -1,5 +1,7 @@
 package com.anhtuta.lilimusic.feature.lyrics
 
+import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,9 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -28,15 +35,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.lyrics.LyricLineFrame
 import com.anhtuta.lilimusic.core.lyrics.LyricSyncFrame
 import com.anhtuta.lilimusic.core.lyrics.LyricSynchronizer
 import com.anhtuta.lilimusic.core.lyrics.LyricWordFrame
-
-private val KaraokeFillLight = Color(0xFF2199F9)
-private val KaraokeFillDark = Color(0xFFFFCC00)
+import com.anhtuta.lilimusic.core.model.LyricTheme
+import com.anhtuta.lilimusic.core.model.PlayerSettings
 
 @Composable
 fun LyricsPane(
@@ -45,36 +51,104 @@ fun LyricsPane(
     onSeekToLine: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    val style = state.settings.toVisualStyle()
+    Box(
         modifier =
             modifier
                 .fillMaxSize()
-                .testTag(LyricsTestTags.PANE),
+                .testTag(LyricsTestTags.PANE)
+                .background(style.colors.background),
     ) {
-        if (state.frame != null) {
-            OffsetRow(
-                offsetMs = state.userOffsetMs,
-                onNudgeOffset = onNudgeOffset,
+        if (state.settings.lyricTheme == LyricTheme.PICTURE_BG) {
+            PictureBackdrop(coverUrl = state.coverUrl, overlay = style.colors.overlay)
+        }
+        Column(modifier = Modifier.fillMaxSize()) {
+            VisualModeMarkers(settings = state.settings)
+            if (state.frame != null) {
+                OffsetRow(
+                    offsetMs = state.userOffsetMs,
+                    onNudgeOffset = onNudgeOffset,
+                    textColor = style.colors.text,
+                )
+            }
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                LyricsBody(
+                    state = state,
+                    style = style,
+                    onSeekToLine = onSeekToLine,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PictureBackdrop(
+    coverUrl: String?,
+    overlay: Color,
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (coverUrl != null) {
+            val blurModifier =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    Modifier.blur(20.dp)
+                } else {
+                    Modifier
+                }
+            AsyncImage(
+                model = coverUrl,
+                contentDescription = null,
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .then(blurModifier)
+                        .testTag(LyricsTestTags.COVER_BACKDROP),
+                contentScale = ContentScale.Crop,
             )
         }
         Box(
             modifier =
                 Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ) {
-            LyricsBody(
-                state = state,
-                onSeekToLine = onSeekToLine,
-            )
-        }
+                    .fillMaxSize()
+                    .background(overlay),
+        )
+    }
+}
+
+@Composable
+private fun VisualModeMarkers(settings: PlayerSettings) {
+    Box(modifier = Modifier.testTag(LyricsTestTags.align(settings.lyricAlign)))
+    Box(modifier = Modifier.testTag(LyricsTestTags.theme(settings.lyricTheme)))
+    if (settings.karaokeMode) {
+        Box(modifier = Modifier.testTag(LyricsTestTags.KARAOKE))
+    }
+    if (settings.blurMode) {
+        Box(modifier = Modifier.testTag(LyricsTestTags.BLUR))
+    }
+    if (settings.giganticLine) {
+        Box(modifier = Modifier.testTag(LyricsTestTags.GIGANTIC))
+    }
+    if (settings.wordAppear) {
+        Box(modifier = Modifier.testTag(LyricsTestTags.WORD_APPEAR))
+    }
+    if (settings.lineAppear) {
+        Box(modifier = Modifier.testTag(LyricsTestTags.LINE_APPEAR))
+    }
+    if (settings.translate) {
+        Box(modifier = Modifier.testTag(LyricsTestTags.TRANSLATE))
     }
 }
 
 @Composable
 private fun LyricsBody(
     state: LyricsUiState,
+    style: LyricVisualStyle,
     onSeekToLine: (Long) -> Unit,
 ) {
     when {
@@ -82,13 +156,15 @@ private fun LyricsBody(
         state.isLoading -> {
             Text(
                 text = stringResource(R.string.lyrics_fetching),
+                color = style.colors.text,
                 modifier = Modifier.testTag(LyricsTestTags.FETCHING),
             )
         }
         state.isMissing -> {
             Text(
                 text = stringResource(R.string.lyrics_missing),
-                textAlign = TextAlign.Center,
+                color = style.colors.text,
+                textAlign = style.textAlign,
                 modifier =
                     Modifier
                         .padding(24.dp)
@@ -98,12 +174,14 @@ private fun LyricsBody(
         state.errorMessage != null -> {
             Text(
                 text = stringResource(R.string.lyrics_error),
+                color = style.colors.text,
                 modifier = Modifier.testTag(LyricsTestTags.ERROR),
             )
         }
         state.frame != null -> {
             SyncedLyricList(
                 frame = state.frame,
+                style = style,
                 onSeekToLine = onSeekToLine,
             )
         }
@@ -114,6 +192,7 @@ private fun LyricsBody(
 private fun OffsetRow(
     offsetMs: Long,
     onNudgeOffset: (Long) -> Unit,
+    textColor: Color,
 ) {
     Row(
         modifier =
@@ -131,10 +210,11 @@ private fun OffsetRow(
                     .testTag(LyricsTestTags.OFFSET_EARLIER)
                     .semantics { contentDescription = earlier },
         ) {
-            Text("−100ms")
+            Text("−100ms", color = textColor)
         }
         Text(
             text = stringResource(R.string.lyrics_offset_value, offsetMs),
+            color = textColor,
             modifier = Modifier.testTag(LyricsTestTags.OFFSET_VALUE),
         )
         val later = stringResource(R.string.lyrics_offset_later)
@@ -145,7 +225,7 @@ private fun OffsetRow(
                     .testTag(LyricsTestTags.OFFSET_LATER)
                     .semantics { contentDescription = later },
         ) {
-            Text("+100ms")
+            Text("+100ms", color = textColor)
         }
     }
 }
@@ -153,6 +233,7 @@ private fun OffsetRow(
 @Composable
 private fun SyncedLyricList(
     frame: LyricSyncFrame,
+    style: LyricVisualStyle,
     onSeekToLine: (Long) -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -165,12 +246,13 @@ private fun SyncedLyricList(
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = style.horizontal,
     ) {
         itemsIndexed(frame.lines) { index, line ->
             LyricLineRow(
                 line = line,
                 isActive = index == frame.activeLineIndex,
+                style = style,
                 onSeek = { onSeekToLine(line.seekPositionMs) },
                 seekDescription = seekDescription,
             )
@@ -182,31 +264,38 @@ private fun SyncedLyricList(
 private fun LyricLineRow(
     line: LyricLineFrame,
     isActive: Boolean,
+    style: LyricVisualStyle,
     onSeek: () -> Unit,
     seekDescription: String,
 ) {
+    val lineAlpha = if (style.settings.lineAppear && !isActive) 0f else 1f
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onSeek)
                 .padding(vertical = 8.dp, horizontal = 16.dp)
+                .graphicsLayer { alpha = lineAlpha }
                 .testTag(if (isActive) LyricsTestTags.ACTIVE_LINE else LyricsTestTags.LINE)
                 .semantics { contentDescription = seekDescription },
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = style.horizontal,
     ) {
         Row {
             line.words.forEach { word ->
-                KaraokeWord(word = word, emphasize = isActive)
+                KaraokeWord(word = word, isActiveLine = isActive, style = style)
             }
         }
-        line.translations.forEach { translation ->
-            Text(
-                text = translation.text,
-                style = MaterialTheme.typography.bodySmall,
-                fontStyle = FontStyle.Italic,
-                modifier = Modifier.testTag(LyricsTestTags.TRANSLATION),
-            )
+        if (style.settings.translate) {
+            line.translations.forEach { translation ->
+                Text(
+                    text = translation.text,
+                    color = style.colors.text.copy(alpha = 0.5f),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontStyle = FontStyle.Italic,
+                    textAlign = style.textAlign,
+                    modifier = Modifier.testTag(LyricsTestTags.TRANSLATION),
+                )
+            }
         }
     }
 }
@@ -214,28 +303,23 @@ private fun LyricLineRow(
 @Composable
 private fun KaraokeWord(
     word: LyricWordFrame,
-    emphasize: Boolean,
+    isActiveLine: Boolean,
+    style: LyricVisualStyle,
 ) {
+    val hideWord = (style.settings.wordAppear || style.settings.lineAppear) && !word.isPassed && !word.isActive
     val displayText =
         when {
+            hideWord -> ""
             word.isEmpty && word.countdownDots > 0 -> "•".repeat(word.countdownDots)
             word.isEmpty -> " "
             else -> word.text
         }
-    val fillColor = if (MaterialTheme.colorScheme.background.luminanceOrLight()) KaraokeFillLight else KaraokeFillDark
-    val restColor = MaterialTheme.colorScheme.onSurface
-    val brush =
-        when {
-            word.fill <= 0f -> SolidColor(restColor)
-            word.fill >= 1f -> SolidColor(fillColor)
-            else ->
-                Brush.horizontalGradient(
-                    0f to fillColor,
-                    word.fill to fillColor,
-                    word.fill to restColor,
-                    1f to restColor,
-                )
-        }
+    val fillColor = style.colors.karaokeFill
+    val restColor = if (isActiveLine) style.colors.activeText else style.colors.text
+    val brush = wordBrush(word, style.settings.karaokeMode, fillColor, restColor)
+    val fontSize =
+        MaterialTheme.typography.bodyLarge.fontSize *
+            if (style.settings.giganticLine && isActiveLine) 1.8f else 1f
     val countdownDescription =
         if (word.countdownDots > 0) {
             stringResource(R.string.lyrics_countdown_cd, word.countdownDots)
@@ -247,8 +331,14 @@ private fun KaraokeWord(
         style =
             TextStyle(
                 brush = brush,
-                fontWeight = if (emphasize) FontWeight.Bold else FontWeight.Normal,
-                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                fontWeight = if (isActiveLine) FontWeight.Bold else FontWeight.Normal,
+                fontSize = fontSize,
+                shadow =
+                    if (style.settings.blurMode) {
+                        Shadow(color = Color.White, offset = Offset.Zero, blurRadius = 8f)
+                    } else {
+                        null
+                    },
             ),
         modifier =
             Modifier.then(
@@ -261,7 +351,24 @@ private fun KaraokeWord(
     )
 }
 
-private fun Color.luminanceOrLight(): Boolean {
-    val luminance = (0.299f * red) + (0.587f * green) + (0.114f * blue)
-    return luminance > 0.5f
+private fun wordBrush(
+    word: LyricWordFrame,
+    karaokeMode: Boolean,
+    fillColor: Color,
+    restColor: Color,
+): Brush {
+    if (!karaokeMode) {
+        return SolidColor(if (word.isActive || word.isPassed) fillColor else restColor)
+    }
+    return when {
+        word.fill <= 0f -> SolidColor(restColor)
+        word.fill >= 1f -> SolidColor(fillColor)
+        else ->
+            Brush.horizontalGradient(
+                0f to fillColor,
+                word.fill to fillColor,
+                word.fill to restColor,
+                1f to restColor,
+            )
+    }
 }

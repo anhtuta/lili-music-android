@@ -26,4 +26,17 @@ class LiliThemeTest {
         assertThat(primary).isNotNull()
         assertThat(primary).isNotEqualTo(Color.Unspecified)
     }
+
+    @Test
+    fun darkThemeProvidesMaterialColorScheme() {
+        var primary: Color? = null
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                primary = MaterialTheme.colorScheme.primary
+            }
+        }
+        composeRule.waitForIdle()
+        assertThat(primary).isNotNull()
+        assertThat(primary).isNotEqualTo(Color.Unspecified)
+    }
 }

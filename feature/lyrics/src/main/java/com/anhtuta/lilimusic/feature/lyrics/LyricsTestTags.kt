@@ -1,5 +1,8 @@
 package com.anhtuta.lilimusic.feature.lyrics
 
+import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricTheme
+
 object LyricsTestTags {
     const val PANE = "lyrics-pane"
     const val FETCHING = "lyrics-fetching"
@@ -11,4 +14,15 @@ object LyricsTestTags {
     const val OFFSET_VALUE = "lyrics-offset-value"
     const val OFFSET_EARLIER = "lyrics-offset-earlier"
     const val OFFSET_LATER = "lyrics-offset-later"
+    const val COVER_BACKDROP = "lyrics-cover-backdrop"
+    const val KARAOKE = "lyrics-karaoke"
+    const val BLUR = "lyrics-blur"
+    const val GIGANTIC = "lyrics-gigantic"
+    const val WORD_APPEAR = "lyrics-word-appear"
+    const val LINE_APPEAR = "lyrics-line-appear"
+    const val TRANSLATE = "lyrics-translate"
+
+    fun align(align: LyricAlign): String = "lyrics-align-${align.storageValue}"
+
+    fun theme(theme: LyricTheme): String = "lyrics-theme-${theme.storageValue}"
 }
