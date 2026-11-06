@@ -2,24 +2,35 @@
 
 [Learning guide index](README.md)
 
-JDK 17+ and an Android SDK. You do **not** need Android Studio. The root [Makefile](../../Makefile) wraps Gradle so you can build and copy an APK from the CLI (`make apk`). Studio still works if you prefer it.
+A **JDK 21** and an Android SDK. You do **not** need Android Studio. The root [Makefile](../../Makefile) wraps Gradle so you can build and copy an APK from the CLI (`make apk`). Studio still works if you prefer it.
+
+App bytecode stays **JVM 17** (`kotlin.jvm.target=17`, `compileOptions` 17). Gradle / Kotlin 2.4 run on **JDK 21 of any vendor** (do not pin JetBrains Runtime — Foojay has no JBR 21 download for macOS aarch64).
 
 Task [012](../tasks/012-makefile.md).
 
 ## CLI-only setup (no Android Studio)
 
-`compileSdk` is **37**, `targetSdk` **35**, `minSdk` **26**. Gradle’s toolchain still wants a JDK 17 compiler even if `java -version` is newer.
+`compileSdk` is **37**, `targetSdk` **35**, `minSdk` **26**.
 
-### 1. JDK 17+
+### 1. JDK 21
 
-Put a JDK 17+ on `PATH`, or set `JAVA_HOME`.
+Java 25 (or 17) on `PATH` is not enough. Gradle’s daemon toolchain is **21**. Install Temurin 21 (or any JDK 21) and, on macOS, point `JAVA_HOME` at it:
 
 ```bash
-java -version   # 17 or newer
+# macOS
+brew install --cask temurin@21
+export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
+
+# Debian/Ubuntu
+sudo apt install openjdk-21-jdk
 ```
 
-- macOS: `brew install --cask temurin@17`
-- Debian/Ubuntu: `sudo apt install openjdk-17-jdk`
+```bash
+java -version          # 21 is ideal; 25 can stay on PATH if JAVA_HOME is 21
+/usr/libexec/java_home -v 21   # macOS
+```
+
+If JDK 21 is missing, Foojay (see `settings.gradle.kts`) can auto-download one **only when the vendor is not pinned to JetBrains**. `gradle/gradle-daemon-jvm.properties` lists a `MAC_OS.AARCH64` URL for that.
 
 ### 2. Android command-line tools
 
@@ -67,7 +78,7 @@ in `local.properties` at the repo root (**gitignored**). `make doctor` reads tha
 Then:
 
 ```bash
-make doctor    # java 17+ and SDK / platforms/android-37.0
+make doctor    # JDK 21 and SDK / platforms/android-37.0
 make apk       # dist/lili-music-<versionName>-debug.apk
 ```
 
@@ -78,7 +89,7 @@ make apk       # dist/lili-music-<versionName>-debug.apk
 | Target | What it does |
 | --- | --- |
 | `make` / `make help` | List targets (default) |
-| `make doctor` | Check JDK 17+ and the SDK |
+| `make doctor` | Check JDK 21 and the SDK |
 | `make build` | `./gradlew :app:assembleDebug` |
 | `make apk` | Debug APK → `dist/lili-music-<versionName>-debug.apk` (prints the path) |
 | `make release-apk` | Release APK → `dist/`. Unsigned until Play signing in **064** |
