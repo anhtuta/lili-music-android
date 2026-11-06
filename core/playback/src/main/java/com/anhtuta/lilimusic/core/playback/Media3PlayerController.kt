@@ -313,6 +313,6 @@ class Media3PlayerController
         }
 
         companion object {
-            const val POSITION_TICK_MS = 50L
+            const val POSITION_TICK_MS = 30L
         }
     }
