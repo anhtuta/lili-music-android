@@ -36,6 +36,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
@@ -51,6 +52,8 @@ fun LibraryScreen(
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit = {},
+    onDownloadsClick: () -> Unit = {},
+    onDownloadAction: (Song) -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -58,6 +61,12 @@ fun LibraryScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.library_title)) },
                 actions = {
+                    TextButton(
+                        onClick = onDownloadsClick,
+                        modifier = Modifier.testTag(LibraryTestTags.DOWNLOADS),
+                    ) {
+                        Text(stringResource(R.string.library_downloads))
+                    }
                     TextButton(
                         onClick = onSettingsClick,
                         modifier = Modifier.testTag(LibraryTestTags.SETTINGS),
@@ -83,6 +92,7 @@ fun LibraryScreen(
                 onSortOrderToggle = onSortOrderToggle,
                 onRefresh = onRefresh,
                 onSongClick = onSongClick,
+                onDownloadAction = onDownloadAction,
             )
         }
     }
@@ -96,6 +106,7 @@ private fun LibraryContent(
     onSortOrderToggle: () -> Unit,
     onRefresh: () -> Unit,
     onSongClick: (Song) -> Unit,
+    onDownloadAction: (Song) -> Unit,
 ) {
     when {
         state.isLoading -> LibraryLoading()
@@ -109,6 +120,7 @@ private fun LibraryContent(
                 onSortSelected = onSortSelected,
                 onSortOrderToggle = onSortOrderToggle,
                 onSongClick = onSongClick,
+                onDownloadAction = onDownloadAction,
             )
     }
 }
@@ -159,6 +171,7 @@ private fun LibraryCatalog(
     onSortSelected: (SongSort) -> Unit,
     onSortOrderToggle: () -> Unit,
     onSongClick: (Song) -> Unit,
+    onDownloadAction: (Song) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         if (state.isOfflineError) {
@@ -202,7 +215,11 @@ private fun LibraryCatalog(
                 items(state.songs, key = { it.id }) { song ->
                     SongRow(
                         song = song,
+                        coverUrl = state.coverUrl(song),
+                        unavailableOffline = state.isUnavailableOffline(song.path),
+                        downloadLabel = downloadActionLabel(state, song.path),
                         onClick = { onSongClick(song) },
+                        onDownloadAction = { onDownloadAction(song) },
                     )
                 }
             }
@@ -282,7 +299,11 @@ private fun SortRow(
 @Composable
 private fun SongRow(
     song: Song,
+    coverUrl: String?,
+    unavailableOffline: Boolean,
+    downloadLabel: String,
     onClick: () -> Unit,
+    onDownloadAction: () -> Unit,
 ) {
     Row(
         modifier =
@@ -294,7 +315,7 @@ private fun SongRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        if (song.imageUrl == null) {
+        if (coverUrl == null) {
             val placeholderDescription = stringResource(R.string.library_cover_placeholder_cd, song.title)
             Box(
                 modifier =
@@ -311,7 +332,7 @@ private fun SongRow(
             }
         } else {
             AsyncImage(
-                model = song.imageUrl,
+                model = coverUrl,
                 contentDescription = stringResource(R.string.library_cover_cd, song.title),
                 modifier =
                     Modifier
@@ -323,7 +344,37 @@ private fun SongRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(text = song.title, style = MaterialTheme.typography.titleMedium)
             Text(text = song.artist, style = MaterialTheme.typography.bodyMedium)
+            if (unavailableOffline) {
+                Text(
+                    text = stringResource(R.string.library_unavailable_offline),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.testTag(LibraryTestTags.unavailable(song.id)),
+                )
+            }
         }
+        TextButton(
+            onClick = onDownloadAction,
+            modifier = Modifier.testTag(LibraryTestTags.download(song.id)),
+        ) {
+            Text(text = downloadLabel)
+        }
+    }
+}
+
+@Composable
+private fun downloadActionLabel(
+    state: LibraryUiState,
+    path: String,
+): String {
+    val download = state.downloads[path]
+    return when (state.status(path)) {
+        DownloadStatus.NONE -> stringResource(R.string.library_download)
+        DownloadStatus.QUEUED -> stringResource(R.string.library_download_waiting)
+        DownloadStatus.DOWNLOADING ->
+            stringResource(R.string.library_download_progress, download?.progressPercent ?: 0)
+        DownloadStatus.COMPLETED -> stringResource(R.string.library_download_delete)
+        DownloadStatus.FAILED -> stringResource(R.string.library_download_retry)
     }
 }
 

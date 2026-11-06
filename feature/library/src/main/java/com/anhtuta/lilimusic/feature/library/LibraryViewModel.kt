@@ -2,10 +2,15 @@ package com.anhtuta.lilimusic.feature.library
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.anhtuta.lilimusic.core.data.network.NetworkMonitor
+import com.anhtuta.lilimusic.core.data.repository.DownloadRepository
 import com.anhtuta.lilimusic.core.data.repository.SongRepository
 import com.anhtuta.lilimusic.core.datastore.SortPreferences
+import com.anhtuta.lilimusic.core.model.DownloadStatus
+import com.anhtuta.lilimusic.core.model.OfflinePlaybackPolicy
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongCatalog
+import com.anhtuta.lilimusic.core.model.SongDownload
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
 import com.anhtuta.lilimusic.core.playback.PlayerController
@@ -26,6 +31,8 @@ class LibraryViewModel
         private val songRepository: SongRepository,
         private val sortPreferences: SortPreferences,
         private val playerController: PlayerController,
+        private val downloadRepository: DownloadRepository,
+        private val networkMonitor: NetworkMonitor,
     ) : ViewModel() {
         private val query = MutableStateFlow("")
         private val isRefreshing = MutableStateFlow(false)
@@ -42,6 +49,8 @@ class LibraryViewModel
                     CatalogSnapshot(songs, currentQuery, prefs.sort, prefs.order)
                 },
                 combine(isRefreshing, loadFailed, initialLoadFinished, ::RefreshSnapshot),
+                downloadRepository.observeDownloads(),
+                networkMonitor.isOnline,
                 ::toUiState,
             ).stateIn(
                 scope = viewModelScope,
@@ -74,8 +83,30 @@ class LibraryViewModel
             refresh()
         }
 
-        fun onSongClick(song: Song) {
-            playerController.play(uiState.value.songs, song.path)
+        fun onSongClick(song: Song): Boolean {
+            val state = uiState.value
+            if (!OfflinePlaybackPolicy.isPlayable(state.isOnline, state.status(song.path))) {
+                return false
+            }
+            val completed = state.downloads.filterValues { it.isComplete }.keys
+            val queue =
+                OfflinePlaybackPolicy
+                    .playQueue(state.songs, state.isOnline, completed)
+                    .map { item ->
+                        OfflinePlaybackPolicy.withDisplayImage(item, state.downloads[item.path]?.coverLocalUri)
+                    }
+            playerController.play(queue, song.path)
+            return true
+        }
+
+        fun onDownloadAction(song: Song) {
+            viewModelScope.launch {
+                when (uiState.value.status(song.path)) {
+                    DownloadStatus.NONE, DownloadStatus.FAILED -> downloadRepository.download(song)
+                    DownloadStatus.COMPLETED -> downloadRepository.remove(song.path)
+                    DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> Unit
+                }
+            }
         }
 
         private fun refresh() {
@@ -105,6 +136,8 @@ class LibraryViewModel
         private fun toUiState(
             catalog: CatalogSnapshot,
             refresh: RefreshSnapshot,
+            downloads: List<SongDownload>,
+            isOnline: Boolean,
         ): LibraryUiState {
             val waiting = !refresh.finished && catalog.songs.isEmpty()
             return LibraryUiState(
@@ -121,6 +154,8 @@ class LibraryViewModel
                 isLoading = waiting && !refresh.failed,
                 isRefreshing = refresh.refreshing && !waiting,
                 isOfflineError = refresh.failed,
+                downloads = downloads.associateBy { it.songPath },
+                isOnline = isOnline,
             )
         }
     }
