@@ -28,8 +28,7 @@ object SongOfTheYearPalette {
     const val LIGHT_TEXT = 0xFFFFFFFF.toInt()
     const val DARK_TEXT = 0xFF000000.toInt()
 
-    fun uniqueYearsDescending(years: Iterable<Int?>): List<Int> =
-        years.filterNotNull().distinct().sortedDescending()
+    fun uniqueYearsDescending(years: Iterable<Int?>): List<Int> = years.filterNotNull().distinct().sortedDescending()
 
     fun backgroundArgb(
         year: Int?,
