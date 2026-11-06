@@ -25,6 +25,10 @@ interface PlayerController {
 
     fun seekTo(positionMs: Long)
 
+    fun seekBack()
+
+    fun seekForward()
+
     fun setPlayMode(playMode: PlayMode)
 
     fun setSpeed(speed: Float)

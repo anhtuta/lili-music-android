@@ -106,6 +106,19 @@ class FakePlayerControllerTest {
     }
 
     @Test
+    fun seekBackAndForwardMoveFiveSeconds() {
+        val controller = FakePlayerController()
+        controller.play(songs, "alpha")
+        controller.advancePosition(20_000L)
+
+        controller.seekBack()
+        assertThat(controller.state.value.positionMs).isEqualTo(15_000L)
+
+        controller.seekForward()
+        assertThat(controller.state.value.positionMs).isEqualTo(20_000L)
+    }
+
+    @Test
     fun shufflePutsCurrentSongFirst() {
         val controller = FakePlayerController(random = Random(4))
         controller.play(songs, "gamma")

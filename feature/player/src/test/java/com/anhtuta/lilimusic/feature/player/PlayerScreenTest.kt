@@ -29,6 +29,8 @@ class PlayerScreenTest {
         var playPause = 0
         var next = 0
         var previous = 0
+        var rewind = 0
+        var forward = 0
         var shuffle = 0
         var back = 0
         composeRule.setContent {
@@ -50,6 +52,8 @@ class PlayerScreenTest {
                             onSkipNext = { next++ },
                             onSkipPrevious = { previous++ },
                             onSeek = {},
+                            onSeekBack = { rewind++ },
+                            onSeekForward = { forward++ },
                             onToggleShuffle = { shuffle++ },
                             onToggleRepeatOne = {},
                             onIncreaseSpeed = {},
@@ -72,6 +76,10 @@ class PlayerScreenTest {
         assertThat(next).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.PREVIOUS).performScrollTo().performClick()
         assertThat(previous).isEqualTo(1)
+        composeRule.onNodeWithTag(PlayerTestTags.REWIND).performScrollTo().performClick()
+        assertThat(rewind).isEqualTo(1)
+        composeRule.onNodeWithTag(PlayerTestTags.FORWARD).performScrollTo().performClick()
+        assertThat(forward).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.SHUFFLE).performScrollTo().performClick()
         assertThat(shuffle).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.BACK).performClick()

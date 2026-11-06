@@ -258,6 +258,16 @@ private fun PlayerTransport(
         ) {
             Text(text = stringResource(R.string.player_previous))
         }
+        val rewindDescription = stringResource(R.string.player_rewind_cd)
+        IconButton(
+            onClick = callbacks.onSeekBack,
+            modifier =
+                Modifier
+                    .testTag(PlayerTestTags.REWIND)
+                    .semantics { contentDescription = rewindDescription },
+        ) {
+            Text(text = stringResource(R.string.player_rewind))
+        }
         TextButton(
             onClick = callbacks.onPlayPause,
             modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
@@ -268,6 +278,16 @@ private fun PlayerTransport(
                         if (isPlaying) R.string.player_pause else R.string.player_play,
                     ),
             )
+        }
+        val forwardDescription = stringResource(R.string.player_forward_cd)
+        IconButton(
+            onClick = callbacks.onSeekForward,
+            modifier =
+                Modifier
+                    .testTag(PlayerTestTags.FORWARD)
+                    .semantics { contentDescription = forwardDescription },
+        ) {
+            Text(text = stringResource(R.string.player_forward))
         }
         IconButton(
             onClick = callbacks.onSkipNext,

@@ -13,6 +13,8 @@ object PlayerTestTags {
     const val PLAY_PAUSE = "player-play-pause"
     const val NEXT = "player-next"
     const val PREVIOUS = "player-previous"
+    const val REWIND = "player-rewind"
+    const val FORWARD = "player-forward"
     const val SHUFFLE = "player-shuffle"
     const val REPEAT_ONE = "player-repeat-one"
     const val SPEED_UP = "player-speed-up"

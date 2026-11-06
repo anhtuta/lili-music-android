@@ -69,6 +69,16 @@ class FakePlayerController(
         publish(playing = _state.value.isPlaying, positionMs = positionMs.coerceAtLeast(0L))
     }
 
+    override fun seekBack() {
+        seekTo(_state.value.positionMs - PlaybackSeek.INCREMENT_MS)
+    }
+
+    override fun seekForward() {
+        val next = _state.value.positionMs + PlaybackSeek.INCREMENT_MS
+        val duration = _state.value.durationMs
+        seekTo(if (duration > 0L) next.coerceAtMost(duration) else next)
+    }
+
     override fun setPlayMode(playMode: PlayMode) {
         queueState = PlayQueue.changeMode(queueState, playMode, random)
         publish(playing = _state.value.isPlaying, positionMs = _state.value.positionMs)

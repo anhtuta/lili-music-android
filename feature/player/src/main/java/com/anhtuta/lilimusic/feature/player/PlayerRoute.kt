@@ -27,6 +27,8 @@ fun PlayerRoute(
                 onSkipNext = viewModel::skipToNext,
                 onSkipPrevious = viewModel::skipToPrevious,
                 onSeek = viewModel::seekTo,
+                onSeekBack = viewModel::seekBack,
+                onSeekForward = viewModel::seekForward,
                 onToggleShuffle = viewModel::toggleShuffle,
                 onToggleRepeatOne = viewModel::toggleRepeatOne,
                 onIncreaseSpeed = viewModel::increaseSpeed,

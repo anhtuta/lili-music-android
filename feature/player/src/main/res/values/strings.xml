@@ -7,6 +7,10 @@
     <string name="player_pause">Pause</string>
     <string name="player_next">Next</string>
     <string name="player_previous">Previous</string>
+    <string name="player_rewind">−5s</string>
+    <string name="player_forward">+5s</string>
+    <string name="player_rewind_cd">Rewind 5 seconds</string>
+    <string name="player_forward_cd">Forward 5 seconds</string>
     <string name="player_shuffle">Shuffle</string>
     <string name="player_repeat_one">Repeat one</string>
     <string name="player_speed_up">Faster</string>

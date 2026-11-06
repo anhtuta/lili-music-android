@@ -169,6 +169,14 @@ class Media3PlayerController
             }
         }
 
+        override fun seekBack() {
+            withController { mediaController -> mediaController.seekBack() }
+        }
+
+        override fun seekForward() {
+            withController { mediaController -> mediaController.seekForward() }
+        }
+
         override fun setPlayMode(playMode: PlayMode) {
             withController { mediaController ->
                 val currentPath = queueState.currentSong?.path
