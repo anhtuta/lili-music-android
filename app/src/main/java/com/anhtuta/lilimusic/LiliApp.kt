@@ -17,6 +17,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
+import com.anhtuta.lilimusic.feature.downloads.DownloadsRoute
+import com.anhtuta.lilimusic.feature.downloads.DownloadsViewModel
 import com.anhtuta.lilimusic.feature.library.LibraryRoute
 import com.anhtuta.lilimusic.feature.lyrics.LyricsRoute
 import com.anhtuta.lilimusic.feature.player.MiniPlayerBar
@@ -32,25 +34,30 @@ import com.anhtuta.lilimusic.navigation.SettingsDestination
 fun LiliApp(
     playerViewModel: PlayerViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel(),
+    downloadsViewModel: DownloadsViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
     val playback by playerViewModel.uiState.collectAsStateWithLifecycle()
     val settings by settingsViewModel.uiState.collectAsStateWithLifecycle()
+    val downloads by downloadsViewModel.uiState.collectAsStateWithLifecycle()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val onPlayerScreen = navBackStackEntry?.destination?.hasRoute<PlayerDestination>() == true
     val onSettingsScreen = navBackStackEntry?.destination?.hasRoute<SettingsDestination>() == true
 
-    NotificationPermissionEffect(isPlaying = playback.isPlaying)
+    NotificationPermissionEffect(
+        request = playback.isPlaying || downloads.items.any { it.isActive },
+    )
 
     LiliTheme(darkTheme = settings.settings.appTheme == AppTheme.DARK) {
         Column(modifier = Modifier.fillMaxSize()) {
             LiliNavHost(
                 navController = navController,
                 modifier = Modifier.weight(1f),
-                libraryContent = { onSongClick, onSettings ->
+                libraryContent = { onSongClick, onSettings, onDownloads ->
                     LibraryRoute(
                         onSongClick = { song -> onSongClick(song.path) },
                         onSettingsClick = onSettings,
+                        onDownloadsClick = onDownloads,
                     )
                 },
                 playerContent = { path, onBack, onSettings ->
@@ -64,6 +71,13 @@ fun LiliApp(
                 },
                 settingsContent = { onBack ->
                     SettingsRoute(onBack = onBack)
+                },
+                downloadsContent = { onBack, onPlay ->
+                    DownloadsRoute(
+                        onBack = onBack,
+                        onPlay = { item -> onPlay(item.songPath) },
+                        viewModel = downloadsViewModel,
+                    )
                 },
             )
             val currentSong = playback.song
@@ -80,11 +94,11 @@ fun LiliApp(
 }
 
 @Composable
-private fun NotificationPermissionEffect(isPlaying: Boolean) {
+private fun NotificationPermissionEffect(request: Boolean) {
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-    LaunchedEffect(isPlaying) {
-        if (isPlaying && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    LaunchedEffect(request) {
+        if (request && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
