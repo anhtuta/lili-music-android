@@ -19,6 +19,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [07 — Player visuals](07-player-visuals.md) | Settings, lyric themes, Palette, app light/dark |
 | [08 — Web parity](08-web-parity.md) | BaiHat.js mismatches vs PR #18; intentional Android extras |
 | [09 — Downloads / offline](09-downloads-offline.md) | Media3 downloads, Downloads screen, offline playback |
+| [10 — Debug launcher](10-debug-launcher.md) | Blank white `ComponentActivity` on Android 16; MainActivity is the only LAUNCHER |
 
 ## Status of phases
 
@@ -30,7 +31,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 - [x] [PR #17](https://github.com/anhtuta/lili-music-android/pull/17) — Synced lyrics (Phase 4) (merged to main)
 - [x] [PR #18](https://github.com/anhtuta/lili-music-android/pull/18) — Player visuals / settings (Phase 5) (merged to main)
 - [x] [PR #19](https://github.com/anhtuta/lili-music-android/pull/19) — Web parity vs class BaiHat.js (task 010) (merged to main)
-- [ ] This PR — downloads and offline playback (Phase 6 060/061) (task 011)
+- [ ] This PR — downloads and offline playback (Phase 6 060/061) (task 011); debug launcher fix (task 013)
 
 ## After a later phase
 
