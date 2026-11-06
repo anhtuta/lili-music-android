@@ -60,6 +60,7 @@ class LibraryViewModel
         fun onSortSelected(sort: SongSort) {
             viewModelScope.launch {
                 sortPreferences.setSort(sort, sort.defaultOrder)
+                refreshCatalog()
             }
         }
 
@@ -67,11 +68,12 @@ class LibraryViewModel
             viewModelScope.launch {
                 val current = sortPreferences.preferences.first()
                 sortPreferences.setSort(current.sort, current.order.toggle())
+                refreshCatalog()
             }
         }
 
         fun onRefresh() {
-            refresh()
+            viewModelScope.launch { refreshCatalog() }
         }
 
         fun onSongClick(song: Song) {
@@ -80,14 +82,16 @@ class LibraryViewModel
         }
 
         private fun refresh() {
-            viewModelScope.launch {
-                isRefreshing.value = true
-                val prefs = sortPreferences.preferences.first()
-                val result = songRepository.refresh(prefs.sort, prefs.order)
-                loadFailed.value = result.isFailure
-                initialLoadFinished.value = true
-                isRefreshing.value = false
-            }
+            viewModelScope.launch { refreshCatalog() }
+        }
+
+        private suspend fun refreshCatalog() {
+            isRefreshing.value = true
+            val prefs = sortPreferences.preferences.first()
+            val result = songRepository.refresh(prefs.sort, prefs.order)
+            loadFailed.value = result.isFailure
+            initialLoadFinished.value = true
+            isRefreshing.value = false
         }
 
         private data class CatalogSnapshot(
@@ -108,18 +112,9 @@ class LibraryViewModel
             refresh: RefreshSnapshot,
         ): LibraryUiState {
             val waiting = !refresh.finished && catalog.songs.isEmpty()
-            val playableCatalog =
-                SongCatalog.filterAndSort(
-                    songs = catalog.songs,
-                    query = "",
-                    sort = catalog.sort,
-                    order = catalog.order,
-                )
+            val playableCatalog = catalog.songs
             return LibraryUiState(
-                songs =
-                    playableCatalog.filter { song ->
-                        SongCatalog.matchesQuery(song, catalog.query)
-                    },
+                songs = SongCatalog.filter(playableCatalog, catalog.query),
                 playableCatalog = playableCatalog,
                 query = catalog.query,
                 sort = catalog.sort,
