@@ -29,6 +29,8 @@ class PlayerScreenTest {
         var playPause = 0
         var next = 0
         var previous = 0
+        var rewind = 0
+        var forward = 0
         var shuffle = 0
         var back = 0
         composeRule.setContent {
@@ -50,6 +52,8 @@ class PlayerScreenTest {
                             onSkipNext = { next++ },
                             onSkipPrevious = { previous++ },
                             onSeek = {},
+                            onSeekBack = { rewind++ },
+                            onSeekForward = { forward++ },
                             onToggleShuffle = { shuffle++ },
                             onToggleRepeatOne = {},
                             onIncreaseSpeed = {},
@@ -62,7 +66,9 @@ class PlayerScreenTest {
         composeRule.onNodeWithTag(PlayerTestTags.TITLE).assertIsDisplayed()
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithText("Ann").assertIsDisplayed()
-        composeRule.onNodeWithTag(PlayerTestTags.POSITION).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
+        composeRule.onNodeWithText("(Album)").assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.POSITION).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("0:15").assertIsDisplayed()
         composeRule.onNodeWithText("1:00").assertIsDisplayed()
 
@@ -72,6 +78,10 @@ class PlayerScreenTest {
         assertThat(next).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.PREVIOUS).performScrollTo().performClick()
         assertThat(previous).isEqualTo(1)
+        composeRule.onNodeWithTag(PlayerTestTags.REWIND).performScrollTo().performClick()
+        assertThat(rewind).isEqualTo(1)
+        composeRule.onNodeWithTag(PlayerTestTags.FORWARD).performScrollTo().performClick()
+        assertThat(forward).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.SHUFFLE).performScrollTo().performClick()
         assertThat(shuffle).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.BACK).performClick()
@@ -106,6 +116,72 @@ class PlayerScreenTest {
 
         composeRule.onNodeWithTag(PlayerTestTags.COVER_PLACEHOLDER).assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.END_OF_QUEUE).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun firstSongOfQueueShowsWebToastEquivalent() {
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            atStartOfQueue = true,
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.FIRST_OF_QUEUE).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("This is the first song of playing list!").assertIsDisplayed()
+    }
+
+    @Test
+    fun missingAlbumShowsNoAlbumFallback() {
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song =
+                                playerTestSong(
+                                    id = 3,
+                                    title = "Gamma",
+                                    path = "gamma",
+                                    album = null,
+                                    imageUrl = null,
+                                ),
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
+        composeRule.onNodeWithText("(No Album)").assertIsDisplayed()
     }
 
     @Test

@@ -16,13 +16,14 @@ fun playerTestSong(
     title: String = "Song $id",
     path: String = "path-$id",
     artist: String = "Artist",
+    album: String? = "Album",
     imageUrl: String? = "https://example.com/$id.jpg",
 ): Song =
     Song(
         id = id,
         title = title,
         artist = artist,
-        album = "Album",
+        album = album,
         path = path,
         type = "Vietnam",
         listens = 1,

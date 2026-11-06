@@ -14,7 +14,19 @@ object LibraryTestTags {
     const val SETTINGS = "library-settings"
     const val DOWNLOADS = "library-downloads"
 
+    const val COVER_PREVIEW = "library-cover-preview"
+
     fun song(id: Long): String = "library-song-$id"
+
+    fun cover(id: Long): String = "library-cover-$id"
+
+    fun listens(id: Long): String = "library-listens-$id"
+
+    fun soy(id: Long): String = "library-soy-$id"
+
+    fun type(id: Long): String = "library-type-$id"
+
+    fun date(id: Long): String = "library-date-$id"
 
     fun download(id: Long): String = "library-download-$id"
 

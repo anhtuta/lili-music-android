@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="lyrics_fetching">Fetching lyric, please wait…</string>
-    <string name="lyrics_missing">Sorry! This song has no lyric yet! You can contribute lyric by sending it to me:\nMail: taanhtu95@gmail.com\nFB: https://fb.com/anhtuta95</string>
+    <string name="lyrics_missing_intro">Sorry! This song has no lyric yet! You can contribute lyric by sending it to me:</string>
+    <string name="lyrics_missing_mail">Mail</string>
+    <string name="lyrics_missing_fb">FB</string>
+    <string name="lyrics_missing_mail_uri" translatable="false">mailto:taanhtu95@gmail.com</string>
+    <string name="lyrics_missing_fb_uri" translatable="false">https://fb.com/anhtuta95</string>
     <string name="lyrics_error">Could not load lyrics.</string>
     <string name="lyrics_offset_value">Offset: %1$dms</string>
     <string name="lyrics_offset_earlier">Lyric earlier (−100ms)</string>
     <string name="lyrics_offset_later">Lyric later (+100ms)</string>
     <string name="lyrics_line_cd">Seek to this lyric line</string>
     <string name="lyrics_countdown_cd">Instrumental countdown, %1$d beats</string>
+    <string name="lyrics_meta_separator">-----------</string>
+    <string name="lyrics_meta_creator">Lyric creator: %1$s</string>
+    <string name="lyrics_meta_source">Source: %1$s</string>
+    <string name="lyrics_meta_date">Date: %1$s</string>
 </resources>

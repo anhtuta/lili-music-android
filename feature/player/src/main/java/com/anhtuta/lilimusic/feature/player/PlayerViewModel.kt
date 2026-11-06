@@ -88,6 +88,14 @@ class PlayerViewModel
             playerController.seekTo(positionMs)
         }
 
+        fun seekBack() {
+            playerController.seekBack()
+        }
+
+        fun seekForward() {
+            playerController.seekForward()
+        }
+
         fun toggleShuffle() {
             playerController.setPlayMode(
                 playerController.state.value.playMode

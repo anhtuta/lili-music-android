@@ -1,5 +1,6 @@
 package com.anhtuta.lilimusic.feature.lyrics
 
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -36,7 +37,10 @@ class LyricsPaneTest {
         }
 
         composeRule.onNodeWithTag(LyricsTestTags.MISSING).assertIsDisplayed()
-        composeRule.onNodeWithText("taanhtu95@gmail.com", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LyricsTestTags.MISSING_MAIL).assertIsDisplayed().assertHasClickAction()
+        composeRule.onNodeWithTag(LyricsTestTags.MISSING_FB).assertIsDisplayed().assertHasClickAction()
+        composeRule.onNodeWithText("Mail").assertIsDisplayed()
+        composeRule.onNodeWithText("FB").assertIsDisplayed()
     }
 
     @Test
@@ -164,6 +168,40 @@ class LyricsPaneTest {
         }
         composeRule.onNodeWithTag(LyricsTestTags.theme(LyricTheme.PICTURE_BG)).assertExists()
         composeRule.onNodeWithTag(LyricsTestTags.COVER_BACKDROP).assertExists()
+    }
+
+    @Test
+    fun lyricMetaFooterShowsWebFields() {
+        val frame =
+            LyricSynchronizer.sync(
+                LyricParser.parse(
+                    """
+                    [ti:Simple Song]
+                    [ar:Test Artist]
+                    [by:Tuzaku]
+                    [date:2021-06-28]
+                    [source:manual]
+                    [00:00.00]Hello
+                    """.trimIndent(),
+                    "song.lrc",
+                ),
+                positionMs = 0L,
+                durationMs = 10_000L,
+            )
+        composeRule.setContent {
+            LiliTheme {
+                LyricsPane(
+                    state = LyricsUiState(hasSong = true, frame = frame),
+                    onNudgeOffset = {},
+                    onSeekToLine = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag(LyricsTestTags.META_FOOTER).assertIsDisplayed()
+        composeRule.onNodeWithText("Simple Song - Test Artist").assertIsDisplayed()
+        composeRule.onNodeWithText("Lyric creator: Tuzaku").assertIsDisplayed()
+        composeRule.onNodeWithText("Source: manual").assertIsDisplayed()
+        composeRule.onNodeWithText("Date: 6/2021").assertIsDisplayed()
     }
 
     @Test

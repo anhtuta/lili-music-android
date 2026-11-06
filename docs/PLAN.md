@@ -71,7 +71,7 @@ Playable filter: `file_name` is a non-empty string. Zing-only songs have `file_n
 
 `createdDate` and `created_date` both work. Persist last sort in DataStore. Never send an unknown `sortBy`.
 
-Local search is client-side substring match on title/artist (web filters the Song column).
+Local search is client-side substring match on title/artist (web filters the Song column). Search only hides rows; the play queue is always the full playable catalog in API sort order. The extra Android asc/desc toggle re-fetches with `sortOrder`. Do not re-sort the unfiltered list client-side.
 
 The **web** prefers `zing_id` over `file_name` when both exist. **Android v1 does the opposite of that streaming path:** hide any song without a non-empty `file_name`, including Zing-only rows.
 
@@ -89,11 +89,11 @@ Sources: `pages/BaiHat/BaiHat.js`, `Player.js`, `Setting.js`, `BaiHatService.js`
 
 Shuffle: Fisher–Yates the playlist, then **move the current song to index 0**. Leaving shuffle restores the original list and relocates the current song.
 
-End of list in sequence/shuffle: stop and warn (web does not wrap). Repeat-one: next/prev replay the same song.
+End of list in sequence/shuffle: stop and warn (web does not wrap). Repeat-one: next/prev replay the same song. Previous **always** goes to the previous track (no 3s restart-current rule). Previous on the first track is a no-op (keep position) and shows “This is the first song of playing list!”. Unknown duration (`C.TIME_UNSET`) falls back to 600s until a real length arrives.
 
-Speed: ±0.1×, persisted. Volume persisted on web; Android uses system/media volume plus optional in-app volume if we keep it — default to Media3 session volume.
+Speed: ±0.1×, persisted, clamped 0.5–2.0× on Android. Volume persisted on web; Android uses system/media volume plus optional in-app volume if we keep it — default to Media3 session volume.
 
-MediaSession: title, artist, artwork, play/pause/stop, next/prev. Map this to Media3 `MediaSessionService` (notification + lock screen).
+MediaSession: title, artist, artwork, play/pause/stop, next/prev, seek back/forward 5s. Map this to Media3 `MediaSessionService` (notification + lock screen).
 
 ### Lyrics
 
@@ -105,19 +105,19 @@ Formats:
 
 Meta tags: `offset`, `by` / deprecated `author`, `date` / deprecated `createdDate`, `source`, `ti`, `ar`. File `offset` is milliseconds added to all times. User offset is ±100ms per tap, client-only, **not persisted** on web (session only); Android should match unless we later persist it.
 
-Countdown dots: on empty words, if gap ≥5s show dots in the last 5s, or if gap ≥3s show dots in the last 3s (`•`…`•••••` from `setBulletText`).
+Countdown dots: on empty words **only when a following word exists**, if gap ≥5s show dots in the last 5s, or if gap ≥3s show dots in the last 3s (`•`…`•••••` from `setBulletText`).
 
 Karaoke: fill the current word left-to-right as `(now - start) / (end - start)`. Web default is **on** (`karaoke-mode` on the lyric container). Light fill `#2199F9`, dark fill `#FC0`.
 
-Tick interval on web is 30ms; Android can use a ~16–50ms frame loop tied to player position.
+Tick interval is **30ms**, matching web `setPlayLyricInterval`.
 
-Missing lyric body equals `Lyric doesn't exist!` or empty `lyric` field → show the “no lyric yet” contribution message (mail / FB from web `NO_LYRIC`).
+Missing lyric body equals `Lyric doesn't exist!` or empty `lyric` field → show the “no lyric yet” contribution message with tappable Mail (`mailto:taanhtu95@gmail.com`) and FB (`https://fb.com/anhtuta95`) links from web `NO_LYRIC`.
 
 ### Settings (persisted in web `localStorage` key `LILIANA_SETTINGS`)
 
 Lyric playground: `lyricAlign` (left/center/right), lyric theme `dark` | `light` | `picture-bg`, `karaokeMode`, `blurMode`, `giganticLine`, `wordAppear`, `lineAppear`, `translate`, `speed`.
 
-Web defaults when a key is missing: `playType` = `SEQUENCE`, `speed` = `1.0`, `karaokeMode` = **true**, lyric theme = **`picture-bg`**, `appTheme` = **light**, `blurMode` / `giganticLine` / `wordAppear` / `lineAppear` / `translate` = off. User lyric offset is session-only.
+Web defaults when a key is missing: `playType` = `SEQUENCE`, `speed` = `1.0`, `karaokeMode` = **true**, lyric theme = **`picture-bg`**, `appTheme` = **light**, `giganticLine` = **on** (HTML class `div-res-big-active-line` on first run), `blurMode` / `wordAppear` / `lineAppear` / `translate` = off. User lyric offset is session-only.
 
 App chrome theme: `appTheme` light/dark (`SETTING_APP_THEME`). Separate from the lyric playground theme.
 
@@ -173,7 +173,7 @@ Kotlin, Jetpack Compose + Material 3, Navigation Compose, Hilt, Media3 (ExoPlaye
 
 ### Playback service
 
-Foreground `MediaSessionService`. App UI talks through a `PlayerConnector` / `PlaybackRepository` (MediaController). Notification and lock screen come from the session. Playback speed is a session command. Listen counting is a WorkManager one-shot scheduled 60s after a play-from-start, cancelled if the song changes or playback stops before 60s.
+Foreground `MediaSessionService`. App UI talks through a `PlayerConnector` / `PlaybackRepository` (MediaController). Notification and lock screen come from the session. Playback speed is a session command. Listen counting is a WorkManager one-shot scheduled 60s after play starts at **exactly position 0**, cancelled **only if the song `path` changes** (pause / resume / finishing do not cancel). Seek back/forward increments are 5 seconds.
 
 ### Data flow
 
@@ -233,7 +233,7 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 | ID | Task | Status |
 | --- | --- | --- |
 | 020 | Navigation shell + Material 3 theme (light/dark); library start destination; placeholder player route | Done in 003 |
-| 021 | Library list UI (title, artist, cover). Listens / SOY / type / date as list columns deferred | Partial (003) |
+| 021 | Library list UI (title, artist, cover). Listens / SOY / type / date + cover preview | Done in 003 + **010** |
 | 022 | Sort controls matching web columns/orders; persist sort | Done in 003 |
 | 023 | Local search | Done in 003 |
 | 024 | Empty / error / offline-cached states; pull to refresh | Done in 003 |
@@ -246,7 +246,7 @@ Each task is a later `docs/tasks/NNN-*.md` plus small commits. Task numbers are 
 | 031 | Play from library; audio URL; placeholder art | Done in 006 |
 | 032 | Sequence / shuffle (current first) / repeat-one | Done in 006 |
 | 033 | Playback speed | Done in 006 |
-| 034 | Listen count after 60s (WorkManager, same-path guard) | Done in 006 |
+| 034 | Listen count after 60s (WorkManager, same-path guard; cancel only on path change) | Done in 006, aligned in **010** |
 | 035 | Mini-player + now-playing controls | Done in 006 |
 
 Also in 006 (pulled forward from later phases because playback needs them): persist play mode / last song / speed; in-app `bai-hat/{path}` route; `POST_NOTIFICATIONS` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK`. HTTPS App Links and the rest of Play Store packaging stay 063–064.
@@ -274,7 +274,11 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 | 052 | Cover-art Palette background | Done in 009 |
 | 053 | Settings screen persistence | Done in 009 |
 
-`.xlrc` translations are gated by the `translate` setting (default **off**, matching web). Speed ±0.1× stays on the player and is also on Settings (already persisted in **006**). In-app volume, waveform, lyric-card export, and sleep timer stay later / out of v1. Downloads are **060–061**.
+`.xlrc` translations are gated by the `translate` setting (default **off**, matching web). Speed ±0.1× stays on the player and is also on Settings (already persisted in **006**). Gigantic line defaults **on**. In-app volume, waveform, lyric-card export, and sleep timer stay later / out of v1. Downloads are **060–061**.
+
+### Phase 5b — Web parity *(task 010)*
+
+Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [docs/tasks/010-web-parity-fixes.md](tasks/010-web-parity-fixes.md) and §10 below.
 
 ### Phase 6 — Offline, share, deep links, store
 
@@ -283,9 +287,9 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 | 060 | Media3 downloads (audio + lyric + cover) + download UI | Done in 010 |
 | 061 | Offline playback using downloaded files | Done in 010 |
 | 062 | Lyric card compose / export / share | |
-| 063 | App links / deep links `bai-hat/{path}` | |
-| 064 | Play Store packaging: applicationId, icons, POST_NOTIFICATIONS, FOREGROUND_SERVICE_MEDIA_PLAYBACK, privacy policy, no `RECORD_AUDIO` | |
-| 065 | Release smoke: Playable-only library, notification controls, offline, lyric formats | |
+| 063 | **External** App Links / intent-filters for `bai-hat/{path}` (Play Store / HTTPS). In-app navigation to `bai-hat/{path}` already exists from **006**. Deferred to this release phase. |
+| 064 | Play Store packaging: applicationId, icons, POST_NOTIFICATIONS, FOREGROUND_SERVICE_MEDIA_PLAYBACK, privacy policy, no `RECORD_AUDIO` |
+| 065 | Release smoke: Playable-only library, notification controls, offline, lyric formats |
 
 ## 7. Workflow (mandatory)
 
@@ -312,4 +316,21 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 
 ## 9. This-run deliverable
 
-Task **010** (`docs/tasks/010-downloads-offline.md`): Media3 downloads of audio + lyric + cover, Downloads screen, offline playback from the download cache, WorkManager network constraint on listen PUT. Lyric-card export (062), HTTPS App Links (063), Play Store packaging (064), and release smoke (065) remain later.
+Task **010** (`docs/tasks/010-web-parity-fixes.md`) is merged on main. This PR adds **060/061** (`docs/tasks/010-downloads-offline.md`): Media3 downloads of audio + lyric + cover, Downloads screen, offline playback from the download cache, WorkManager network constraint on listen PUT. Lyric-card export (062), HTTPS App Links (063), Play Store packaging (064), and release smoke (065) remain later.
+
+## 10. Intentional differences from the web app
+
+These Android extras / choices are **kept as-is** (not bugs):
+
+| Item | Android behaviour | Web |
+| --- | --- | --- |
+| **4** | Speed clamped to **0.5–2.0×** in 0.1 steps | Unbounded ±0.1 in the settings panel |
+| **7 / 21** | Restore last song **paused** on cold start (`lastSongPath` in DataStore) | No last-song restore |
+| **11** | Extra asc/desc toggle next to sort chips | Column click re-fetches with a **fixed** order per column |
+| **12** | Instant search (no debounce) | Search box filters as you type (DOM filter); no debounce either, but Android is Compose state |
+| **13** | Tap a lyric line to seek | Lyric taps do not seek |
+| **20** | Cover Palette tints now-playing chrome | `getAverageRGB` only tinted waveform bars (not ported) |
+| **22** | External `/bai-hat` intent-filters / App Links deferred to **063** | Hash route `#/bai-hat/{path}` |
+| **Downloads** | Media3 downloads + offline playback from cache (060/061) | No download / offline library |
+
+The extra sort-order toggle (**11**) still talks to the API (`sortOrder`); it does not locally re-sort an unfiltered catalog. Online play uses the **full playable catalog** in API order (`catalogIndex`); search only filters the view. Offline play uses that same catalog filtered to completed downloads.

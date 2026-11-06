@@ -1,6 +1,5 @@
 package com.anhtuta.lilimusic.feature.library
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,16 +23,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
@@ -205,23 +203,42 @@ private fun LibraryCatalog(
         if (state.songs.isEmpty()) {
             LibraryEmpty(query = state.query)
         } else {
+            val soyYears =
+                remember(state.songs) {
+                    SongOfTheYearPalette.uniqueYearsDescending(state.songs.map { it.songOfTheYear })
+                }
+            var previewSong by remember { mutableStateOf<Song?>(null) }
             LazyColumn(
                 modifier =
                     Modifier
-                        .fillMaxSize()
+                        .weight(1f)
+                        .fillMaxWidth()
                         .testTag(LibraryTestTags.LIST),
                 contentPadding = PaddingValues(vertical = 8.dp),
             ) {
                 items(state.songs, key = { it.id }) { song ->
-                    SongRow(
+                    LibrarySongRow(
                         song = song,
+                        soyYears = soyYears,
                         coverUrl = state.coverUrl(song),
                         unavailableOffline = state.isUnavailableOffline(song.path),
                         downloadLabel = downloadActionLabel(state, song.path),
                         onClick = { onSongClick(song) },
+                        onCoverClick = {
+                            if (state.coverUrl(song) != null) {
+                                previewSong = song
+                            }
+                        },
                         onDownloadAction = { onDownloadAction(song) },
                     )
                 }
+            }
+            previewSong?.let { preview ->
+                CoverPreviewDialog(
+                    song = preview,
+                    coverUrl = state.coverUrl(preview),
+                    onDismiss = { previewSong = null },
+                )
             }
         }
     }
@@ -292,72 +309,6 @@ private fun SortRow(
                         },
                     ),
             )
-        }
-    }
-}
-
-@Composable
-private fun SongRow(
-    song: Song,
-    coverUrl: String?,
-    unavailableOffline: Boolean,
-    downloadLabel: String,
-    onClick: () -> Unit,
-    onDownloadAction: () -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .testTag(LibraryTestTags.song(song.id))
-                .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        if (coverUrl == null) {
-            val placeholderDescription = stringResource(R.string.library_cover_placeholder_cd, song.title)
-            Box(
-                modifier =
-                    Modifier
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .semantics { contentDescription = placeholderDescription },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = song.title.take(1),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        } else {
-            AsyncImage(
-                model = coverUrl,
-                contentDescription = stringResource(R.string.library_cover_cd, song.title),
-                modifier =
-                    Modifier
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-            )
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = song.title, style = MaterialTheme.typography.titleMedium)
-            Text(text = song.artist, style = MaterialTheme.typography.bodyMedium)
-            if (unavailableOffline) {
-                Text(
-                    text = stringResource(R.string.library_unavailable_offline),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.testTag(LibraryTestTags.unavailable(song.id)),
-                )
-            }
-        }
-        TextButton(
-            onClick = onDownloadAction,
-            modifier = Modifier.testTag(LibraryTestTags.download(song.id)),
-        ) {
-            Text(text = downloadLabel)
         }
     }
 }

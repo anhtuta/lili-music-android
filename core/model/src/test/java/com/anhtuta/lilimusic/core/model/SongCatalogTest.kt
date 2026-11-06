@@ -20,42 +20,59 @@ class SongCatalogTest {
     @Test
     fun searchMatchesTitleOrArtistIgnoringCase() {
         val songs = listOf(alpha, beta, gamma)
-        assertThat(SongCatalog.filterAndSort(songs, "ann", SongSort.TITLE, SortOrder.ASC).map { it.id })
+        assertThat(SongCatalog.filter(songs, "ann").map { it.id })
             .containsExactly(2L, 3L)
             .inOrder()
-        assertThat(SongCatalog.filterAndSort(songs, "ALPHA", SongSort.TITLE, SortOrder.ASC).map { it.title })
+        assertThat(SongCatalog.filter(songs, "ALPHA").map { it.title })
             .containsExactly("Alpha")
     }
 
     @Test
-    fun blankQueryReturnsAllSongs() {
-        val songs = listOf(alpha, beta)
-        assertThat(SongCatalog.filterAndSort(songs, "  ", SongSort.TITLE, SortOrder.ASC)).hasSize(2)
+    fun blankQueryKeepsIncomingOrder() {
+        val songs = listOf(gamma, alpha, beta)
+        assertThat(
+            SongCatalog.filter(songs, "  ").map { it.title },
+        ).containsExactly("Gamma", "Alpha", "Beta").inOrder()
     }
 
     @Test
-    fun sortByListensDescending() {
+    fun searchPreservesIncomingOrder() {
+        val songs = listOf(gamma, alpha, beta)
+        assertThat(
+            SongCatalog.filter(songs, "ann").map { it.title },
+        ).containsExactly("Gamma", "Beta").inOrder()
+    }
+
+    @Test
+    fun localSortByListensDescending() {
         val songs = listOf(alpha, beta, gamma)
         assertThat(
-            SongCatalog.filterAndSort(songs, "", SongSort.LISTENS, SortOrder.DESC).map { it.listens },
+            SongCatalog.sorted(songs, SongSort.LISTENS, SortOrder.DESC).map { it.listens },
         ).containsExactly(9, 5, 2).inOrder()
     }
 
     @Test
-    fun sortByTitleAscending() {
+    fun localSortByTitleAscending() {
         val songs = listOf(gamma, alpha, beta)
         assertThat(
-            SongCatalog.filterAndSort(songs, "", SongSort.TITLE, SortOrder.ASC).map { it.title },
+            SongCatalog.sorted(songs, SongSort.TITLE, SortOrder.ASC).map { it.title },
         ).containsExactly("Alpha", "Beta", "Gamma").inOrder()
     }
 
     @Test
-    fun sortBySongOfTheYearPutsNullsLastWhenAscending() {
+    fun localSortNullsMatchMysql() {
         val songs = listOf(alpha, gamma)
         assertThat(
-            SongCatalog
-                .filterAndSort(songs, "", SongSort.SONG_OF_THE_YEAR, SortOrder.ASC)
-                .map { it.songOfTheYear },
+            SongCatalog.sorted(songs, SongSort.SONG_OF_THE_YEAR, SortOrder.ASC).map { it.songOfTheYear },
+        ).containsExactly(null, 2020).inOrder()
+        assertThat(
+            SongCatalog.sorted(songs, SongSort.SONG_OF_THE_YEAR, SortOrder.DESC).map { it.songOfTheYear },
         ).containsExactly(2020, null).inOrder()
+        assertThat(
+            SongCatalog.sorted(songs, SongSort.TYPE, SortOrder.ASC).map { it.type },
+        ).containsExactly(null, "Vietnam").inOrder()
+        assertThat(
+            SongCatalog.sorted(songs, SongSort.TYPE, SortOrder.DESC).map { it.type },
+        ).containsExactly("Vietnam", null).inOrder()
     }
 }

@@ -9,6 +9,7 @@ import com.anhtuta.lilimusic.core.database.LyricDao
 import com.anhtuta.lilimusic.core.database.LyricLocalDataSource
 import com.anhtuta.lilimusic.core.database.MIGRATION_1_2
 import com.anhtuta.lilimusic.core.database.MIGRATION_2_3
+import com.anhtuta.lilimusic.core.database.MIGRATION_3_4
 import com.anhtuta.lilimusic.core.database.RoomDownloadLocalDataSource
 import com.anhtuta.lilimusic.core.database.RoomLyricLocalDataSource
 import com.anhtuta.lilimusic.core.database.RoomSongLocalDataSource
@@ -35,7 +36,7 @@ object DatabaseModule {
                 context,
                 LiliMusicDatabase::class.java,
                 "lili-music.db",
-            ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
 
     @Provides

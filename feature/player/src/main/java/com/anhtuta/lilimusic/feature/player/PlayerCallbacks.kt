@@ -6,6 +6,8 @@ data class PlayerCallbacks(
     val onSkipNext: () -> Unit,
     val onSkipPrevious: () -> Unit,
     val onSeek: (Long) -> Unit,
+    val onSeekBack: () -> Unit = {},
+    val onSeekForward: () -> Unit = {},
     val onToggleShuffle: () -> Unit,
     val onToggleRepeatOne: () -> Unit,
     val onIncreaseSpeed: () -> Unit,

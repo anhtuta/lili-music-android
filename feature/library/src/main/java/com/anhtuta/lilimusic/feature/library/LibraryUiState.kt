@@ -9,6 +9,7 @@ import com.anhtuta.lilimusic.core.model.SortOrder
 
 data class LibraryUiState(
     val songs: List<Song> = emptyList(),
+    val playableCatalog: List<Song> = emptyList(),
     val query: String = "",
     val sort: SongSort = SongSort.TITLE,
     val sortOrder: SortOrder = SortOrder.ASC,

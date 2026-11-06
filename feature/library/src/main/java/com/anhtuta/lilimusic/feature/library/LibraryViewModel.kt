@@ -69,6 +69,7 @@ class LibraryViewModel
         fun onSortSelected(sort: SongSort) {
             viewModelScope.launch {
                 sortPreferences.setSort(sort, sort.defaultOrder)
+                refreshCatalog()
             }
         }
 
@@ -76,11 +77,12 @@ class LibraryViewModel
             viewModelScope.launch {
                 val current = sortPreferences.preferences.first()
                 sortPreferences.setSort(current.sort, current.order.toggle())
+                refreshCatalog()
             }
         }
 
         fun onRefresh() {
-            refresh()
+            viewModelScope.launch { refreshCatalog() }
         }
 
         fun onSongClick(song: Song): Boolean {
@@ -88,10 +90,11 @@ class LibraryViewModel
             if (!OfflinePlaybackPolicy.isPlayable(state.isOnline, state.status(song.path))) {
                 return false
             }
+            val catalog = state.playableCatalog.ifEmpty { state.songs }
             val completed = state.downloads.filterValues { it.isComplete }.keys
             val queue =
                 OfflinePlaybackPolicy
-                    .playQueue(state.songs, state.isOnline, completed)
+                    .playQueue(catalog, state.isOnline, completed)
                     .map { item ->
                         OfflinePlaybackPolicy.withDisplayImage(item, state.downloads[item.path]?.coverLocalUri)
                     }
@@ -110,14 +113,16 @@ class LibraryViewModel
         }
 
         private fun refresh() {
-            viewModelScope.launch {
-                isRefreshing.value = true
-                val prefs = sortPreferences.preferences.first()
-                val result = songRepository.refresh(prefs.sort, prefs.order)
-                loadFailed.value = result.isFailure
-                initialLoadFinished.value = true
-                isRefreshing.value = false
-            }
+            viewModelScope.launch { refreshCatalog() }
+        }
+
+        private suspend fun refreshCatalog() {
+            isRefreshing.value = true
+            val prefs = sortPreferences.preferences.first()
+            val result = songRepository.refresh(prefs.sort, prefs.order)
+            loadFailed.value = result.isFailure
+            initialLoadFinished.value = true
+            isRefreshing.value = false
         }
 
         private data class CatalogSnapshot(
@@ -140,14 +145,10 @@ class LibraryViewModel
             isOnline: Boolean,
         ): LibraryUiState {
             val waiting = !refresh.finished && catalog.songs.isEmpty()
+            val playableCatalog = catalog.songs
             return LibraryUiState(
-                songs =
-                    SongCatalog.filterAndSort(
-                        songs = catalog.songs,
-                        query = catalog.query,
-                        sort = catalog.sort,
-                        order = catalog.order,
-                    ),
+                songs = SongCatalog.filter(playableCatalog, catalog.query),
+                playableCatalog = playableCatalog,
                 query = catalog.query,
                 sort = catalog.sort,
                 sortOrder = catalog.order,

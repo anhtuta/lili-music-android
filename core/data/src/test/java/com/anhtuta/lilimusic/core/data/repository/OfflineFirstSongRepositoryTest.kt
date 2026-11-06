@@ -89,6 +89,24 @@ class OfflineFirstSongRepositoryTest {
         }
 
     @Test
+    fun refreshPreservesApiOrder() =
+        runTest {
+            network.songs =
+                listOf(
+                    NetworkSong(id = 30, title = "C", artist = "A", path = "c", fileName = "c.mp3"),
+                    NetworkSong(id = 1, title = "A", artist = "A", path = "a", fileName = "a.mp3"),
+                    NetworkSong(id = 20, title = "B", artist = "A", path = "b", fileName = "b.mp3"),
+                )
+
+            repository.refresh(SongSort.LISTENS, SortOrder.DESC)
+
+            repository.observePlayableSongs().test {
+                assertThat(awaitItem().map { it.id }).containsExactly(30L, 1L, 20L).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun failedRefreshKeepsCachedSongs() =
         runTest {
             local.seed(listOf(cachedEntity(id = 1, title = "Cached")))

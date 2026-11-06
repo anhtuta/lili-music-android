@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SongDao {
-    @Query("SELECT * FROM songs")
+    @Query("SELECT * FROM songs ORDER BY catalogIndex ASC")
     fun observeAll(): Flow<List<SongEntity>>
 
     @Query("SELECT * FROM songs WHERE id = :id")
