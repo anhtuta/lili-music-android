@@ -313,10 +313,11 @@ Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [
 | Shuffle “current first” easy to get wrong | Dedicated unit tests around playlist mutation |
 | Lyric timing vs ExoPlayer position | Use player `currentPosition` + both offsets; test with fake clock |
 | Download storage / scoped storage | Media3 download directory in app-private storage (no extra storage permission on 26+) |
+| Debug APK opens a blank `ComponentActivity` | Never put `MAIN`/`LAUNCHER` on Compose `ui-test-manifest`’s `ComponentActivity`; keep that filter only on `MainActivity`. See task [013](tasks/013-debug-launcher.md) |
 
 ## 9. This-run deliverable
 
-Task **010** (`docs/tasks/010-web-parity-fixes.md`) is merged on main. This PR adds **060/061** (`docs/tasks/011-downloads-offline.md`): Media3 downloads of audio + lyric + cover, Downloads screen, offline playback from the download cache, WorkManager network constraint on listen PUT. Lyric-card export (062), HTTPS App Links (063), Play Store packaging (064), and release smoke (065) remain later.
+Task **010** (`docs/tasks/010-web-parity-fixes.md`) is merged on main. This PR adds **060/061** (`docs/tasks/011-downloads-offline.md`): Media3 downloads of audio + lyric + cover, Downloads screen, offline playback from the download cache, WorkManager network constraint on listen PUT. It also fixes the debug launcher blank screen ([013](tasks/013-debug-launcher.md)). Lyric-card export (062), HTTPS App Links (063), Play Store packaging (064), and release smoke (065) remain later.
 
 ## 10. Intentional differences from the web app
 
