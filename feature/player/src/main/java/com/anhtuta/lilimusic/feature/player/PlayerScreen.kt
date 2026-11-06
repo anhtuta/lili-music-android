@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.PlayMode
+import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import java.util.Locale
 
@@ -125,49 +126,14 @@ private fun PlayerBody(
     ) {
         PlayerCover(title = song.title, imageUrl = song.imageUrl)
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = song.title,
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.testTag(PlayerTestTags.TITLE),
-        )
-        Text(
-            text = song.artist,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.testTag(PlayerTestTags.ARTIST),
-        )
-        val album = song.album?.takeIf { it.isNotBlank() } ?: stringResource(R.string.player_no_album)
-        Text(
-            text = stringResource(R.string.player_album, album),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.testTag(PlayerTestTags.ALBUM),
-        )
+        PlayerSongHeadings(song = song)
         Spacer(modifier = Modifier.height(16.dp))
         PlayerSeekBar(
             positionMs = state.positionMs,
             durationMs = state.durationMs,
             onSeek = callbacks.onSeek,
         )
-        if (state.reachedEnd) {
-            Text(
-                text = stringResource(R.string.player_end_of_queue),
-                color = MaterialTheme.colorScheme.error,
-                modifier =
-                    Modifier
-                        .padding(top = 8.dp)
-                        .testTag(PlayerTestTags.END_OF_QUEUE),
-            )
-        }
-        if (state.atStartOfQueue) {
-            Text(
-                text = stringResource(R.string.player_first_of_queue),
-                color = MaterialTheme.colorScheme.error,
-                modifier =
-                    Modifier
-                        .padding(top = 8.dp)
-                        .testTag(PlayerTestTags.FIRST_OF_QUEUE),
-            )
-        }
+        PlayerQueueMessages(state = state)
         Spacer(modifier = Modifier.height(8.dp))
         PlayerTransport(
             isPlaying = state.isPlaying,
@@ -188,6 +154,51 @@ private fun PlayerBody(
         ) {
             lyrics()
         }
+    }
+}
+
+@Composable
+private fun PlayerSongHeadings(song: Song) {
+    Text(
+        text = song.title,
+        style = MaterialTheme.typography.headlineSmall,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.testTag(PlayerTestTags.TITLE),
+    )
+    Text(
+        text = song.artist,
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.testTag(PlayerTestTags.ARTIST),
+    )
+    val album = song.album?.takeIf { it.isNotBlank() } ?: stringResource(R.string.player_no_album)
+    Text(
+        text = stringResource(R.string.player_album, album),
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.testTag(PlayerTestTags.ALBUM),
+    )
+}
+
+@Composable
+private fun PlayerQueueMessages(state: PlayerUiState) {
+    if (state.reachedEnd) {
+        Text(
+            text = stringResource(R.string.player_end_of_queue),
+            color = MaterialTheme.colorScheme.error,
+            modifier =
+                Modifier
+                    .padding(top = 8.dp)
+                    .testTag(PlayerTestTags.END_OF_QUEUE),
+        )
+    }
+    if (state.atStartOfQueue) {
+        Text(
+            text = stringResource(R.string.player_first_of_queue),
+            color = MaterialTheme.colorScheme.error,
+            modifier =
+                Modifier
+                    .padding(top = 8.dp)
+                    .testTag(PlayerTestTags.FIRST_OF_QUEUE),
+        )
     }
 }
 

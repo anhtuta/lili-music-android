@@ -68,7 +68,7 @@ class PlayerScreenTest {
         composeRule.onNodeWithText("Ann").assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
         composeRule.onNodeWithText("(Album)").assertIsDisplayed()
-        composeRule.onNodeWithTag(PlayerTestTags.POSITION).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.POSITION).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("0:15").assertIsDisplayed()
         composeRule.onNodeWithText("1:00").assertIsDisplayed()
 
