@@ -24,6 +24,9 @@ ifeq ($(strip $(COMPILE_SDK)),)
 COMPILE_SDK := 37
 endif
 
+SDKMANAGER_INSTALL := sdkmanager "platforms;android-$(COMPILE_SDK).0" "build-tools;$(COMPILE_SDK).0.0" "platform-tools"
+SDKMANAGER_DEPRECATION := sdkmanager may print a deprecation warning pointing to the new android sdk CLI; that warning is harmless.
+
 .PHONY: help doctor build apk release-apk install test lint check clean
 
 help: ## Show this help
@@ -57,18 +60,23 @@ doctor: ## Check JDK 17+ and the Android SDK
 		echo "Install command-line tools, then:"; \
 		echo "  export ANDROID_HOME=\"\$$HOME/Android/Sdk\""; \
 		echo "  export PATH=\"\$$ANDROID_HOME/cmdline-tools/latest/bin:\$$ANDROID_HOME/platform-tools:\$$PATH\""; \
-		echo "  sdkmanager \"platform-tools\" \"platforms;android-$(COMPILE_SDK)\" \"build-tools;35.0.0\""; \
+		echo '  $(SDKMANAGER_INSTALL)'; \
 		echo "  yes | sdkmanager --licenses"; \
+		echo "$(SDKMANAGER_DEPRECATION)"; \
 		echo "Or set sdk.dir in local.properties (Gradle reads that too)."; \
 		exit 1; \
 	fi; \
 	echo "OK  SDK $$sdk_dir"; \
-	if [ ! -d "$$sdk_dir/platforms/android-$(COMPILE_SDK)" ]; then \
-		echo "Missing platforms;android-$(COMPILE_SDK). Install with:"; \
-		echo "  sdkmanager \"platforms;android-$(COMPILE_SDK)\""; \
+	platform_dir=$$(sh scripts/find-android-platform.sh "$$sdk_dir" "$(COMPILE_SDK)") || platform_dir=""; \
+	if [ -z "$$platform_dir" ]; then \
+		echo "Missing platforms/android-$(COMPILE_SDK) or android-$(COMPILE_SDK).0 (compileSdk $(COMPILE_SDK))."; \
+		echo "There is no sdkmanager package platforms;android-$(COMPILE_SDK); API $(COMPILE_SDK) is platforms;android-$(COMPILE_SDK).0."; \
+		echo "Install with:"; \
+		echo '  $(SDKMANAGER_INSTALL)'; \
+		echo "$(SDKMANAGER_DEPRECATION)"; \
 		exit 1; \
 	fi; \
-	echo "OK  platforms;android-$(COMPILE_SDK)"
+	echo "OK  platform $$platform_dir"
 
 build: ## Assemble the debug APK
 	$(GRADLEW) $(APP):assembleDebug
