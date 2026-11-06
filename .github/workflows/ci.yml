@@ -20,6 +20,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Makefile dry-run
+        run: bash scripts/test-makefile.sh
+
       - name: Lint commit messages
         if: github.event_name == 'pull_request'
         uses: wagoid/commitlint-github-action@v6
