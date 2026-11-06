@@ -3,6 +3,7 @@ package com.anhtuta.lilimusic.feature.lyrics
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -36,7 +37,8 @@ class LyricsPaneTest {
         }
 
         composeRule.onNodeWithTag(LyricsTestTags.MISSING).assertIsDisplayed()
-        composeRule.onNodeWithText("taanhtu95@gmail.com", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText("Mail").assertIsDisplayed().assertHasClickAction()
+        composeRule.onNodeWithText("FB").assertIsDisplayed().assertHasClickAction()
     }
 
     @Test

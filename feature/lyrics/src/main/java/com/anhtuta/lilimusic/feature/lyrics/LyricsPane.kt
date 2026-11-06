@@ -32,9 +32,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.lyrics.LyricLineFrame
@@ -162,15 +167,7 @@ private fun LyricsBody(
             )
         }
         state.isMissing -> {
-            Text(
-                text = stringResource(R.string.lyrics_missing),
-                color = style.colors.text,
-                textAlign = style.textAlign,
-                modifier =
-                    Modifier
-                        .padding(24.dp)
-                        .testTag(LyricsTestTags.MISSING),
-            )
+            MissingLyricMessage(style = style)
         }
         state.errorMessage != null -> {
             Text(
@@ -187,6 +184,41 @@ private fun LyricsBody(
             )
         }
     }
+}
+
+@Composable
+private fun MissingLyricMessage(style: LyricVisualStyle) {
+    val intro = stringResource(R.string.lyrics_missing_intro)
+    val mail = stringResource(R.string.lyrics_missing_mail)
+    val fb = stringResource(R.string.lyrics_missing_fb)
+    val mailUri = stringResource(R.string.lyrics_missing_mail_uri)
+    val fbUri = stringResource(R.string.lyrics_missing_fb_uri)
+    val linkStyle = SpanStyle(color = style.colors.karaokeFill, textDecoration = TextDecoration.Underline)
+    val message =
+        buildAnnotatedString {
+            append(intro)
+            append("\n")
+            withLink(LinkAnnotation.Url(mailUri)) {
+                pushStyle(linkStyle)
+                append(mail)
+                pop()
+            }
+            append("\n")
+            withLink(LinkAnnotation.Url(fbUri)) {
+                pushStyle(linkStyle)
+                append(fb)
+                pop()
+            }
+        }
+    Text(
+        text = message,
+        color = style.colors.text,
+        textAlign = style.textAlign,
+        modifier =
+            Modifier
+                .padding(24.dp)
+                .testTag(LyricsTestTags.MISSING),
+    )
 }
 
 @Composable
