@@ -7,6 +7,8 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import com.anhtuta.lilimusic.core.playback.download.DownloadInfrastructure
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,6 +18,7 @@ class ExoPlayerFactory
     @Inject
     constructor(
         @ApplicationContext private val context: Context,
+        private val downloadInfrastructure: DownloadInfrastructure,
     ) {
         fun create(): ExoPlayer {
             val audioAttributes =
@@ -26,6 +29,7 @@ class ExoPlayerFactory
                     .build()
             return ExoPlayer
                 .Builder(context)
+                .setMediaSourceFactory(DefaultMediaSourceFactory(downloadInfrastructure.playbackDataSourceFactory))
                 .setAudioAttributes(audioAttributes, true)
                 .setHandleAudioBecomingNoisy(true)
                 .setWakeMode(C.WAKE_MODE_NETWORK)

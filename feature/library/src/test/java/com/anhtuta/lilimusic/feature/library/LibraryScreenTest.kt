@@ -208,4 +208,73 @@ class LibraryScreenTest {
         composeRule.onNodeWithTag(LibraryTestTags.SETTINGS).performClick()
         assertThat(settings).isEqualTo(1)
     }
+
+    @Test
+    fun downloadsActionFiresCallback() {
+        var downloads = 0
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                    onDownloadsClick = { downloads++ },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.DOWNLOADS).performClick()
+        assertThat(downloads).isEqualTo(1)
+    }
+
+    @Test
+    fun downloadButtonFiresCallback() {
+        var downloadedId: Long? = null
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha")),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                    onDownloadAction = { downloadedId = it.id },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.download(1)).performClick()
+        assertThat(downloadedId).isEqualTo(1L)
+    }
+
+    @Test
+    fun unavailableOfflineRowIsMarked() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 3, title = "Gamma", path = "gamma")),
+                            isLoading = false,
+                            isOnline = false,
+                        ),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Unavailable offline").assertIsDisplayed()
+    }
 }

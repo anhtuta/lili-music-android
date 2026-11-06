@@ -34,6 +34,7 @@ fun PlayerRoute(
                 onIncreaseSpeed = viewModel::increaseSpeed,
                 onDecreaseSpeed = viewModel::decreaseSpeed,
                 onSettings = onSettingsClick,
+                onDownload = viewModel::onDownloadAction,
             ),
         lyrics = lyrics,
     )

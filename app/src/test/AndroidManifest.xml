@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Unit-test merge only. Do not copy this LAUNCHER into src/debug; Android 16
+     starts the first MAIN/LAUNCHER activity, and an empty ComponentActivity
+     is a blank white screen. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity

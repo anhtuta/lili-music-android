@@ -12,6 +12,7 @@ object LibraryTestTags {
     const val SORT_ORDER = "library-sort-order"
     const val ERROR_BANNER = "library-error-banner"
     const val SETTINGS = "library-settings"
+    const val DOWNLOADS = "library-downloads"
 
     const val COVER_PREVIEW = "library-cover-preview"
 
@@ -26,6 +27,10 @@ object LibraryTestTags {
     fun type(id: Long): String = "library-type-$id"
 
     fun date(id: Long): String = "library-date-$id"
+
+    fun download(id: Long): String = "library-download-$id"
+
+    fun unavailable(id: Long): String = "library-unavailable-$id"
 
     fun sort(sort: SongSort): String = "library-sort-${sort.name.lowercase()}"
 }

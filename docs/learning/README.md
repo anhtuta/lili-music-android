@@ -14,10 +14,12 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [02 — PR #7 Kotlin](02-kotlin-bump.md) | Kotlin 2.4.21 + Gradle / KSP / compileSdk alignment |
 | [03 — PR #14 Data](03-data-and-library.md) | Song model, Retrofit, Room, library UI |
 | [04 — PR #15 Play](04-playback.md) | Media3, queue, listen counting, player UI |
-| [05 — How to run](05-how-to-run.md) | Android Studio, Gradle commands, smoke checks |
+| [05 — How to run](05-how-to-run.md) | CLI `make apk` (no Android Studio), SDK setup, Gradle / smoke checks |
 | [06 — Synced lyrics](06-synced-lyrics.md) | LRC/XLRC/TRC parser, fetch, Room cache, player pane |
 | [07 — Player visuals](07-player-visuals.md) | Settings, lyric themes, Palette, app light/dark |
 | [08 — Web parity](08-web-parity.md) | BaiHat.js mismatches vs PR #18; intentional Android extras |
+| [09 — Downloads / offline](09-downloads-offline.md) | Media3 downloads, Downloads screen, offline playback |
+| [10 — Debug launcher](10-debug-launcher.md) | Blank white `ComponentActivity` on Android 16; MainActivity is the only LAUNCHER |
 
 ## Status of phases
 
@@ -27,8 +29,9 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 - [x] [PR #15](https://github.com/anhtuta/lili-music-android/pull/15) — Playback (Media3, queue, listens) (merged to main)
 - [x] [PR #16](https://github.com/anhtuta/lili-music-android/pull/16) — Learning guide (merged to main)
 - [x] [PR #17](https://github.com/anhtuta/lili-music-android/pull/17) — Synced lyrics (Phase 4) (merged to main)
-- [ ] [PR #18](https://github.com/anhtuta/lili-music-android/pull/18) — player visuals / settings (Phase 5) (task 009)
-- [ ] This PR — web parity vs class BaiHat.js (task 010), stacked on #18
+- [x] [PR #18](https://github.com/anhtuta/lili-music-android/pull/18) — Player visuals / settings (Phase 5) (merged to main)
+- [x] [PR #19](https://github.com/anhtuta/lili-music-android/pull/19) — Web parity vs class BaiHat.js (task 010) (merged to main)
+- [ ] This PR — downloads and offline playback (Phase 6 060/061) (task 011); debug launcher fix (task 013)
 
 ## After a later phase
 

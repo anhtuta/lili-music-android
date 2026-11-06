@@ -21,7 +21,7 @@ Multi-module layout: `feature:*` screens, `core:*` plumbing, `:app` for Hilt, na
 | `:feature:player` | Now-playing + mini-player | Player page / sticky bar |
 | `:feature:lyrics` | Synced lyric pane on now-playing | Lyrics column on the player page |
 | `:feature:settings` | Settings screen (lyric + app theme) | Web `Setting.js` / `localStorage` |
-| `:feature:downloads` | Later phase | Future route |
+| `:feature:downloads` | Download list, progress, retry, delete | Android-only downloads page (web has none) |
 
 Song flow: API → Retrofit → Room → Repository → ViewModel → Compose → Media3. See [PR #15 Play](04-playback.md) for `FakePlayerController` and listen policy.
 

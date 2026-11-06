@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,10 @@ fun LibrarySongRow(
     onClick: () -> Unit,
     onCoverClick: () -> Unit,
     modifier: Modifier = Modifier,
+    coverUrl: String? = song.imageUrl,
+    unavailableOffline: Boolean = false,
+    downloadLabel: String? = null,
+    onDownloadAction: (() -> Unit)? = null,
 ) {
     Row(
         modifier =
@@ -47,11 +52,27 @@ fun LibrarySongRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        SongCover(song = song, onCoverClick = onCoverClick)
+        SongCover(song = song, coverUrl = coverUrl, onCoverClick = onCoverClick)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = song.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(text = song.artist, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             SongMetaRow(song = song, soyYears = soyYears)
+            if (unavailableOffline) {
+                Text(
+                    text = stringResource(R.string.library_unavailable_offline),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.testTag(LibraryTestTags.unavailable(song.id)),
+                )
+            }
+        }
+        if (downloadLabel != null && onDownloadAction != null) {
+            TextButton(
+                onClick = onDownloadAction,
+                modifier = Modifier.testTag(LibraryTestTags.download(song.id)),
+            ) {
+                Text(text = downloadLabel)
+            }
         }
     }
 }
@@ -60,8 +81,9 @@ fun LibrarySongRow(
 fun CoverPreviewDialog(
     song: Song,
     onDismiss: () -> Unit,
+    coverUrl: String? = song.imageUrl,
 ) {
-    val imageUrl = song.imageUrl ?: return
+    val imageUrl = coverUrl ?: return
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier =
@@ -94,9 +116,10 @@ fun CoverPreviewDialog(
 @Composable
 private fun SongCover(
     song: Song,
+    coverUrl: String?,
     onCoverClick: () -> Unit,
 ) {
-    if (song.imageUrl == null) {
+    if (coverUrl == null) {
         val placeholderDescription = stringResource(R.string.library_cover_placeholder_cd, song.title)
         Box(
             modifier =
@@ -114,7 +137,7 @@ private fun SongCover(
         }
     } else {
         AsyncImage(
-            model = song.imageUrl,
+            model = coverUrl,
             contentDescription = stringResource(R.string.library_cover_cd, song.title),
             modifier =
                 Modifier

@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
@@ -49,6 +50,8 @@ fun LibraryScreen(
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit = {},
+    onDownloadsClick: () -> Unit = {},
+    onDownloadAction: (Song) -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -56,6 +59,12 @@ fun LibraryScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.library_title)) },
                 actions = {
+                    TextButton(
+                        onClick = onDownloadsClick,
+                        modifier = Modifier.testTag(LibraryTestTags.DOWNLOADS),
+                    ) {
+                        Text(stringResource(R.string.library_downloads))
+                    }
                     TextButton(
                         onClick = onSettingsClick,
                         modifier = Modifier.testTag(LibraryTestTags.SETTINGS),
@@ -81,6 +90,7 @@ fun LibraryScreen(
                 onSortOrderToggle = onSortOrderToggle,
                 onRefresh = onRefresh,
                 onSongClick = onSongClick,
+                onDownloadAction = onDownloadAction,
             )
         }
     }
@@ -94,6 +104,7 @@ private fun LibraryContent(
     onSortOrderToggle: () -> Unit,
     onRefresh: () -> Unit,
     onSongClick: (Song) -> Unit,
+    onDownloadAction: (Song) -> Unit,
 ) {
     when {
         state.isLoading -> LibraryLoading()
@@ -107,6 +118,7 @@ private fun LibraryContent(
                 onSortSelected = onSortSelected,
                 onSortOrderToggle = onSortOrderToggle,
                 onSongClick = onSongClick,
+                onDownloadAction = onDownloadAction,
             )
     }
 }
@@ -157,6 +169,7 @@ private fun LibraryCatalog(
     onSortSelected: (SongSort) -> Unit,
     onSortOrderToggle: () -> Unit,
     onSongClick: (Song) -> Unit,
+    onDownloadAction: (Song) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         if (state.isOfflineError) {
@@ -207,18 +220,23 @@ private fun LibraryCatalog(
                     LibrarySongRow(
                         song = song,
                         soyYears = soyYears,
+                        coverUrl = state.coverUrl(song),
+                        unavailableOffline = state.isUnavailableOffline(song.path),
+                        downloadLabel = downloadActionLabel(state, song.path),
                         onClick = { onSongClick(song) },
                         onCoverClick = {
-                            if (song.imageUrl != null) {
+                            if (state.coverUrl(song) != null) {
                                 previewSong = song
                             }
                         },
+                        onDownloadAction = { onDownloadAction(song) },
                     )
                 }
             }
             previewSong?.let { preview ->
                 CoverPreviewDialog(
                     song = preview,
+                    coverUrl = state.coverUrl(preview),
                     onDismiss = { previewSong = null },
                 )
             }
@@ -292,6 +310,22 @@ private fun SortRow(
                     ),
             )
         }
+    }
+}
+
+@Composable
+private fun downloadActionLabel(
+    state: LibraryUiState,
+    path: String,
+): String {
+    val download = state.downloads[path]
+    return when (state.status(path)) {
+        DownloadStatus.NONE -> stringResource(R.string.library_download)
+        DownloadStatus.QUEUED -> stringResource(R.string.library_download_waiting)
+        DownloadStatus.DOWNLOADING ->
+            stringResource(R.string.library_download_progress, download?.progressPercent ?: 0)
+        DownloadStatus.COMPLETED -> stringResource(R.string.library_download_delete)
+        DownloadStatus.FAILED -> stringResource(R.string.library_download_retry)
     }
 }
 

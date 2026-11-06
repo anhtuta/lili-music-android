@@ -11,6 +11,7 @@ fun LibraryRoute(
     onSongClick: (Song) -> Unit,
     viewModel: LibraryViewModel = hiltViewModel(),
     onSettingsClick: () -> Unit = {},
+    onDownloadsClick: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LibraryScreen(
@@ -20,9 +21,12 @@ fun LibraryRoute(
         onSortOrderToggle = viewModel::onSortOrderToggle,
         onRefresh = viewModel::onRefresh,
         onSongClick = { song ->
-            viewModel.onSongClick(song)
-            onSongClick(song)
+            if (viewModel.onSongClick(song)) {
+                onSongClick(song)
+            }
         },
         onSettingsClick = onSettingsClick,
+        onDownloadsClick = onDownloadsClick,
+        onDownloadAction = viewModel::onDownloadAction,
     )
 }

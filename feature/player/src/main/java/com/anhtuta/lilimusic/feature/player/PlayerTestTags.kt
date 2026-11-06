@@ -28,4 +28,5 @@ object PlayerTestTags {
     const val MINI_PLAY_PAUSE = "mini-player-play-pause"
     const val SETTINGS = "player-settings"
     const val PALETTE = "player-palette"
+    const val DOWNLOAD = "player-download"
 }

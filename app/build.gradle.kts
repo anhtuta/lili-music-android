@@ -56,11 +56,19 @@ android {
 }
 
 kotlin {
-    jvmToolchain(17)
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
 
 tasks.matching { it.name == "testReleaseUnitTest" }.configureEach {
     enabled = false
+}
+
+tasks.configureEach {
+    if (name == "testDebugUnitTest") {
+        dependsOn("processDebugMainManifest")
+    }
 }
 
 dependencies {
@@ -107,4 +115,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.work.testing)
+    kspTest(libs.hilt.compiler)
 }

@@ -11,9 +11,10 @@ import androidx.navigation.toRoute
 
 @Composable
 fun LiliNavHost(
-    libraryContent: @Composable (onSongClick: (String) -> Unit, onSettings: () -> Unit) -> Unit,
+    libraryContent: @Composable (onSongClick: (String) -> Unit, onSettings: () -> Unit, onDownloads: () -> Unit) -> Unit,
     playerContent: @Composable (path: String, onBack: () -> Unit, onSettings: () -> Unit) -> Unit,
     settingsContent: @Composable (onBack: () -> Unit) -> Unit,
+    downloadsContent: @Composable (onBack: () -> Unit, onPlay: (String) -> Unit) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
@@ -26,6 +27,7 @@ fun LiliNavHost(
             libraryContent(
                 { path -> navController.navigate(PlayerDestination(path)) },
                 { navController.navigate(SettingsDestination) },
+                { navController.navigate(DownloadsDestination) },
             )
         }
         composable<PlayerDestination>(
@@ -43,6 +45,12 @@ fun LiliNavHost(
         }
         composable<SettingsDestination> {
             settingsContent { navController.popBackStack() }
+        }
+        composable<DownloadsDestination> {
+            downloadsContent(
+                { navController.popBackStack() },
+                { path -> navController.navigate(PlayerDestination(path)) },
+            )
         }
     }
 }

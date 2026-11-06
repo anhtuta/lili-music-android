@@ -13,4 +13,5 @@ data class PlayerCallbacks(
     val onIncreaseSpeed: () -> Unit,
     val onDecreaseSpeed: () -> Unit,
     val onSettings: () -> Unit = {},
+    val onDownload: () -> Unit = {},
 )

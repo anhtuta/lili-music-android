@@ -20,17 +20,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Makefile dry-run
+        run: bash scripts/test-makefile.sh
+
       - name: Lint commit messages
         if: github.event_name == 'pull_request'
         uses: wagoid/commitlint-github-action@v6
         with:
           configFile: ./commitlint.config.mjs
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
           cache: gradle
 
       - name: Set up Android SDK
@@ -45,3 +48,29 @@ jobs:
 
       - name: Check
         run: ./gradlew check --stacktrace --no-daemon
+
+  assemble-jdk25:
+    name: Assemble on JDK 25
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Assemble debug
+        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon

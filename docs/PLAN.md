@@ -274,7 +274,7 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 | 052 | Cover-art Palette background | Done in 009 |
 | 053 | Settings screen persistence | Done in 009 |
 
-`.xlrc` translations are gated by the `translate` setting (default **off**, matching web). Speed ±0.1× stays on the player and is also on Settings (already persisted in **006**). Gigantic line defaults **on**. In-app volume, waveform, lyric-card export, downloads, and sleep timer stay later / out of v1.
+`.xlrc` translations are gated by the `translate` setting (default **off**, matching web). Speed ±0.1× stays on the player and is also on Settings (already persisted in **006**). Gigantic line defaults **on**. In-app volume, waveform, lyric-card export, and sleep timer stay later / out of v1. Downloads are **060–061**.
 
 ### Phase 5b — Web parity *(task 010)*
 
@@ -282,11 +282,11 @@ Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [
 
 ### Phase 6 — Offline, share, deep links, store
 
-| ID | Task |
-| --- | --- |
-| 060 | Media3 downloads (audio + lyric + cover) + download UI |
-| 061 | Offline playback using downloaded files |
-| 062 | Lyric card compose / export / share |
+| ID | Task | Status |
+| --- | --- | --- |
+| 060 | Media3 downloads (audio + lyric + cover) + download UI | Done in 011 |
+| 061 | Offline playback using downloaded files | Done in 011 |
+| 062 | Lyric card compose / export / share | |
 | 063 | **External** App Links / intent-filters for `bai-hat/{path}` (Play Store / HTTPS). In-app navigation to `bai-hat/{path}` already exists from **006**. Deferred to this release phase. |
 | 064 | Play Store packaging: applicationId, icons, POST_NOTIFICATIONS, FOREGROUND_SERVICE_MEDIA_PLAYBACK, privacy policy, no `RECORD_AUDIO` |
 | 065 | Release smoke: Playable-only library, notification controls, offline, lyric formats |
@@ -307,16 +307,17 @@ Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [
 | `sortBy=createdDate` vs `created_date` | Golden test against live API during task 013 |
 | Missing lyric returns HTTP 200 HTML | Parser/repository treats exact body `Lyric doesn't exist!` as empty |
 | `file` query params contain Unicode / spaces | Always URL-encode; MockWebServer + one live smoke later |
-| Media3 notification / Play policy | Use FGS mediaPlayback type only; never `RECORD_AUDIO` |
+| Media3 notification / Play policy | Playback FGS is `mediaPlayback`; download FGS is `dataSync`; never `RECORD_AUDIO` |
 | Unpaged `/api/song/all` growing | Fine for ~150 songs; add local paging in UI if the list grows |
 | Relative vs absolute `image_url` | Single `ImageUrlResolver` with tests |
 | Shuffle “current first” easy to get wrong | Dedicated unit tests around playlist mutation |
 | Lyric timing vs ExoPlayer position | Use player `currentPosition` + both offsets; test with fake clock |
 | Download storage / scoped storage | Media3 download directory in app-private storage (no extra storage permission on 26+) |
+| Debug APK opens a blank `ComponentActivity` | Never put `MAIN`/`LAUNCHER` on Compose `ui-test-manifest`’s `ComponentActivity`; keep that filter only on `MainActivity`. See task [013](tasks/013-debug-launcher.md) |
 
 ## 9. This-run deliverable
 
-Task **010** (`docs/tasks/010-web-parity-fixes.md`): web-parity fixes stacked on Phase 5 / PR #18. External HTTPS App Links stay **063** in the release phase.
+Task **010** (`docs/tasks/010-web-parity-fixes.md`) is merged on main. This PR adds **060/061** (`docs/tasks/011-downloads-offline.md`): Media3 downloads of audio + lyric + cover, Downloads screen, offline playback from the download cache, WorkManager network constraint on listen PUT. It also fixes the debug launcher blank screen ([013](tasks/013-debug-launcher.md)). Lyric-card export (062), HTTPS App Links (063), Play Store packaging (064), and release smoke (065) remain later.
 
 ## 10. Intentional differences from the web app
 
@@ -331,5 +332,6 @@ These Android extras / choices are **kept as-is** (not bugs):
 | **13** | Tap a lyric line to seek | Lyric taps do not seek |
 | **20** | Cover Palette tints now-playing chrome | `getAverageRGB` only tinted waveform bars (not ported) |
 | **22** | External `/bai-hat` intent-filters / App Links deferred to **063** | Hash route `#/bai-hat/{path}` |
+| **Downloads** | Media3 downloads + offline playback from cache (060/061) | No download / offline library |
 
-The extra sort-order toggle (**11**) still talks to the API (`sortOrder`); it does not locally re-sort an unfiltered catalog.
+The extra sort-order toggle (**11**) still talks to the API (`sortOrder`); it does not locally re-sort an unfiltered catalog. Online play uses the **full playable catalog** in API order (`catalogIndex`); search only filters the view. Offline play uses that same catalog filtered to completed downloads.

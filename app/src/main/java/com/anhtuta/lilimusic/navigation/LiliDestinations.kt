@@ -14,3 +14,6 @@ data class PlayerDestination(
 
 @Serializable
 data object SettingsDestination
+
+@Serializable
+data object DownloadsDestination

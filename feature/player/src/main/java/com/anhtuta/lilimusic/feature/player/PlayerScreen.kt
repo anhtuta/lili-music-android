@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
@@ -70,6 +71,14 @@ fun PlayerScreen(
                     }
                 },
                 actions = {
+                    if (state.song != null) {
+                        TextButton(
+                            onClick = callbacks.onDownload,
+                            modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
+                        ) {
+                            Text(text = downloadActionLabel(state))
+                        }
+                    }
                     TextButton(
                         onClick = callbacks.onSettings,
                         modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
@@ -376,3 +385,13 @@ private fun PlayerModeRow(
         }
     }
 }
+
+@Composable
+private fun downloadActionLabel(state: PlayerUiState): String =
+    when (state.downloadStatus) {
+        DownloadStatus.NONE -> stringResource(R.string.player_download)
+        DownloadStatus.QUEUED -> stringResource(R.string.player_download_waiting)
+        DownloadStatus.DOWNLOADING -> stringResource(R.string.player_download_progress, state.downloadProgress)
+        DownloadStatus.COMPLETED -> stringResource(R.string.player_download_delete)
+        DownloadStatus.FAILED -> stringResource(R.string.player_download_retry)
+    }

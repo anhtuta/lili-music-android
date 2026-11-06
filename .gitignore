@@ -29,5 +29,8 @@ captures/
 *.aab
 *.dex
 
+# CLI APK export (`make apk`)
+dist/
+
 # Test / lint outputs
 *.hprof

@@ -35,7 +35,9 @@ android {
 }
 
 kotlin {
-    jvmToolchain(17)
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
 
 tasks.matching { it.name == "testReleaseUnitTest" }.configureEach {
@@ -50,6 +52,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.session)
+    implementation(libs.media3.database)
     implementation(libs.work.runtime)
     implementation(libs.androidx.hilt.work)
     implementation(libs.kotlinx.coroutines.android)
