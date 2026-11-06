@@ -49,8 +49,8 @@ class SettingsPreferencesDataSourceTest {
                 source.setBlurMode(true)
                 assertThat(awaitItem().blurMode).isTrue()
 
-                source.setGiganticLine(true)
-                assertThat(awaitItem().giganticLine).isTrue()
+                source.setGiganticLine(false)
+                assertThat(awaitItem().giganticLine).isFalse()
 
                 source.setWordAppear(true)
                 assertThat(awaitItem().wordAppear).isTrue()
