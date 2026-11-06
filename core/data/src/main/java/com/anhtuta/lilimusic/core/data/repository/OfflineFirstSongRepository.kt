@@ -37,7 +37,7 @@ class OfflineFirstSongRepository
             withContext(ioDispatcher) {
                 runCatching {
                     val playable = network.getSongs(sort, order).mapNotNull { it.toPlayableSong(baseUrl) }
-                    local.replaceAll(playable.map { it.toEntity() })
+                    local.replaceAll(playable.mapIndexed { index, song -> song.toEntity(catalogIndex = index) })
                 }
             }
 

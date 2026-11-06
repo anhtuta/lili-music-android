@@ -34,7 +34,7 @@ class LibraryViewModelTest {
         }
 
     @Test
-    fun successShowsSortedSongs() =
+    fun successShowsCatalogInApiOrder() =
         runTest {
             val repository = FakeSongRepository()
             val viewModel = LibraryViewModel(repository, FakeSortPreferences(), FakePlayerController())
@@ -46,7 +46,7 @@ class LibraryViewModelTest {
             )
 
             viewModel.uiState.test {
-                val state = awaitItemUntil { it.songs.map { song -> song.title } == listOf("Alpha", "Beta") }
+                val state = awaitItemUntil { it.songs.map { song -> song.title } == listOf("Beta", "Alpha") }
                 assertThat(state.isLoading).isFalse()
                 assertThat(state.isOfflineError).isFalse()
                 assertThat(repository.refreshCalls).isNotEmpty()
@@ -126,10 +126,11 @@ class LibraryViewModelTest {
         }
 
     @Test
-    fun selectingSortUsesColumnDefaultOrder() =
+    fun selectingSortUsesColumnDefaultOrderAndRefetches() =
         runTest {
+            val repository = FakeSongRepository()
             val preferences = FakeSortPreferences()
-            val viewModel = LibraryViewModel(FakeSongRepository(), preferences, FakePlayerController())
+            val viewModel = LibraryViewModel(repository, preferences, FakePlayerController())
 
             viewModel.onSortSelected(SongSort.LISTENS)
 
@@ -138,6 +139,25 @@ class LibraryViewModelTest {
                 assertThat(state.sortOrder).isEqualTo(SortOrder.DESC)
                 cancelAndIgnoreRemainingEvents()
             }
+            assertThat(repository.refreshCalls.last()).isEqualTo(SongSort.LISTENS to SortOrder.DESC)
+        }
+
+    @Test
+    fun togglingSortOrderRefetchesFromApi() =
+        runTest {
+            val repository = FakeSongRepository()
+            val preferences = FakeSortPreferences()
+            val viewModel = LibraryViewModel(repository, preferences, FakePlayerController())
+            repository.refreshCalls.clear()
+
+            viewModel.onSortOrderToggle()
+
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.sortOrder == SortOrder.DESC }
+                assertThat(state.sort).isEqualTo(SongSort.TITLE)
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertThat(repository.refreshCalls.last()).isEqualTo(SongSort.TITLE to SortOrder.DESC)
         }
 
     @Test
@@ -155,7 +175,7 @@ class LibraryViewModelTest {
         }
 
     @Test
-    fun songClickPlaysVisibleQueueFromThatPath() =
+    fun songClickPlaysFullCatalogFromThatPath() =
         runTest {
             val repository = FakeSongRepository()
             val controller = FakePlayerController()
@@ -167,7 +187,7 @@ class LibraryViewModelTest {
                 ),
             )
             viewModel.uiState.test {
-                awaitItemUntil { it.songs.map { song -> song.path } == listOf("alpha", "beta") }
+                awaitItemUntil { it.songs.map { song -> song.path } == listOf("beta", "alpha") }
                 cancelAndIgnoreRemainingEvents()
             }
 
@@ -181,7 +201,36 @@ class LibraryViewModelTest {
             assertThat(
                 controller.state.value.queue
                     .map { it.path },
-            ).containsExactly("alpha", "beta").inOrder()
+            ).containsExactly("beta", "alpha").inOrder()
+        }
+
+    @Test
+    fun searchFiltersViewButPlayUsesFullCatalog() =
+        runTest {
+            val repository = FakeSongRepository()
+            val controller = FakePlayerController()
+            val viewModel = LibraryViewModel(repository, FakeSortPreferences(), controller)
+            val hello = libraryTestSong(id = 1, title = "Hello", artist = "Ann", path = "hello")
+            val world = libraryTestSong(id = 2, title = "World", artist = "Bob", path = "world")
+            repository.emit(listOf(hello, world))
+            viewModel.onQueryChange("bob")
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.songs.size == 1 }
+                assertThat(state.songs.single().path).isEqualTo("world")
+                assertThat(state.playableCatalog.map { it.path }).containsExactly("hello", "world").inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            viewModel.onSongClick(world)
+
+            assertThat(
+                controller.state.value.queue
+                    .map { it.path },
+            ).containsExactly("hello", "world").inOrder()
+            assertThat(
+                controller.state.value.currentSong
+                    ?.path,
+            ).isEqualTo("world")
         }
 }
 

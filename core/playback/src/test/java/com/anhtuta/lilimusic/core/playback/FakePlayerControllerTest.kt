@@ -77,6 +77,64 @@ class FakePlayerControllerTest {
     }
 
     @Test
+    fun skipPreviousFromMiddleGoesToPreviousTrackNotRestart() {
+        val controller = FakePlayerController()
+        controller.play(songs, "beta")
+        controller.advancePosition(20_000L)
+        controller.skipToPrevious()
+
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("alpha")
+        assertThat(controller.state.value.positionMs).isEqualTo(0L)
+    }
+
+    @Test
+    fun skipPreviousOnFirstTrackKeepsPositionAndSignalsStart() {
+        val controller = FakePlayerController()
+        controller.play(songs, "alpha")
+        controller.advancePosition(20_000L)
+        controller.skipToPrevious()
+
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("alpha")
+        assertThat(controller.state.value.positionMs).isEqualTo(20_000L)
+        assertThat(controller.state.value.atStartOfQueue).isTrue()
+        assertThat(controller.state.value.isPlaying).isTrue()
+    }
+
+    @Test
+    fun skipPreviousInRepeatOneReplaysTheSameSong() {
+        val controller = FakePlayerController(initialPlayMode = PlayMode.REPEAT_ONE)
+        controller.play(songs, "beta")
+        controller.advancePosition(20_000L)
+        controller.skipToPrevious()
+
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("beta")
+        assertThat(controller.state.value.positionMs).isEqualTo(0L)
+        assertThat(controller.state.value.isPlaying).isTrue()
+    }
+
+    @Test
+    fun seekBackAndForwardMoveFiveSeconds() {
+        val controller = FakePlayerController()
+        controller.play(songs, "alpha")
+        controller.advancePosition(20_000L)
+
+        controller.seekBack()
+        assertThat(controller.state.value.positionMs).isEqualTo(15_000L)
+
+        controller.seekForward()
+        assertThat(controller.state.value.positionMs).isEqualTo(20_000L)
+    }
+
+    @Test
     fun shufflePutsCurrentSongFirst() {
         val controller = FakePlayerController(random = Random(4))
         controller.play(songs, "gamma")
@@ -91,17 +149,18 @@ class FakePlayerControllerTest {
     }
 
     @Test
-    fun pauseCancelsListenThenResumeFromMiddleDoesNotReschedule() {
+    fun pauseDoesNotCancelListenAndResumeFromMiddleDoesNotReschedule() {
         val scheduler = RecordingListenCountScheduler()
         val controller = FakePlayerController(listenCountScheduler = scheduler)
         controller.play(songs, "alpha")
         controller.advancePosition(20_000L)
         controller.playPause()
 
-        assertThat(scheduler.decisions.last().cancelPending).isTrue()
+        assertThat(scheduler.decisions.last().cancelPending).isFalse()
         assertThat(scheduler.decisions.last().schedulePath).isNull()
 
         controller.playPause()
+        assertThat(scheduler.decisions.last().cancelPending).isFalse()
         assertThat(scheduler.decisions.last().schedulePath).isNull()
     }
 }

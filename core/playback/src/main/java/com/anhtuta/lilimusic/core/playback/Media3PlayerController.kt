@@ -5,7 +5,6 @@ package com.anhtuta.lilimusic.core.playback
 import android.content.ComponentName
 import android.content.Context
 import androidx.core.content.ContextCompat
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -149,13 +148,25 @@ class Media3PlayerController
 
         override fun skipToPrevious() {
             withController { mediaController ->
-                if (queueState.playMode == PlayMode.REPEAT_ONE || mediaController.currentPosition <= 3_000L) {
-                    mediaController.seekTo(0)
-                    return@withController
+                when (
+                    SkipPreviousPolicy.decide(
+                        repeatOne = queueState.playMode == PlayMode.REPEAT_ONE,
+                        currentIndex = queueState.currentIndex,
+                    )
+                ) {
+                    SkipPreviousAction.ReplayCurrent -> {
+                        mediaController.seekTo(0)
+                        mediaController.play()
+                    }
+                    SkipPreviousAction.StayAtStart -> {
+                        publishFromPlayer(mediaController, atStartOfQueue = true)
+                    }
+                    SkipPreviousAction.GoToPrevious -> {
+                        queueState = PlayQueue.skipPrevious(queueState)
+                        mediaController.seekTo(queueState.currentIndex, 0L)
+                        persistLastSong()
+                    }
                 }
-                queueState = PlayQueue.skipPrevious(queueState)
-                mediaController.seekTo(queueState.currentIndex, 0L)
-                persistLastSong()
             }
         }
 
@@ -163,6 +174,14 @@ class Media3PlayerController
             withController { mediaController ->
                 mediaController.seekTo(positionMs.coerceAtLeast(0L))
             }
+        }
+
+        override fun seekBack() {
+            withController { mediaController -> mediaController.seekBack() }
+        }
+
+        override fun seekForward() {
+            withController { mediaController -> mediaController.seekForward() }
         }
 
         override fun setPlayMode(playMode: PlayMode) {
@@ -223,19 +242,20 @@ class Media3PlayerController
         private fun publishFromPlayer(
             player: Player,
             reachedEnd: Boolean = player.playbackState == Player.STATE_ENDED,
+            atStartOfQueue: Boolean = false,
         ) {
             val previous = _state.value
-            val duration = player.duration.takeUnless { it == C.TIME_UNSET } ?: 0L
             val next =
                 PlaybackState(
                     currentSong = queueState.currentSong,
                     queue = queueState.playableQueue,
                     isPlaying = player.isPlaying,
                     positionMs = player.currentPosition.coerceAtLeast(0L),
-                    durationMs = duration.coerceAtLeast(0L),
+                    durationMs = PlaybackDuration.fromMedia3(player.duration),
                     playMode = queueState.playMode,
                     speed = player.playbackParameters.speed,
                     reachedEnd = reachedEnd && !player.isPlaying,
+                    atStartOfQueue = atStartOfQueue,
                 )
             _state.value = next
             listenCountScheduler.apply(
@@ -265,11 +285,7 @@ class Media3PlayerController
                             _state.value =
                                 _state.value.copy(
                                     positionMs = mediaController.currentPosition.coerceAtLeast(0L),
-                                    durationMs =
-                                        mediaController.duration
-                                            .takeUnless { it == C.TIME_UNSET }
-                                            ?.coerceAtLeast(0L)
-                                            ?: _state.value.durationMs,
+                                    durationMs = PlaybackDuration.fromMedia3(mediaController.duration),
                                 )
                         }
                     }
@@ -297,6 +313,6 @@ class Media3PlayerController
         }
 
         companion object {
-            const val POSITION_TICK_MS = 50L
+            const val POSITION_TICK_MS = 30L
         }
     }

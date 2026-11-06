@@ -97,6 +97,24 @@ class SongDaoTest {
         }
 
     @Test
+    fun replaceAllPreservesApiOrderNotPrimaryKeyOrder() =
+        runTest(UnconfinedTestDispatcher()) {
+            val local = RoomSongLocalDataSource(database, songDao)
+            local.replaceAll(
+                listOf(
+                    entity(id = 30, title = "Third", catalogIndex = 0),
+                    entity(id = 1, title = "First", catalogIndex = 1),
+                    entity(id = 20, title = "Second", catalogIndex = 2),
+                ),
+            )
+
+            local.observeSongs().test {
+                assertThat(awaitItem().map { it.id }).containsExactly(30L, 1L, 20L).inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun entityRoundTripsToDomain() {
         val entity = entity(id = 9, title = "Round")
         val song = entity.toSong()
@@ -108,6 +126,7 @@ class SongDaoTest {
     private fun entity(
         id: Long,
         title: String,
+        catalogIndex: Int = 0,
     ): SongEntity =
         SongEntity(
             id = id,
@@ -126,5 +145,6 @@ class SongDaoTest {
             createdDate = "2021-06-09T12:21:29.000000Z",
             formatCreatedDate = "2021/06/09",
             streamUrl = "https://example.com/api/song/file?file=round.mp3",
+            catalogIndex = catalogIndex,
         )
 }

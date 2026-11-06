@@ -20,7 +20,22 @@ class ListenCountPolicyTest {
     }
 
     @Test
-    fun pauseCancelsPendingListen() {
+    fun playFromNonZeroPositionDoesNotSchedule() {
+        val decision =
+            ListenCountPolicy.decide(
+                previousPath = null,
+                previousPlaying = false,
+                currentPath = "hello",
+                currentPlaying = true,
+                positionMs = 1L,
+            )
+
+        assertThat(decision.cancelPending).isFalse()
+        assertThat(decision.schedulePath).isNull()
+    }
+
+    @Test
+    fun pauseDoesNotCancelPendingListen() {
         val decision =
             ListenCountPolicy.decide(
                 previousPath = "hello",
@@ -30,7 +45,22 @@ class ListenCountPolicyTest {
                 positionMs = 30_000L,
             )
 
-        assertThat(decision.cancelPending).isTrue()
+        assertThat(decision.cancelPending).isFalse()
+        assertThat(decision.schedulePath).isNull()
+    }
+
+    @Test
+    fun finishingDoesNotCancelPendingListen() {
+        val decision =
+            ListenCountPolicy.decide(
+                previousPath = "hello",
+                previousPlaying = true,
+                currentPath = "hello",
+                currentPlaying = false,
+                positionMs = 180_000L,
+            )
+
+        assertThat(decision.cancelPending).isFalse()
         assertThat(decision.schedulePath).isNull()
     }
 
@@ -60,6 +90,7 @@ class ListenCountPolicyTest {
                 positionMs = 0L,
             )
 
+        assertThat(decision.cancelPending).isFalse()
         assertThat(decision.schedulePath).isEqualTo("hello")
     }
 

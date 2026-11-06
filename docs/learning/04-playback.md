@@ -2,12 +2,12 @@
 
 [Learning guide index](README.md) · [PR #15](https://github.com/anhtuta/lili-music-android/pull/15)
 
-**What was built.** `MediaSessionService` + ExoPlayer, `PlayerController` (+ Fake), sequence/shuffle-current-first/repeat-one, speed ±0.1, WorkManager listen 60s after play-from-start, DataStore restore (prepared paused), full player + mini-player, library tap plays visible queue, `bai-hat/{path}`. Task [006](../tasks/006-playback.md). Now on main.
+**What was built.** `MediaSessionService` + ExoPlayer, `PlayerController` (+ Fake), sequence/shuffle-current-first/repeat-one, speed ±0.1, WorkManager listen 60s after play-from-start, DataStore restore (prepared paused), full player + mini-player, library tap plays the catalog, `bai-hat/{path}`. Task [006](../tasks/006-playback.md). Now on main. Queue-vs-search and listen-timer details: [task 010](08-web-parity.md).
 
 **Status:** Merged.
 
 > [!WARNING]
-> **Listen counting.** Scheduled 60s after play starts near position 0; cancelled on pause/stop/song change. Not accumulated play time. Matches [docs/PLAN.md](../PLAN.md) and the web timer.
+> **Listen counting.** Task [010](08-web-parity.md) aligned this with web `BaiHat.js` `onPlay`: scheduled 60s after play starts at **exactly position 0**; cancelled **only** when `path` changes. Pause / resume / finishing do **not** cancel. Not accumulated play time.
 
 ## New terms
 
@@ -35,6 +35,8 @@
 6. [ListenCountPolicy.kt](../../core/playback/src/main/java/com/anhtuta/lilimusic/core/playback/ListenCountPolicy.kt) — pure schedule-vs-cancel decision.
 7. [PlayerViewModel.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerViewModel.kt) — `restoreLastPlayed` prepares paused (no autoplay).
 8. [PlayerScreen.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerScreen.kt) / [MiniPlayerBar.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/MiniPlayerBar.kt) — Compose chrome.
+
+Library row tap plays the **full playable catalog** (search only filters the view) as of [task 010](08-web-parity.md). Previous never uses Media3’s 3s restart-current rule.
 
 `FakePlayerController`: real Media3 needs a device, a service, and network audio. The fake keeps `PlaybackState` in memory so `PlayerViewModel` tests stay fast JVM unit tests on CI.
 
@@ -69,12 +71,12 @@ Listen policy, from `ListenCountPolicy.kt`:
 val startedFromStart =
     currentPlaying &&
         !currentPath.isNullOrBlank() &&
-        positionMs <= FROM_START_MAX_POSITION_MS &&
+        positionMs == 0L &&
         (!previousPlaying || pathChanged)
-val cancelPending = (pathChanged && previousPath != null) || stopped
+val cancelPending = pathChanged && previousPath != null
 ```
 
-Schedule when playing, path present, `positionMs` at most 1000ms, and (was not playing or path changed). Cancel when path changes or playback stops.
+Schedule when playing, path present, `positionMs == 0`, and (was not playing or path changed). Cancel only when path changes.
 
 Restore last song paused, from `PlayerViewModel.kt`:
 

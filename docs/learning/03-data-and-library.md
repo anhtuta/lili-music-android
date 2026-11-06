@@ -30,7 +30,7 @@
 3. [NetworkSong.kt](../../core/network/src/main/java/com/anhtuta/lilimusic/core/network/model/NetworkSong.kt) — `@SerialName("file_name")` snake_case → camelCase.
 4. [SongEntity.kt](../../core/database/src/main/java/com/anhtuta/lilimusic/core/database/SongEntity.kt) / [SongDao.kt](../../core/database/src/main/java/com/anhtuta/lilimusic/core/database/SongDao.kt) — Room + Flow `observeAll()`.
 5. [OfflineFirstSongRepository.kt](../../core/data/src/main/java/com/anhtuta/lilimusic/core/data/repository/OfflineFirstSongRepository.kt) — observe Room; refresh API then `replaceAll`.
-6. [LibraryViewModel.kt](../../feature/library/src/main/java/com/anhtuta/lilimusic/feature/library/LibraryViewModel.kt) — `combine` → `stateIn` StateFlow (like a React selector). Row tap plays the visible queue as of [PR #15](04-playback.md).
+6. [LibraryViewModel.kt](../../feature/library/src/main/java/com/anhtuta/lilimusic/feature/library/LibraryViewModel.kt) — `combine` → `stateIn` StateFlow (like a React selector). Row tap plays the **full catalog**; search only filters the view ([task 010](08-web-parity.md)).
 7. [LibraryScreen.kt](../../feature/library/src/main/java/com/anhtuta/lilimusic/feature/library/LibraryScreen.kt) — Scaffold, `PullToRefreshBox`, `LazyColumn`, Coil.
 8. [SortPreferencesDataSource.kt](../../core/datastore/src/main/java/com/anhtuta/lilimusic/core/datastore/SortPreferencesDataSource.kt) — DataStore sort keys.
 

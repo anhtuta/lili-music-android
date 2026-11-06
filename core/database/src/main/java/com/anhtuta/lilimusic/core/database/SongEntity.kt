@@ -23,6 +23,7 @@ data class SongEntity(
     val createdDate: String?,
     val formatCreatedDate: String?,
     val streamUrl: String,
+    val catalogIndex: Int = 0,
 )
 
 fun SongEntity.toSong(): Song =
@@ -45,7 +46,7 @@ fun SongEntity.toSong(): Song =
         streamUrl = streamUrl,
     )
 
-fun Song.toEntity(): SongEntity =
+fun Song.toEntity(catalogIndex: Int = 0): SongEntity =
     SongEntity(
         id = id,
         title = title,
@@ -63,4 +64,5 @@ fun Song.toEntity(): SongEntity =
         createdDate = createdDate,
         formatCreatedDate = formatCreatedDate,
         streamUrl = streamUrl,
+        catalogIndex = catalogIndex,
     )

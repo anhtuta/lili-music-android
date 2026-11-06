@@ -17,6 +17,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [05 — How to run](05-how-to-run.md) | Android Studio, Gradle commands, smoke checks |
 | [06 — Synced lyrics](06-synced-lyrics.md) | LRC/XLRC/TRC parser, fetch, Room cache, player pane |
 | [07 — Player visuals](07-player-visuals.md) | Settings, lyric themes, Palette, app light/dark |
+| [08 — Web parity](08-web-parity.md) | BaiHat.js mismatches vs PR #18; intentional Android extras |
 
 ## Status of phases
 
@@ -26,7 +27,8 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 - [x] [PR #15](https://github.com/anhtuta/lili-music-android/pull/15) — Playback (Media3, queue, listens) (merged to main)
 - [x] [PR #16](https://github.com/anhtuta/lili-music-android/pull/16) — Learning guide (merged to main)
 - [x] [PR #17](https://github.com/anhtuta/lili-music-android/pull/17) — Synced lyrics (Phase 4) (merged to main)
-- [ ] This PR — player visuals / settings (Phase 5) (task 009)
+- [ ] [PR #18](https://github.com/anhtuta/lili-music-android/pull/18) — player visuals / settings (Phase 5) (task 009)
+- [ ] This PR — web parity vs class BaiHat.js (task 010), stacked on #18
 
 ## After a later phase
 

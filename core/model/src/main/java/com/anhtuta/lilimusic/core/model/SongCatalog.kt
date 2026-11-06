@@ -13,12 +13,20 @@ object SongCatalog {
             song.artist.contains(needle, ignoreCase = true)
     }
 
-    fun filterAndSort(
+    fun filter(
         songs: List<Song>,
         query: String,
+    ): List<Song> = songs.filter { matchesQuery(it, query) }
+
+    /**
+     * MySQL-style nulls: ASC nulls first, DESC nulls last.
+     * Used if a local sort remains (cached catalog when a refresh cannot run).
+     */
+    fun sorted(
+        songs: List<Song>,
         sort: SongSort,
         order: SortOrder,
-    ): List<Song> = songs.filter { matchesQuery(it, query) }.sortedWith(comparator(sort, order))
+    ): List<Song> = songs.sortedWith(comparator(sort, order))
 
     fun comparator(
         sort: SongSort,
@@ -28,9 +36,9 @@ object SongCatalog {
             when (sort) {
                 SongSort.TITLE -> compareBy(String.CASE_INSENSITIVE_ORDER, Song::title)
                 SongSort.LISTENS -> compareBy(Song::listens)
-                SongSort.SONG_OF_THE_YEAR -> compareBy(nullsLast(), Song::songOfTheYear)
-                SongSort.TYPE -> compareBy(nullsLast(String.CASE_INSENSITIVE_ORDER), Song::type)
-                SongSort.CREATED_DATE -> compareBy(nullsLast(), Song::createdDate)
+                SongSort.SONG_OF_THE_YEAR -> compareBy(nullsFirst(), Song::songOfTheYear)
+                SongSort.TYPE -> compareBy(nullsFirst(String.CASE_INSENSITIVE_ORDER), Song::type)
+                SongSort.CREATED_DATE -> compareBy(nullsFirst(), Song::createdDate)
             }
         return if (order == SortOrder.DESC) ascending.reversed() else ascending
     }

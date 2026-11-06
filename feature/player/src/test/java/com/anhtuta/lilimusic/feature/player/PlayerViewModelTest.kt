@@ -96,6 +96,11 @@ class PlayerViewModelTest {
             viewModel.seekTo(12_000L)
 
             assertThat(controller.state.value.positionMs).isEqualTo(12_000L)
+
+            viewModel.seekBack()
+            assertThat(controller.state.value.positionMs).isEqualTo(7_000L)
+            viewModel.seekForward()
+            assertThat(controller.state.value.positionMs).isEqualTo(12_000L)
         }
 }
 

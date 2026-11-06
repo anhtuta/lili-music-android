@@ -13,4 +13,5 @@ data class PlaybackState(
     val playMode: PlayMode = PlayMode.SEQUENCE,
     val speed: Float = PlaybackSpeed.DEFAULT,
     val reachedEnd: Boolean = false,
+    val atStartOfQueue: Boolean = false,
 )

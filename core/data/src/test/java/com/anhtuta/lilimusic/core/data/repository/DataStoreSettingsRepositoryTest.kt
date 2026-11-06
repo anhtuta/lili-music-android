@@ -32,8 +32,8 @@ class DataStoreSettingsRepositoryTest {
                 repository.setBlurMode(true)
                 assertThat(awaitItem().blurMode).isTrue()
 
-                repository.setGiganticLine(true)
-                assertThat(awaitItem().giganticLine).isTrue()
+                repository.setGiganticLine(false)
+                assertThat(awaitItem().giganticLine).isFalse()
 
                 repository.setWordAppear(true)
                 assertThat(awaitItem().wordAppear).isTrue()

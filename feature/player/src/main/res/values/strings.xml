@@ -7,6 +7,10 @@
     <string name="player_pause">Pause</string>
     <string name="player_next">Next</string>
     <string name="player_previous">Previous</string>
+    <string name="player_rewind">−5s</string>
+    <string name="player_forward">+5s</string>
+    <string name="player_rewind_cd">Rewind 5 seconds</string>
+    <string name="player_forward_cd">Forward 5 seconds</string>
     <string name="player_shuffle">Shuffle</string>
     <string name="player_repeat_one">Repeat one</string>
     <string name="player_speed_up">Faster</string>
@@ -15,6 +19,9 @@
     <string name="player_cover_cd">Cover art for %1$s</string>
     <string name="player_cover_placeholder_cd">No cover art for %1$s</string>
     <string name="player_end_of_queue">Reached the end of the list</string>
+    <string name="player_first_of_queue">This is the first song of playing list!</string>
     <string name="player_empty">Song unavailable</string>
+    <string name="player_no_album">No Album</string>
+    <string name="player_album">(%1$s)</string>
     <string name="mini_player_cd">Now playing %1$s</string>
 </resources>

@@ -7,8 +7,11 @@ data class ListenCountDecision(
 
 object ListenCountPolicy {
     const val DELAY_MS = 60_000L
-    const val FROM_START_MAX_POSITION_MS = 1_000L
 
+    /**
+     * Web `BaiHat.js` `onPlay`: arm a 60s listen only when `currentTime === 0`.
+     * The timeout is not cleared on pause/resume/finish; it no-ops if `path` changed.
+     */
     fun decide(
         previousPath: String?,
         previousPlaying: Boolean,
@@ -17,13 +20,12 @@ object ListenCountPolicy {
         positionMs: Long,
     ): ListenCountDecision {
         val pathChanged = previousPath != currentPath
-        val stopped = previousPlaying && !currentPlaying
         val startedFromStart =
             currentPlaying &&
                 !currentPath.isNullOrBlank() &&
-                positionMs <= FROM_START_MAX_POSITION_MS &&
+                positionMs == 0L &&
                 (!previousPlaying || pathChanged)
-        val cancelPending = (pathChanged && previousPath != null) || stopped
+        val cancelPending = pathChanged && previousPath != null
         return ListenCountDecision(
             cancelPending = cancelPending,
             schedulePath = currentPath.takeIf { startedFromStart },

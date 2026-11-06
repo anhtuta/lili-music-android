@@ -113,6 +113,46 @@ class LyricSynchronizerTest {
     }
 
     @Test
+    fun countdownSkippedWhenNoFollowingWord() {
+        val lyric =
+            ParsedLyric(
+                format = LyricFormat.TRC,
+                lines =
+                    listOf(
+                        LyricLine(
+                            startMs = 0L,
+                            endMs = 8_000L,
+                            words = listOf(LyricWord(startMs = 0L, endMs = 8_000L, text = "", isEmpty = true)),
+                        ),
+                    ),
+            )
+        val frame = LyricSynchronizer.sync(lyric, positionMs = 4_000L, durationMs = 8_000L)
+        assertThat(frame.lines[0].words[0].countdownDots).isEqualTo(0)
+    }
+
+    @Test
+    fun countdownShowsWhenFollowingWordExists() {
+        val lyric =
+            ParsedLyric(
+                format = LyricFormat.TRC,
+                lines =
+                    listOf(
+                        LyricLine(
+                            startMs = 0L,
+                            endMs = 9_000L,
+                            words =
+                                listOf(
+                                    LyricWord(startMs = 0L, endMs = 8_000L, text = "", isEmpty = true),
+                                    LyricWord(startMs = 8_000L, endMs = 9_000L, text = "next", isEmpty = false),
+                                ),
+                        ),
+                    ),
+            )
+        val frame = LyricSynchronizer.sync(lyric, positionMs = 4_000L, durationMs = 9_000L)
+        assertThat(frame.lines[0].words[0].countdownDots).isEqualTo(4)
+    }
+
+    @Test
     fun emptyLyricYieldsEmptyFrame() {
         val frame =
             LyricSynchronizer.sync(

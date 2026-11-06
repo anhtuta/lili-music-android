@@ -25,7 +25,7 @@ class SettingsViewModelTest {
                 val state = awaitItemUntil { it.settings == PlayerSettings() && it.speed == 1.0f }
                 assertThat(state.settings.lyricTheme).isEqualTo(LyricTheme.PICTURE_BG)
                 assertThat(state.settings.karaokeMode).isTrue()
-                assertThat(state.settings.giganticLine).isFalse()
+                assertThat(state.settings.giganticLine).isTrue()
                 assertThat(state.settings.translate).isFalse()
                 assertThat(state.settings.appTheme).isEqualTo(AppTheme.LIGHT)
                 cancelAndIgnoreRemainingEvents()
@@ -44,7 +44,7 @@ class SettingsViewModelTest {
             viewModel.setBlurMode(true)
             viewModel.setWordAppear(true)
             viewModel.setLineAppear(true)
-            viewModel.setGiganticLine(true)
+            viewModel.setGiganticLine(false)
             viewModel.setTranslate(true)
             viewModel.setAppTheme(AppTheme.DARK)
 
@@ -60,7 +60,7 @@ class SettingsViewModelTest {
                 assertThat(state.settings.blurMode).isTrue()
                 assertThat(state.settings.wordAppear).isTrue()
                 assertThat(state.settings.lineAppear).isTrue()
-                assertThat(state.settings.giganticLine).isTrue()
+                assertThat(state.settings.giganticLine).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }

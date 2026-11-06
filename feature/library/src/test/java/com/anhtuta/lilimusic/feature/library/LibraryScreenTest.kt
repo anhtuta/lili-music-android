@@ -44,8 +44,71 @@ class LibraryScreenTest {
 
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithText("Bob").assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.type(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.date(1), useUnmergedTree = true).assertIsDisplayed()
         composeRule.onNodeWithTag(LibraryTestTags.song(1)).performClick()
         assertThat(clickedId).isEqualTo(1L)
+    }
+
+    @Test
+    fun soyBadgeAndCoverPreviewOpenWhenImageExists() {
+        var clickedId: Long? = null
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs =
+                                listOf(
+                                    libraryTestSong(
+                                        id = 1,
+                                        title = "Alpha",
+                                        artist = "Ann",
+                                        songOfTheYear = 2024,
+                                        imageUrl = "https://example.com/alpha.jpg",
+                                    ),
+                                ),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = { clickedId = it.id },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.soy(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithText("2024").assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.cover(1), useUnmergedTree = true).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.COVER_PREVIEW).assertIsDisplayed()
+        composeRule.onNodeWithText("Ann - Alpha").assertIsDisplayed()
+        assertThat(clickedId).isNull()
+    }
+
+    @Test
+    fun coverWithoutImageDoesNotOpenPreview() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha", imageUrl = null)),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.cover(1), useUnmergedTree = true).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.COVER_PREVIEW).assertDoesNotExist()
     }
 
     @Test

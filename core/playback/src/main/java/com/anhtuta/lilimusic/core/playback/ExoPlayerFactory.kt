@@ -29,6 +29,8 @@ class ExoPlayerFactory
                 .setAudioAttributes(audioAttributes, true)
                 .setHandleAudioBecomingNoisy(true)
                 .setWakeMode(C.WAKE_MODE_NETWORK)
+                .setSeekBackIncrementMs(PlaybackSeek.INCREMENT_MS)
+                .setSeekForwardIncrementMs(PlaybackSeek.INCREMENT_MS)
                 .build()
         }
     }
