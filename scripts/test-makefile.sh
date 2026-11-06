@@ -23,7 +23,10 @@ for target in $targets; do
   echo "$phony" | grep -Eq "(^|[[:space:]])${target}([[:space:]]|$)" || fail ".PHONY missing ${target}"
 done
 
-make -n doctor | grep -Eq 'java|ANDROID_HOME' || fail "make -n doctor should mention java or ANDROID_HOME"
+make -n doctor | grep -Eq 'java|ANDROID_HOME|JDK 21' || fail "make -n doctor should mention java, ANDROID_HOME, or JDK 21"
+make -n doctor | grep -q 'temurin@21' || fail "make -n doctor should suggest brew install --cask temurin@21"
+make -n doctor | grep -q 'java_home -v 21' || fail "make -n doctor should mention /usr/libexec/java_home -v 21"
+make -n doctor | grep -q 'openjdk-21-jdk' || fail "make -n doctor should suggest apt openjdk-21-jdk"
 make -n doctor | grep -q 'platforms;android-37.0' || fail "make -n doctor should suggest platforms;android-37.0"
 make -n doctor | grep -q 'build-tools;37.0.0' || fail "make -n doctor should suggest build-tools;37.0.0"
 make -n doctor | grep -q 'android sdk CLI' || fail "make -n doctor should mention the android sdk CLI deprecation warning"
@@ -38,6 +41,8 @@ make -n lint | grep -q 'lintDebug' || fail "make -n lint should run lintDebug"
 make -n check | grep -q './gradlew check' || fail "make -n check should run ./gradlew check"
 make -n clean | grep -q './gradlew clean' || fail "make -n clean should run ./gradlew clean"
 make -n clean | grep -q 'dist' || fail "make -n clean should remove dist/"
+
+[ -f scripts/find-jdk21.sh ] || fail "missing scripts/find-jdk21.sh"
 
 finder="scripts/find-android-platform.sh"
 [ -f "$finder" ] || fail "missing $finder"
