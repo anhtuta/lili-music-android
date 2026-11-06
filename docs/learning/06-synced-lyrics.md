@@ -2,7 +2,7 @@
 
 [Learning guide index](README.md) · Task [008](../tasks/008-synced-lyrics.md)
 
-**What was built.** Pure-Kotlin parsers for `.lrc`, `.xlrc` (`[tranN]` translations), and `.trc` (word durations). `GET /api/lyric?file=` treats HTTP 200 body `Lyric doesn't exist!` as missing. Room caches lyric *text* for offline replay. The now-playing screen shows a synced pane: current line highlighted and auto-scrolled, karaoke fill, countdown dots in long empty gaps, translation lines, session-only ±100ms offset. Tap a line seeks (web does not; Android extra).
+**What was built.** Pure-Kotlin parsers for `.lrc`, `.xlrc` (`[tranN]` translations), and `.trc` (word durations). `GET /api/lyric?file=` treats HTTP 200 body `Lyric doesn't exist!` as missing. Room caches lyric *text* for offline replay. The now-playing screen shows a synced pane: current line highlighted and auto-scrolled, karaoke fill, countdown dots in long empty gaps (**only if a following word exists**, [task 010](08-web-parity.md)), translation lines, session-only ±100ms offset. Tap a line seeks (web does not; Android extra). Position ticker is 30ms.
 
 **Status:** Merged ([PR #17](https://github.com/anhtuta/lili-music-android/pull/17)).
 
