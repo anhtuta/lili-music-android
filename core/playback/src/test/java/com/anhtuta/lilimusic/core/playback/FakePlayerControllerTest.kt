@@ -120,17 +120,18 @@ class FakePlayerControllerTest {
     }
 
     @Test
-    fun pauseCancelsListenThenResumeFromMiddleDoesNotReschedule() {
+    fun pauseDoesNotCancelListenAndResumeFromMiddleDoesNotReschedule() {
         val scheduler = RecordingListenCountScheduler()
         val controller = FakePlayerController(listenCountScheduler = scheduler)
         controller.play(songs, "alpha")
         controller.advancePosition(20_000L)
         controller.playPause()
 
-        assertThat(scheduler.decisions.last().cancelPending).isTrue()
+        assertThat(scheduler.decisions.last().cancelPending).isFalse()
         assertThat(scheduler.decisions.last().schedulePath).isNull()
 
         controller.playPause()
+        assertThat(scheduler.decisions.last().cancelPending).isFalse()
         assertThat(scheduler.decisions.last().schedulePath).isNull()
     }
 }
