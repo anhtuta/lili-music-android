@@ -39,7 +39,7 @@ android {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks.matching { it.name == "testReleaseUnitTest" }.configureEach {
