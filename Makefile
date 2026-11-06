@@ -32,22 +32,25 @@ SDKMANAGER_DEPRECATION := sdkmanager may print a deprecation warning pointing to
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage: make <target>\n\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  %-14s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-doctor: ## Check JDK 21 and the Android SDK
+doctor: ## Check JDK 21+ and the Android SDK
 	@sdk_dir=""; \
 	if [ -n "$$ANDROID_HOME" ]; then sdk_dir="$$ANDROID_HOME"; \
 	elif [ -n "$$ANDROID_SDK_ROOT" ]; then sdk_dir="$$ANDROID_SDK_ROOT"; \
 	elif [ -f local.properties ]; then sdk_dir=$$(sed -n 's/^sdk.dir=//p' local.properties | tail -n1); \
 	fi; \
-	jdk21=$$(sh scripts/find-jdk21.sh) || jdk21=""; \
-	if [ -z "$$jdk21" ]; then \
-		echo "Need JDK 21 for the Gradle toolchain (Java 25 on PATH is not enough)."; \
-		echo "  macOS:  brew install --cask temurin@21"; \
-		echo "          export JAVA_HOME=\"\$$(/usr/libexec/java_home -v 21)\""; \
+	jdk_info=$$(sh scripts/find-jdk.sh) || jdk_info=""; \
+	if [ -z "$$jdk_info" ]; then \
+		echo "Need JDK 21 or newer to run Gradle (25 is fine; bytecode stays 17)."; \
+		echo "  java -version"; \
+		echo "  macOS:  JAVA_HOME can be an Oracle/Temurin 21+ install on PATH"; \
+		echo "          brew install --cask temurin@21   # only if no 21+ JDK exists"; \
 		echo "  Debian: sudo apt install openjdk-21-jdk"; \
-		echo "Gradle can also auto-download JDK 21 via Foojay when no vendor is pinned."; \
 		exit 1; \
 	fi; \
-	echo "OK  JDK 21 $$jdk21"; \
+	jdk_home=$$(printf '%s\n' "$$jdk_info" | cut -f1); \
+	jdk_major=$$(printf '%s\n' "$$jdk_info" | cut -f2); \
+	jdk_ver=$$(printf '%s\n' "$$jdk_info" | cut -f3); \
+	echo "OK  JDK $$jdk_major ($$jdk_ver) $$jdk_home"; \
 	if [ -z "$$sdk_dir" ] || [ ! -d "$$sdk_dir" ]; then \
 		echo "Android SDK not found (ANDROID_HOME, ANDROID_SDK_ROOT, or local.properties sdk.dir)."; \
 		echo "Install command-line tools, then:"; \
