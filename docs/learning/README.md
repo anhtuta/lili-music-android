@@ -14,7 +14,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [02 — PR #7 Kotlin](02-kotlin-bump.md) | Kotlin 2.4.21 + Gradle / KSP / compileSdk alignment |
 | [03 — PR #14 Data](03-data-and-library.md) | Song model, Retrofit, Room, library UI |
 | [04 — PR #15 Play](04-playback.md) | Media3, queue, listen counting, player UI |
-| [05 — How to run](05-how-to-run.md) | Android Studio, Gradle commands, smoke checks |
+| [05 — How to run](05-how-to-run.md) | CLI `make apk` (no Android Studio), SDK setup, Gradle / smoke checks |
 | [06 — Synced lyrics](06-synced-lyrics.md) | LRC/XLRC/TRC parser, fetch, Room cache, player pane |
 | [07 — Player visuals](07-player-visuals.md) | Settings, lyric themes, Palette, app light/dark |
 | [08 — Web parity](08-web-parity.md) | BaiHat.js mismatches vs PR #18; intentional Android extras |

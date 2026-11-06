@@ -2,12 +2,98 @@
 
 [Learning guide index](README.md)
 
-JDK 17 + Android SDK. Open the repo root in Android Studio, sync Gradle, run `:app` on an API 26+ emulator or device.
+JDK 17+ and an Android SDK. You do **not** need Android Studio. The root [Makefile](../../Makefile) wraps Gradle so you can build and copy an APK from the CLI (`make apk`). Studio still works if you prefer it.
+
+Task [012](../tasks/012-makefile.md).
+
+## CLI-only setup (no Android Studio)
+
+`compileSdk` is **37**, `targetSdk` **35**, `minSdk` **26**. Gradle’s toolchain still wants a JDK 17 compiler even if `java -version` is newer.
+
+### 1. JDK 17+
+
+Put a JDK 17+ on `PATH`, or set `JAVA_HOME`.
+
+```bash
+java -version   # 17 or newer
+```
+
+- macOS: `brew install --cask temurin@17`
+- Debian/Ubuntu: `sudo apt install openjdk-17-jdk`
+
+### 2. Android command-line tools
+
+1. Download **Command line tools only** from [Android Studio downloads](https://developer.android.com/studio#command-line-tools-only).
+2. Unpack into `cmdline-tools/latest` under your SDK root (example `$HOME/Android/Sdk`):
+
+```bash
+mkdir -p "$HOME/Android/Sdk/cmdline-tools"
+unzip commandlinetools-*.zip -d "$HOME/Android/Sdk/cmdline-tools"
+mv "$HOME/Android/Sdk/cmdline-tools/cmdline-tools" "$HOME/Android/Sdk/cmdline-tools/latest"
+```
+
+3. Export the SDK and put `sdkmanager` / `adb` on `PATH`:
+
+```bash
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+```
+
+`ANDROID_SDK_ROOT` is the older name for the same directory; `make doctor` accepts either.
+
+### 3. sdkmanager packages
+
+Match `compileSdk` (37 in [app/build.gradle.kts](../../app/build.gradle.kts)). `build-tools;35.0.0` is enough for this AGP; Gradle can also fetch build-tools on first assemble if the network is allowed.
+
+```bash
+sdkmanager "platform-tools" "platforms;android-37" "build-tools;35.0.0"
+yes | sdkmanager --licenses
+```
+
+### 4. Point Gradle at the SDK
+
+Either keep `ANDROID_HOME` in the environment, or write it once for Gradle:
+
+```
+sdk.dir=/absolute/path/to/Android/Sdk
+```
+
+in `local.properties` at the repo root (**gitignored**). `make doctor` reads that file too.
+
+Then:
+
+```bash
+make doctor    # java 17+ and SDK / platforms;android-37
+make apk       # dist/lili-music-<versionName>-debug.apk
+```
+
+`make doctor` prints install hints if something is missing.
+
+### Make targets
+
+| Target | What it does |
+| --- | --- |
+| `make` / `make help` | List targets (default) |
+| `make doctor` | Check JDK 17+ and the SDK |
+| `make build` | `./gradlew :app:assembleDebug` |
+| `make apk` | Debug APK → `dist/lili-music-<versionName>-debug.apk` (prints the path) |
+| `make release-apk` | Release APK → `dist/`. Unsigned until Play signing in **064** |
+| `make install` | `adb install -r` the debug APK (device or emulator) |
+| `make test` | `./gradlew testDebugUnitTest` |
+| `make lint` | `./gradlew lintDebug` |
+| `make check` | Same gate as CI |
+| `make clean` | Gradle `clean` and delete `dist/` |
+
+`dist/` is gitignored. `versionName` comes from `app/build.gradle.kts` (currently `0.1.0`).
+
+## Android Studio (optional)
 
 1. **Open project** — Open the folder that contains [settings.gradle.kts](../../settings.gradle.kts).
 2. **Sync Gradle** — First sync downloads SDK pieces and deps.
 3. **Run** — AVD API 26+ or USB device → Run. Library hits the live API.
-4. **Same gate as CI** — `./gradlew check`
+4. **Same gate as CI** — `./gradlew check` or `make check`
+
+## Gradle commands (same as Make)
 
 | Command | What it does |
 | --- | --- |
@@ -17,6 +103,8 @@ JDK 17 + Android SDK. Open the repo root in Android Studio, sync Gradle, run `:a
 | `./gradlew ktlintCheck` | Kotlin style |
 | `./gradlew detekt` | Static analysis |
 | `./gradlew check` | All of the above (CI) |
+
+API base URL is `BuildConfig.API_BASE_URL` in `:app`.
 
 After playback: tap a song → mini-player; try shuffle / repeat-one / speed. Lock-screen and Bluetooth need a real device.
 
