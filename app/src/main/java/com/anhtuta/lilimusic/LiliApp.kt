@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,45 +50,47 @@ fun LiliApp(
     )
 
     LiliTheme(darkTheme = settings.settings.appTheme == AppTheme.DARK) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            LiliNavHost(
-                navController = navController,
-                modifier = Modifier.weight(1f),
-                libraryContent = { onSongClick, onSettings, onDownloads ->
-                    LibraryRoute(
-                        onSongClick = { song -> onSongClick(song.path) },
-                        onSettingsClick = onSettings,
-                        onDownloadsClick = onDownloads,
-                    )
-                },
-                playerContent = { path, onBack, onSettings ->
-                    PlayerRoute(
-                        path = path,
-                        onBack = onBack,
-                        viewModel = playerViewModel,
-                        lyrics = { LyricsRoute() },
-                        onSettingsClick = onSettings,
-                    )
-                },
-                settingsContent = { onBack ->
-                    SettingsRoute(onBack = onBack)
-                },
-                downloadsContent = { onBack, onPlay ->
-                    DownloadsRoute(
-                        onBack = onBack,
-                        onPlay = { item -> onPlay(item.songPath) },
-                        viewModel = downloadsViewModel,
-                    )
-                },
-            )
-            val currentSong = playback.song
-            if (!onPlayerScreen && !onSettingsScreen && currentSong != null) {
-                MiniPlayerBar(
-                    song = currentSong,
-                    isPlaying = playback.isPlaying,
-                    onPlayPause = playerViewModel::playPause,
-                    onClick = { navController.navigate(PlayerDestination(currentSong.path)) },
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                LiliNavHost(
+                    navController = navController,
+                    modifier = Modifier.weight(1f),
+                    libraryContent = { onSongClick, onSettings, onDownloads ->
+                        LibraryRoute(
+                            onSongClick = { song -> onSongClick(song.path) },
+                            onSettingsClick = onSettings,
+                            onDownloadsClick = onDownloads,
+                        )
+                    },
+                    playerContent = { path, onBack, onSettings ->
+                        PlayerRoute(
+                            path = path,
+                            onBack = onBack,
+                            viewModel = playerViewModel,
+                            lyrics = { LyricsRoute() },
+                            onSettingsClick = onSettings,
+                        )
+                    },
+                    settingsContent = { onBack ->
+                        SettingsRoute(onBack = onBack)
+                    },
+                    downloadsContent = { onBack, onPlay ->
+                        DownloadsRoute(
+                            onBack = onBack,
+                            onPlay = { item -> onPlay(item.songPath) },
+                            viewModel = downloadsViewModel,
+                        )
+                    },
                 )
+                val currentSong = playback.song
+                if (!onPlayerScreen && !onSettingsScreen && currentSong != null) {
+                    MiniPlayerBar(
+                        song = currentSong,
+                        isPlaying = playback.isPlaying,
+                        onPlayPause = playerViewModel::playPause,
+                        onClick = { navController.navigate(PlayerDestination(currentSong.path)) },
+                    )
+                }
             }
         }
     }
