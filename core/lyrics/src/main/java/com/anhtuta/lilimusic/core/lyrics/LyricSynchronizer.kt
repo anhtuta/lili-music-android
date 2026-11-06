@@ -63,7 +63,7 @@ object LyricSynchronizer {
                             isEmpty = word.isEmpty,
                             fill = fillFor(word.startMs, endMs, positionMs, offsetMs, isActive, isPassed),
                             countdownDots =
-                                if (isActive && word.isEmpty) {
+                                if (isActive && word.isEmpty && globalIndex < indexed.lastIndex) {
                                     countdownDots(word.startMs, endMs, positionMs, offsetMs)
                                 } else {
                                     0
