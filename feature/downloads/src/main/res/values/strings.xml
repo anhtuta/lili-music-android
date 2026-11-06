@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="downloads_title">Downloads</string>
+    <string name="downloads_back">Back</string>
+    <string name="downloads_empty">No downloaded songs yet</string>
+    <string name="downloads_delete_all">Delete all</string>
+    <string name="downloads_delete_all_confirm">Remove all downloaded songs from this device?</string>
+    <string name="downloads_confirm">Delete</string>
+    <string name="downloads_cancel">Cancel</string>
+    <string name="downloads_retry">Retry</string>
+    <string name="downloads_delete">Delete</string>
+    <string name="downloads_status_queued">Waiting</string>
+    <string name="downloads_status_downloading">Downloading %1$d%%</string>
+    <string name="downloads_status_completed">Downloaded</string>
+    <string name="downloads_status_failed">Couldn’t download</string>
+    <string name="downloads_play">Play</string>
+</resources>
