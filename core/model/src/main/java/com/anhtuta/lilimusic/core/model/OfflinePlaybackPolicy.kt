@@ -11,11 +11,15 @@ object OfflinePlaybackPolicy {
         status: DownloadStatus,
     ): Boolean = !isOnline && status != DownloadStatus.COMPLETED
 
+    /**
+     * Online: the full playable catalog in API order. Offline: that catalog filtered to completed downloads.
+     * Search must not pass the visible/filtered list.
+     */
     fun playQueue(
-        songs: List<Song>,
+        catalog: List<Song>,
         isOnline: Boolean,
         completedPaths: Set<String>,
-    ): List<Song> = if (isOnline) songs else songs.filter { it.path in completedPaths }
+    ): List<Song> = if (isOnline) catalog else catalog.filter { it.path in completedPaths }
 
     fun displayImageUrl(
         remoteImageUrl: String?,

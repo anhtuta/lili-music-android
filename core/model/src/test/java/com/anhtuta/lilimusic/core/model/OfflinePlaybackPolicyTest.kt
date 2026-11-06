@@ -32,17 +32,17 @@ class OfflinePlaybackPolicyTest {
     }
 
     @Test
-    fun onlinePlayQueueKeepsVisibleList() {
-        val songs = listOf(testSong(path = "a"), testSong(id = 2, path = "b"))
+    fun onlinePlayQueueKeepsFullCatalogOrder() {
+        val catalog = listOf(testSong(path = "a"), testSong(id = 2, path = "b"), testSong(id = 3, path = "c"))
 
         val queue =
             OfflinePlaybackPolicy.playQueue(
-                songs = songs,
+                catalog = catalog,
                 isOnline = true,
-                completedPaths = setOf("a"),
+                completedPaths = setOf("b"),
             )
 
-        assertThat(queue.map { it.path }).containsExactly("a", "b").inOrder()
+        assertThat(queue.map { it.path }).containsExactly("a", "b", "c").inOrder()
     }
 
     @Test
@@ -51,7 +51,7 @@ class OfflinePlaybackPolicyTest {
 
         val queue =
             OfflinePlaybackPolicy.playQueue(
-                songs = songs,
+                catalog = songs,
                 isOnline = false,
                 completedPaths = setOf("b", "c"),
             )

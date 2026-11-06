@@ -322,6 +322,44 @@ class LibraryViewModelTest {
                     .map { it.path },
             ).containsExactly("beta")
         }
+
+    @Test
+    fun searchFiltersViewButOfflinePlayUsesDownloadedCatalog() =
+        runTest {
+            val controller = FakePlayerController()
+            val repository = FakeSongRepository()
+            val downloads = FakeDownloadRepository()
+            downloads.emit(
+                libraryTestDownload(path = "hello"),
+                libraryTestDownload(path = "world"),
+            )
+            val viewModel =
+                libraryViewModel(
+                    repository = repository,
+                    controller = controller,
+                    downloads = downloads,
+                    network = FakeNetworkMonitor(initiallyOnline = false),
+                )
+            val hello = libraryTestSong(id = 1, title = "Hello", artist = "Ann", path = "hello")
+            val world = libraryTestSong(id = 2, title = "World", artist = "Bob", path = "world")
+            val extra = libraryTestSong(id = 3, title = "Extra", artist = "Ann", path = "extra")
+            repository.emit(listOf(hello, world, extra))
+            viewModel.onQueryChange("bob")
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.songs.size == 1 && it.status("hello").name == "COMPLETED" }
+                assertThat(state.songs.single().path).isEqualTo("world")
+                assertThat(state.playableCatalog.map { it.path }).containsExactly("hello", "world", "extra").inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            val started = viewModel.onSongClick(world)
+
+            assertThat(started).isTrue()
+            assertThat(
+                controller.state.value.queue
+                    .map { it.path },
+            ).containsExactly("hello", "world").inOrder()
+        }
 }
 
 private fun libraryViewModel(
