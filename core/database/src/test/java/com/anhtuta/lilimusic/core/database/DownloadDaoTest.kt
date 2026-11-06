@@ -51,7 +51,10 @@ class DownloadDaoTest {
                 downloadDao.upsert(downloadEntity(path = "a", title = "Alpha", updatedAt = 2L))
                 downloadDao.upsert(downloadEntity(path = "b", title = "Beta", updatedAt = 3L))
 
-                val rows = awaitItem()
+                var rows = awaitItem()
+                while (rows.size < 2) {
+                    rows = awaitItem()
+                }
                 assertThat(rows.map { it.songPath }).containsExactly("b", "a").inOrder()
                 cancelAndIgnoreRemainingEvents()
             }
