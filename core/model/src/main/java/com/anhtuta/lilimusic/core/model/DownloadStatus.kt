@@ -12,7 +12,6 @@ enum class DownloadStatus {
         get() = this == QUEUED || this == DOWNLOADING
 
     companion object {
-        fun fromStorage(value: String?): DownloadStatus =
-            entries.find { it.name == value } ?: NONE
+        fun fromStorage(value: String?): DownloadStatus = entries.find { it.name == value } ?: NONE
     }
 }
