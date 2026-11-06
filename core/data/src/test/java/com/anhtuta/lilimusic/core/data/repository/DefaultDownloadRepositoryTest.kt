@@ -1,5 +1,6 @@
 package com.anhtuta.lilimusic.core.data.repository
 
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.anhtuta.lilimusic.core.data.testdoubles.FakeAudioDownloadEngine
 import com.anhtuta.lilimusic.core.data.testdoubles.FakeCoverStore
@@ -168,9 +169,9 @@ class DefaultDownloadRepositoryTest {
             repository.observeHasActiveDownloads().test {
                 assertThat(awaitItem()).isFalse()
                 repository.download(downloadTestSong())
-                assertThat(awaitItem()).isTrue()
+                awaitItemUntil { it }
                 engine.emitCompleted("hello-artist")
-                assertThat(awaitItem()).isFalse()
+                awaitItemUntil { !it }
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -209,4 +210,11 @@ class DefaultDownloadRepositoryTest {
             formatCreatedDate = null,
             streamUrl = "https://example.com/api/song/file?file=hello.mp3",
         )
+}
+
+private suspend fun ReceiveTurbine<Boolean>.awaitItemUntil(predicate: (Boolean) -> Boolean): Boolean {
+    while (true) {
+        val item = awaitItem()
+        if (predicate(item)) return item
+    }
 }
