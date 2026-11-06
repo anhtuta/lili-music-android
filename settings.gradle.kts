@@ -12,11 +12,6 @@ pluginManagement {
     }
 }
 
-plugins {
-    // Auto-provision JDK 21 of any vendor (Temurin on macOS aarch64). Do not pin JETBRAINS.
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
