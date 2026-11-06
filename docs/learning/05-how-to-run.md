@@ -43,12 +43,16 @@ export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
 ### 3. sdkmanager packages
 
-Match `compileSdk` (37 in [app/build.gradle.kts](../../app/build.gradle.kts)). `build-tools;35.0.0` is enough for this AGP; Gradle can also fetch build-tools on first assemble if the network is allowed.
+Match `compileSdk` **37** in [app/build.gradle.kts](../../app/build.gradle.kts). There is **no** `platforms;android-37` package. API 37 is published as `platforms;android-37.0` (also 37.1 / 37.2) and installs into `platforms/android-37.0`. AGP `compileSdk = 37` resolves that folder (it uses `android-37.0/android.jar`). Install Build-Tools 37.0.0 for AGP 9.5, not 35.0.0:
 
 ```bash
-sdkmanager "platform-tools" "platforms;android-37" "build-tools;35.0.0"
+sdkmanager "platforms;android-37.0" "build-tools;37.0.0" "platform-tools"
 yes | sdkmanager --licenses
 ```
+
+`sdkmanager` may print a deprecation warning pointing at the new `android sdk` CLI. That warning is harmless; the packages still install.
+
+`make doctor` accepts an installed folder named `android-37`, `android-37.0`, or `android-37.*`.
 
 ### 4. Point Gradle at the SDK
 
@@ -63,7 +67,7 @@ in `local.properties` at the repo root (**gitignored**). `make doctor` reads tha
 Then:
 
 ```bash
-make doctor    # java 17+ and SDK / platforms;android-37
+make doctor    # java 17+ and SDK / platforms/android-37.0
 make apk       # dist/lili-music-<versionName>-debug.apk
 ```
 
