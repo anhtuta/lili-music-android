@@ -5,6 +5,7 @@ object PlayerTestTags {
     const val BACK = "player-back"
     const val TITLE = "player-title"
     const val ARTIST = "player-artist"
+    const val ALBUM = "player-album"
     const val COVER = "player-cover"
     const val COVER_PLACEHOLDER = "player-cover-placeholder"
     const val SEEK = "player-seek"

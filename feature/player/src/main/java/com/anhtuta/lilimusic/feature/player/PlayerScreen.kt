@@ -136,6 +136,12 @@ private fun PlayerBody(
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.testTag(PlayerTestTags.ARTIST),
         )
+        val album = song.album?.takeIf { it.isNotBlank() } ?: stringResource(R.string.player_no_album)
+        Text(
+            text = stringResource(R.string.player_album, album),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.testTag(PlayerTestTags.ALBUM),
+        )
         Spacer(modifier = Modifier.height(16.dp))
         PlayerSeekBar(
             positionMs = state.positionMs,

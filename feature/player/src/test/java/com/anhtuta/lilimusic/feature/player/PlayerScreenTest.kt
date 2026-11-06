@@ -66,6 +66,8 @@ class PlayerScreenTest {
         composeRule.onNodeWithTag(PlayerTestTags.TITLE).assertIsDisplayed()
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithText("Ann").assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
+        composeRule.onNodeWithText("(Album)").assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.POSITION).assertIsDisplayed()
         composeRule.onNodeWithText("0:15").assertIsDisplayed()
         composeRule.onNodeWithText("1:00").assertIsDisplayed()
@@ -144,6 +146,42 @@ class PlayerScreenTest {
 
         composeRule.onNodeWithTag(PlayerTestTags.FIRST_OF_QUEUE).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("This is the first song of playing list!").assertIsDisplayed()
+    }
+
+    @Test
+    fun missingAlbumShowsNoAlbumFallback() {
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song =
+                                playerTestSong(
+                                    id = 3,
+                                    title = "Gamma",
+                                    path = "gamma",
+                                    album = null,
+                                    imageUrl = null,
+                                ),
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
+        composeRule.onNodeWithText("(No Album)").assertIsDisplayed()
     }
 
     @Test
