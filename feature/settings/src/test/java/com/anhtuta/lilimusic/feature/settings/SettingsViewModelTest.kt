@@ -25,7 +25,7 @@ class SettingsViewModelTest {
                 val state = awaitItemUntil { it.settings == PlayerSettings() && it.speed == 1.0f }
                 assertThat(state.settings.lyricTheme).isEqualTo(LyricTheme.PICTURE_BG)
                 assertThat(state.settings.karaokeMode).isTrue()
-                assertThat(state.settings.giganticLine).isFalse()
+                assertThat(state.settings.giganticLine).isTrue()
                 assertThat(state.settings.translate).isFalse()
                 assertThat(state.settings.appTheme).isEqualTo(AppTheme.LIGHT)
                 cancelAndIgnoreRemainingEvents()

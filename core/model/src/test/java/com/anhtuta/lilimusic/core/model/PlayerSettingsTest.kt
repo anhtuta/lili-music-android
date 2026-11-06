@@ -11,7 +11,7 @@ class PlayerSettingsTest {
         assertThat(settings.lyricTheme).isEqualTo(LyricTheme.PICTURE_BG)
         assertThat(settings.karaokeMode).isTrue()
         assertThat(settings.blurMode).isFalse()
-        assertThat(settings.giganticLine).isFalse()
+        assertThat(settings.giganticLine).isTrue()
         assertThat(settings.wordAppear).isFalse()
         assertThat(settings.lineAppear).isFalse()
         assertThat(settings.translate).isFalse()
