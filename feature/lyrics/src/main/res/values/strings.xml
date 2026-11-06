@@ -8,4 +8,8 @@
     <string name="lyrics_offset_later">Lyric later (+100ms)</string>
     <string name="lyrics_line_cd">Seek to this lyric line</string>
     <string name="lyrics_countdown_cd">Instrumental countdown, %1$d beats</string>
+    <string name="lyrics_meta_separator">-----------</string>
+    <string name="lyrics_meta_creator">Lyric creator: %1$s</string>
+    <string name="lyrics_meta_source">Source: %1$s</string>
+    <string name="lyrics_meta_date">Date: %1$s</string>
 </resources>

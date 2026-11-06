@@ -167,6 +167,40 @@ class LyricsPaneTest {
     }
 
     @Test
+    fun lyricMetaFooterShowsWebFields() {
+        val frame =
+            LyricSynchronizer.sync(
+                LyricParser.parse(
+                    """
+                    [ti:Simple Song]
+                    [ar:Test Artist]
+                    [by:Tuzaku]
+                    [date:2021-06-28]
+                    [source:manual]
+                    [00:00.00]Hello
+                    """.trimIndent(),
+                    "song.lrc",
+                ),
+                positionMs = 0L,
+                durationMs = 10_000L,
+            )
+        composeRule.setContent {
+            LiliTheme {
+                LyricsPane(
+                    state = LyricsUiState(hasSong = true, frame = frame),
+                    onNudgeOffset = {},
+                    onSeekToLine = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag(LyricsTestTags.META_FOOTER).assertIsDisplayed()
+        composeRule.onNodeWithText("Simple Song - Test Artist").assertIsDisplayed()
+        composeRule.onNodeWithText("Lyric creator: Tuzaku").assertIsDisplayed()
+        composeRule.onNodeWithText("Source: manual").assertIsDisplayed()
+        composeRule.onNodeWithText("Date: 6/2021").assertIsDisplayed()
+    }
+
+    @Test
     fun fetchingStateShowsWaitCopy() {
         composeRule.setContent {
             LiliTheme {
