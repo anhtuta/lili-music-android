@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.session)
+    implementation(libs.media3.database)
     implementation(libs.work.runtime)
     implementation(libs.androidx.hilt.work)
     implementation(libs.kotlinx.coroutines.android)

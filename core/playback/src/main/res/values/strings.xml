@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lili_download_notification_channel_name">Downloads</string>
+    <string name="lili_download_notification_channel_description">Progress while saving songs for offline listening</string>
+</resources>
