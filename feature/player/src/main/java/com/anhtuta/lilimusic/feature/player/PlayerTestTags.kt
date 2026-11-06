@@ -21,6 +21,7 @@ object PlayerTestTags {
     const val SPEED_DOWN = "player-speed-down"
     const val SPEED_VALUE = "player-speed-value"
     const val END_OF_QUEUE = "player-end-of-queue"
+    const val FIRST_OF_QUEUE = "player-first-of-queue"
     const val MINI_BAR = "mini-player"
     const val MINI_TITLE = "mini-player-title"
     const val MINI_PLAY_PAUSE = "mini-player-play-pause"

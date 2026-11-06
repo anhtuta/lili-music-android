@@ -152,6 +152,16 @@ private fun PlayerBody(
                         .testTag(PlayerTestTags.END_OF_QUEUE),
             )
         }
+        if (state.atStartOfQueue) {
+            Text(
+                text = stringResource(R.string.player_first_of_queue),
+                color = MaterialTheme.colorScheme.error,
+                modifier =
+                    Modifier
+                        .padding(top = 8.dp)
+                        .testTag(PlayerTestTags.FIRST_OF_QUEUE),
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
         PlayerTransport(
             isPlaying = state.isPlaying,

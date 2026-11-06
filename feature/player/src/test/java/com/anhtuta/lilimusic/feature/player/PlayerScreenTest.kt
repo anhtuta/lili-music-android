@@ -117,6 +117,36 @@ class PlayerScreenTest {
     }
 
     @Test
+    fun firstSongOfQueueShowsWebToastEquivalent() {
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            atStartOfQueue = true,
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.FIRST_OF_QUEUE).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("This is the first song of playing list!").assertIsDisplayed()
+    }
+
+    @Test
     fun lyricsSlotIsComposedOnNowPlaying() {
         composeRule.setContent {
             LiliTheme {

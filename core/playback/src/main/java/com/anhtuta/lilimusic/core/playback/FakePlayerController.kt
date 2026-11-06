@@ -54,9 +54,21 @@ class FakePlayerController(
     }
 
     override fun skipToPrevious() {
-        when (SkipPreviousPolicy.decide(repeatOne = queueState.playMode == PlayMode.REPEAT_ONE)) {
+        when (
+            SkipPreviousPolicy.decide(
+                repeatOne = queueState.playMode == PlayMode.REPEAT_ONE,
+                currentIndex = queueState.currentIndex,
+            )
+        ) {
             SkipPreviousAction.ReplayCurrent -> {
                 publish(playing = true, positionMs = 0L)
+            }
+            SkipPreviousAction.StayAtStart -> {
+                publish(
+                    playing = _state.value.isPlaying,
+                    positionMs = _state.value.positionMs,
+                    atStartOfQueue = true,
+                )
             }
             SkipPreviousAction.GoToPrevious -> {
                 queueState = PlayQueue.skipPrevious(queueState)
@@ -96,6 +108,7 @@ class FakePlayerController(
         playing: Boolean,
         positionMs: Long,
         reachedEnd: Boolean = false,
+        atStartOfQueue: Boolean = false,
     ) {
         val previous = _state.value
         val next =
@@ -108,6 +121,7 @@ class FakePlayerController(
                 playMode = queueState.playMode,
                 speed = previous.speed,
                 reachedEnd = reachedEnd,
+                atStartOfQueue = atStartOfQueue,
             )
         _state.value = next
         listenCountScheduler.apply(

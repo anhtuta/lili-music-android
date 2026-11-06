@@ -149,10 +149,18 @@ class Media3PlayerController
 
         override fun skipToPrevious() {
             withController { mediaController ->
-                when (SkipPreviousPolicy.decide(repeatOne = queueState.playMode == PlayMode.REPEAT_ONE)) {
+                when (
+                    SkipPreviousPolicy.decide(
+                        repeatOne = queueState.playMode == PlayMode.REPEAT_ONE,
+                        currentIndex = queueState.currentIndex,
+                    )
+                ) {
                     SkipPreviousAction.ReplayCurrent -> {
                         mediaController.seekTo(0)
                         mediaController.play()
+                    }
+                    SkipPreviousAction.StayAtStart -> {
+                        publishFromPlayer(mediaController, atStartOfQueue = true)
                     }
                     SkipPreviousAction.GoToPrevious -> {
                         queueState = PlayQueue.skipPrevious(queueState)
@@ -235,6 +243,7 @@ class Media3PlayerController
         private fun publishFromPlayer(
             player: Player,
             reachedEnd: Boolean = player.playbackState == Player.STATE_ENDED,
+            atStartOfQueue: Boolean = false,
         ) {
             val previous = _state.value
             val duration = player.duration.takeUnless { it == C.TIME_UNSET } ?: 0L
@@ -248,6 +257,7 @@ class Media3PlayerController
                     playMode = queueState.playMode,
                     speed = player.playbackParameters.speed,
                     reachedEnd = reachedEnd && !player.isPlaying,
+                    atStartOfQueue = atStartOfQueue,
                 )
             _state.value = next
             listenCountScheduler.apply(

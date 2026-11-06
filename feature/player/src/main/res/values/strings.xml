@@ -19,6 +19,7 @@
     <string name="player_cover_cd">Cover art for %1$s</string>
     <string name="player_cover_placeholder_cd">No cover art for %1$s</string>
     <string name="player_end_of_queue">Reached the end of the list</string>
+    <string name="player_first_of_queue">This is the first song of playing list!</string>
     <string name="player_empty">Song unavailable</string>
     <string name="mini_player_cd">Now playing %1$s</string>
 </resources>

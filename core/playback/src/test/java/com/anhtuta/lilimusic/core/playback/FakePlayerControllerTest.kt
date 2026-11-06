@@ -91,6 +91,22 @@ class FakePlayerControllerTest {
     }
 
     @Test
+    fun skipPreviousOnFirstTrackKeepsPositionAndSignalsStart() {
+        val controller = FakePlayerController()
+        controller.play(songs, "alpha")
+        controller.advancePosition(20_000L)
+        controller.skipToPrevious()
+
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("alpha")
+        assertThat(controller.state.value.positionMs).isEqualTo(20_000L)
+        assertThat(controller.state.value.atStartOfQueue).isTrue()
+        assertThat(controller.state.value.isPlaying).isTrue()
+    }
+
+    @Test
     fun skipPreviousInRepeatOneReplaysTheSameSong() {
         val controller = FakePlayerController(initialPlayMode = PlayMode.REPEAT_ONE)
         controller.play(songs, "beta")

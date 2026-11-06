@@ -18,11 +18,17 @@ internal class RepeatAwarePlayer(
     }
 
     override fun seekToPreviousMediaItem() {
-        when (SkipPreviousPolicy.decide(repeatOne = repeatMode == Player.REPEAT_MODE_ONE)) {
+        when (
+            SkipPreviousPolicy.decide(
+                repeatOne = repeatMode == Player.REPEAT_MODE_ONE,
+                currentIndex = currentMediaItemIndex,
+            )
+        ) {
             SkipPreviousAction.ReplayCurrent -> {
                 seekTo(0)
                 play()
             }
+            SkipPreviousAction.StayAtStart -> Unit
             SkipPreviousAction.GoToPrevious -> super.seekToPreviousMediaItem()
         }
     }
@@ -37,11 +43,17 @@ internal class RepeatAwarePlayer(
     }
 
     override fun seekToPrevious() {
-        when (SkipPreviousPolicy.decide(repeatOne = repeatMode == Player.REPEAT_MODE_ONE)) {
+        when (
+            SkipPreviousPolicy.decide(
+                repeatOne = repeatMode == Player.REPEAT_MODE_ONE,
+                currentIndex = currentMediaItemIndex,
+            )
+        ) {
             SkipPreviousAction.ReplayCurrent -> {
                 seekTo(0)
                 play()
             }
+            SkipPreviousAction.StayAtStart -> Unit
             // Media3's seekToPrevious restarts the current item after 3s; web always
             // goes to the previous track, so skip that threshold.
             SkipPreviousAction.GoToPrevious -> seekToPreviousMediaItem()

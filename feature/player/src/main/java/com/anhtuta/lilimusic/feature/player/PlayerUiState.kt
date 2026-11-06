@@ -13,6 +13,7 @@ data class PlayerUiState(
     val playMode: PlayMode = PlayMode.SEQUENCE,
     val speed: Float = PlaybackSpeed.DEFAULT,
     val reachedEnd: Boolean = false,
+    val atStartOfQueue: Boolean = false,
 )
 
 fun PlaybackState.toPlayerUiState(): PlayerUiState =
@@ -24,4 +25,5 @@ fun PlaybackState.toPlayerUiState(): PlayerUiState =
         playMode = playMode,
         speed = speed,
         reachedEnd = reachedEnd,
+        atStartOfQueue = atStartOfQueue,
     )
