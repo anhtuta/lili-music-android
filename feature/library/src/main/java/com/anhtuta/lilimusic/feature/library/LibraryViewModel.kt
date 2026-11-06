@@ -75,7 +75,8 @@ class LibraryViewModel
         }
 
         fun onSongClick(song: Song) {
-            playerController.play(uiState.value.songs, song.path)
+            val queue = uiState.value.playableCatalog.ifEmpty { uiState.value.songs }
+            playerController.play(queue, song.path)
         }
 
         private fun refresh() {
@@ -107,14 +108,19 @@ class LibraryViewModel
             refresh: RefreshSnapshot,
         ): LibraryUiState {
             val waiting = !refresh.finished && catalog.songs.isEmpty()
+            val playableCatalog =
+                SongCatalog.filterAndSort(
+                    songs = catalog.songs,
+                    query = "",
+                    sort = catalog.sort,
+                    order = catalog.order,
+                )
             return LibraryUiState(
                 songs =
-                    SongCatalog.filterAndSort(
-                        songs = catalog.songs,
-                        query = catalog.query,
-                        sort = catalog.sort,
-                        order = catalog.order,
-                    ),
+                    playableCatalog.filter { song ->
+                        SongCatalog.matchesQuery(song, catalog.query)
+                    },
+                playableCatalog = playableCatalog,
                 query = catalog.query,
                 sort = catalog.sort,
                 sortOrder = catalog.order,

@@ -155,7 +155,7 @@ class LibraryViewModelTest {
         }
 
     @Test
-    fun songClickPlaysVisibleQueueFromThatPath() =
+    fun songClickPlaysFullCatalogFromThatPath() =
         runTest {
             val repository = FakeSongRepository()
             val controller = FakePlayerController()
@@ -182,6 +182,35 @@ class LibraryViewModelTest {
                 controller.state.value.queue
                     .map { it.path },
             ).containsExactly("alpha", "beta").inOrder()
+        }
+
+    @Test
+    fun searchFiltersViewButPlayUsesFullCatalog() =
+        runTest {
+            val repository = FakeSongRepository()
+            val controller = FakePlayerController()
+            val viewModel = LibraryViewModel(repository, FakeSortPreferences(), controller)
+            val hello = libraryTestSong(id = 1, title = "Hello", artist = "Ann", path = "hello")
+            val world = libraryTestSong(id = 2, title = "World", artist = "Bob", path = "world")
+            repository.emit(listOf(hello, world))
+            viewModel.onQueryChange("bob")
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.songs.size == 1 }
+                assertThat(state.songs.single().path).isEqualTo("world")
+                assertThat(state.playableCatalog.map { it.path }).containsExactly("hello", "world").inOrder()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            viewModel.onSongClick(world)
+
+            assertThat(
+                controller.state.value.queue
+                    .map { it.path },
+            ).containsExactly("hello", "world").inOrder()
+            assertThat(
+                controller.state.value.currentSong
+                    ?.path,
+            ).isEqualTo("world")
         }
 }
 
