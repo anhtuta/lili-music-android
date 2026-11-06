@@ -274,18 +274,18 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 | 052 | Cover-art Palette background | Done in 009 |
 | 053 | Settings screen persistence | Done in 009 |
 
-`.xlrc` translations are gated by the `translate` setting (default **off**, matching web). Speed ±0.1× stays on the player and is also on Settings (already persisted in **006**). In-app volume, waveform, lyric-card export, downloads, and sleep timer stay later / out of v1.
+`.xlrc` translations are gated by the `translate` setting (default **off**, matching web). Speed ±0.1× stays on the player and is also on Settings (already persisted in **006**). In-app volume, waveform, lyric-card export, and sleep timer stay later / out of v1. Downloads are **060–061**.
 
 ### Phase 6 — Offline, share, deep links, store
 
-| ID | Task |
-| --- | --- |
-| 060 | Media3 downloads (audio + lyric + cover) + download UI |
-| 061 | Offline playback using downloaded files |
-| 062 | Lyric card compose / export / share |
-| 063 | App links / deep links `bai-hat/{path}` |
-| 064 | Play Store packaging: applicationId, icons, POST_NOTIFICATIONS, FOREGROUND_SERVICE_MEDIA_PLAYBACK, privacy policy, no `RECORD_AUDIO` |
-| 065 | Release smoke: Playable-only library, notification controls, offline, lyric formats |
+| ID | Task | Status |
+| --- | --- | --- |
+| 060 | Media3 downloads (audio + lyric + cover) + download UI | Done in 010 |
+| 061 | Offline playback using downloaded files | Done in 010 |
+| 062 | Lyric card compose / export / share | |
+| 063 | App links / deep links `bai-hat/{path}` | |
+| 064 | Play Store packaging: applicationId, icons, POST_NOTIFICATIONS, FOREGROUND_SERVICE_MEDIA_PLAYBACK, privacy policy, no `RECORD_AUDIO` | |
+| 065 | Release smoke: Playable-only library, notification controls, offline, lyric formats | |
 
 ## 7. Workflow (mandatory)
 
@@ -303,7 +303,7 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 | `sortBy=createdDate` vs `created_date` | Golden test against live API during task 013 |
 | Missing lyric returns HTTP 200 HTML | Parser/repository treats exact body `Lyric doesn't exist!` as empty |
 | `file` query params contain Unicode / spaces | Always URL-encode; MockWebServer + one live smoke later |
-| Media3 notification / Play policy | Use FGS mediaPlayback type only; never `RECORD_AUDIO` |
+| Media3 notification / Play policy | Playback FGS is `mediaPlayback`; download FGS is `dataSync`; never `RECORD_AUDIO` |
 | Unpaged `/api/song/all` growing | Fine for ~150 songs; add local paging in UI if the list grows |
 | Relative vs absolute `image_url` | Single `ImageUrlResolver` with tests |
 | Shuffle “current first” easy to get wrong | Dedicated unit tests around playlist mutation |
@@ -312,4 +312,4 @@ Also in 008 (pulled forward from Phase 5 because lyrics need to be visible): syn
 
 ## 9. This-run deliverable
 
-Task **009** (`docs/tasks/009-player-visuals.md`): Settings screen + DataStore persistence, lyric visual toggles/themes, cover Palette on now-playing, `appTheme` light/dark. Downloads, lyric-card export, sleep timer, and HTTPS App Links remain later phases.
+Task **010** (`docs/tasks/010-downloads-offline.md`): Media3 downloads of audio + lyric + cover, Downloads screen, offline playback from the download cache, WorkManager network constraint on listen PUT. Lyric-card export (062), HTTPS App Links (063), Play Store packaging (064), and release smoke (065) remain later.
