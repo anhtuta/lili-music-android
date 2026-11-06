@@ -5,7 +5,6 @@ package com.anhtuta.lilimusic.core.playback
 import android.content.ComponentName
 import android.content.Context
 import androidx.core.content.ContextCompat
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -246,14 +245,13 @@ class Media3PlayerController
             atStartOfQueue: Boolean = false,
         ) {
             val previous = _state.value
-            val duration = player.duration.takeUnless { it == C.TIME_UNSET } ?: 0L
             val next =
                 PlaybackState(
                     currentSong = queueState.currentSong,
                     queue = queueState.playableQueue,
                     isPlaying = player.isPlaying,
                     positionMs = player.currentPosition.coerceAtLeast(0L),
-                    durationMs = duration.coerceAtLeast(0L),
+                    durationMs = PlaybackDuration.fromMedia3(player.duration),
                     playMode = queueState.playMode,
                     speed = player.playbackParameters.speed,
                     reachedEnd = reachedEnd && !player.isPlaying,
@@ -287,11 +285,7 @@ class Media3PlayerController
                             _state.value =
                                 _state.value.copy(
                                     positionMs = mediaController.currentPosition.coerceAtLeast(0L),
-                                    durationMs =
-                                        mediaController.duration
-                                            .takeUnless { it == C.TIME_UNSET }
-                                            ?.coerceAtLeast(0L)
-                                            ?: _state.value.durationMs,
+                                    durationMs = PlaybackDuration.fromMedia3(mediaController.duration),
                                 )
                         }
                     }
