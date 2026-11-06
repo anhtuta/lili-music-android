@@ -2,11 +2,8 @@ package com.anhtuta.lilimusic.core.playback
 
 import android.content.Context
 import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,11 +24,7 @@ class WorkListenCountScheduler
                 workManager.cancelUniqueWork(UNIQUE_WORK_NAME)
             }
             val path = decision.schedulePath ?: return
-            val request =
-                OneTimeWorkRequestBuilder<RecordListenWorker>()
-                    .setInitialDelay(ListenCountPolicy.DELAY_MS, TimeUnit.MILLISECONDS)
-                    .setInputData(workDataOf(RecordListenWorker.KEY_PATH to path))
-                    .build()
+            val request = RecordListenWorkRequests.create(path)
             workManager.enqueueUniqueWork(UNIQUE_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
         }
 
