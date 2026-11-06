@@ -77,6 +77,35 @@ class FakePlayerControllerTest {
     }
 
     @Test
+    fun skipPreviousFromMiddleGoesToPreviousTrackNotRestart() {
+        val controller = FakePlayerController()
+        controller.play(songs, "beta")
+        controller.advancePosition(20_000L)
+        controller.skipToPrevious()
+
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("alpha")
+        assertThat(controller.state.value.positionMs).isEqualTo(0L)
+    }
+
+    @Test
+    fun skipPreviousInRepeatOneReplaysTheSameSong() {
+        val controller = FakePlayerController(initialPlayMode = PlayMode.REPEAT_ONE)
+        controller.play(songs, "beta")
+        controller.advancePosition(20_000L)
+        controller.skipToPrevious()
+
+        assertThat(
+            controller.state.value.currentSong
+                ?.path,
+        ).isEqualTo("beta")
+        assertThat(controller.state.value.positionMs).isEqualTo(0L)
+        assertThat(controller.state.value.isPlaying).isTrue()
+    }
+
+    @Test
     fun shufflePutsCurrentSongFirst() {
         val controller = FakePlayerController(random = Random(4))
         controller.play(songs, "gamma")

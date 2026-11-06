@@ -149,13 +149,17 @@ class Media3PlayerController
 
         override fun skipToPrevious() {
             withController { mediaController ->
-                if (queueState.playMode == PlayMode.REPEAT_ONE || mediaController.currentPosition <= 3_000L) {
-                    mediaController.seekTo(0)
-                    return@withController
+                when (SkipPreviousPolicy.decide(repeatOne = queueState.playMode == PlayMode.REPEAT_ONE)) {
+                    SkipPreviousAction.ReplayCurrent -> {
+                        mediaController.seekTo(0)
+                        mediaController.play()
+                    }
+                    SkipPreviousAction.GoToPrevious -> {
+                        queueState = PlayQueue.skipPrevious(queueState)
+                        mediaController.seekTo(queueState.currentIndex, 0L)
+                        persistLastSong()
+                    }
                 }
-                queueState = PlayQueue.skipPrevious(queueState)
-                mediaController.seekTo(queueState.currentIndex, 0L)
-                persistLastSong()
             }
         }
 

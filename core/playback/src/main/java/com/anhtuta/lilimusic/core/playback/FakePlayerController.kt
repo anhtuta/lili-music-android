@@ -54,11 +54,14 @@ class FakePlayerController(
     }
 
     override fun skipToPrevious() {
-        val wasFirst = queueState.currentIndex == 0 && queueState.playMode != PlayMode.REPEAT_ONE
-        queueState = PlayQueue.skipPrevious(queueState)
-        publish(playing = _state.value.isPlaying, positionMs = 0L)
-        if (wasFirst) {
-            _state.value = _state.value.copy(positionMs = 0L)
+        when (SkipPreviousPolicy.decide(repeatOne = queueState.playMode == PlayMode.REPEAT_ONE)) {
+            SkipPreviousAction.ReplayCurrent -> {
+                publish(playing = true, positionMs = 0L)
+            }
+            SkipPreviousAction.GoToPrevious -> {
+                queueState = PlayQueue.skipPrevious(queueState)
+                publish(playing = _state.value.isPlaying, positionMs = 0L)
+            }
         }
     }
 
