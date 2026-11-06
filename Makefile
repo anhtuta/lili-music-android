@@ -32,29 +32,22 @@ SDKMANAGER_DEPRECATION := sdkmanager may print a deprecation warning pointing to
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage: make <target>\n\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  %-14s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-doctor: ## Check JDK 17+ and the Android SDK
+doctor: ## Check JDK 21 and the Android SDK
 	@sdk_dir=""; \
 	if [ -n "$$ANDROID_HOME" ]; then sdk_dir="$$ANDROID_HOME"; \
 	elif [ -n "$$ANDROID_SDK_ROOT" ]; then sdk_dir="$$ANDROID_SDK_ROOT"; \
 	elif [ -f local.properties ]; then sdk_dir=$$(sed -n 's/^sdk.dir=//p' local.properties | tail -n1); \
 	fi; \
-	if ! command -v java >/dev/null 2>&1; then \
-		echo "java not found on PATH."; \
-		echo "Install JDK 17+ (Temurin) and put it on PATH, or set JAVA_HOME."; \
-		echo "  macOS:  brew install --cask temurin@17"; \
-		echo "  Debian: sudo apt install openjdk-17-jdk"; \
+	jdk21=$$(sh scripts/find-jdk21.sh) || jdk21=""; \
+	if [ -z "$$jdk21" ]; then \
+		echo "Need JDK 21 for the Gradle toolchain (Java 25 on PATH is not enough)."; \
+		echo "  macOS:  brew install --cask temurin@21"; \
+		echo "          export JAVA_HOME=\"\$$(/usr/libexec/java_home -v 21)\""; \
+		echo "  Debian: sudo apt install openjdk-21-jdk"; \
+		echo "Gradle can also auto-download JDK 21 via Foojay when no vendor is pinned."; \
 		exit 1; \
 	fi; \
-	java_raw=$$(java -version 2>&1 | sed -n 's/.*version "\([^"]*\)".*/\1/p' | head -n1); \
-	java_major=$$(echo "$$java_raw" | awk -F. '{ if ($$1 == "1") print $$2; else print $$1 }'); \
-	if [ -z "$$java_major" ] || [ "$$java_major" -lt 17 ]; then \
-		echo "Need JDK 17+, found: $$java_raw"; \
-		echo "Install JDK 17+ and put it first on PATH, or set JAVA_HOME."; \
-		echo "  macOS:  brew install --cask temurin@17"; \
-		echo "  Debian: sudo apt install openjdk-17-jdk"; \
-		exit 1; \
-	fi; \
-	echo "OK  java $$java_raw (need 17+)"; \
+	echo "OK  JDK 21 $$jdk21"; \
 	if [ -z "$$sdk_dir" ] || [ ! -d "$$sdk_dir" ]; then \
 		echo "Android SDK not found (ANDROID_HOME, ANDROID_SDK_ROOT, or local.properties sdk.dir)."; \
 		echo "Install command-line tools, then:"; \
