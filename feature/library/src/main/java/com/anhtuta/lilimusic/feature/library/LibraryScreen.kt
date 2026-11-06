@@ -198,7 +198,8 @@ private fun LibraryCatalog(
             LazyColumn(
                 modifier =
                     Modifier
-                        .fillMaxSize()
+                        .weight(1f)
+                        .fillMaxWidth()
                         .testTag(LibraryTestTags.LIST),
                 contentPadding = PaddingValues(vertical = 8.dp),
             ) {

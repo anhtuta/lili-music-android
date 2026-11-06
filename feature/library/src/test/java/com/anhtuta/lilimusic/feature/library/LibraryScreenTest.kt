@@ -44,9 +44,9 @@ class LibraryScreenTest {
 
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithText("Bob").assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.listens(1)).assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.type(1)).assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.date(1)).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.type(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.date(1), useUnmergedTree = true).assertIsDisplayed()
         composeRule.onNodeWithTag(LibraryTestTags.song(1)).performClick()
         assertThat(clickedId).isEqualTo(1L)
     }
@@ -80,9 +80,9 @@ class LibraryScreenTest {
             }
         }
 
-        composeRule.onNodeWithTag(LibraryTestTags.soy(1)).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.soy(1), useUnmergedTree = true).assertIsDisplayed()
         composeRule.onNodeWithText("2024").assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.cover(1)).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.cover(1), useUnmergedTree = true).performClick()
         composeRule.onNodeWithTag(LibraryTestTags.COVER_PREVIEW).assertIsDisplayed()
         composeRule.onNodeWithText("Ann - Alpha").assertIsDisplayed()
         assertThat(clickedId).isNull()
@@ -107,7 +107,7 @@ class LibraryScreenTest {
             }
         }
 
-        composeRule.onNodeWithTag(LibraryTestTags.cover(1)).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.cover(1), useUnmergedTree = true).performClick()
         composeRule.onNodeWithTag(LibraryTestTags.COVER_PREVIEW).assertDoesNotExist()
     }
 
