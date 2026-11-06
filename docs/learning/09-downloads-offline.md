@@ -1,8 +1,8 @@
-# Task 010 — Phase 6: downloads and offline playback
+# Task 011 — Phase 6: downloads and offline playback
 
-[Learning guide index](README.md) · Task [010](../tasks/010-downloads-offline.md)
+[Learning guide index](README.md) · Task [011](../tasks/011-downloads-offline.md)
 
-**What was built.** A listener can download a playable song into app-private storage (audio via Media3 `DownloadManager`, lyric body in the existing Room `lyrics` table, cover file under `filesDir/covers`). A Downloads screen shows progress, completed, failed + retry, delete one, and delete all. Downloaded songs play from the download `SimpleCache` online and offline. With no network, the library still lists the Room catalog; non-downloaded rows are marked **Unavailable offline** and do not start playback. Listen counting still waits 60s from play-from-start (web match) and now also requires a network connection so an offline listen PUT is sent later instead of being dropped.
+**What was built.** A listener can download a playable song into app-private storage (audio via Media3 `DownloadManager`, lyric body in the existing Room `lyrics` table, cover file under `filesDir/covers`). A Downloads screen shows progress, completed, failed + retry, delete one, and delete all. Downloaded songs play from the download `SimpleCache` online and offline. With no network, the library still lists the Room catalog; non-downloaded rows are marked **Unavailable offline** and do not start playback. Online play uses the **full playable catalog** in API order (PR #19); search only filters the view. Offline play uses that catalog filtered to completed downloads. Listen counting still waits 60s from play-from-start and cancels only on path change (web match) and now also requires a network connection so an offline listen PUT is sent later instead of being dropped.
 
 **Status:** This PR.
 
@@ -23,7 +23,7 @@ Missing lyric (`Lyric doesn't exist!`) is not a download failure. Cancelling an 
 | `FLAG_IGNORE_CACHE_ON_ERROR` | Corrupt cache → try upstream instead of failing | Fall back to origin if the SW cache is bad |
 | `NoOpCacheEvictor` | Never delete cached audio | LRU off; downloads stay until the user deletes |
 | Room `downloads` table | Metadata (status, percent, cover path) | A downloads index; audio bytes live in SimpleCache |
-| Additive migration | `MIGRATION_2_3` `CREATE TABLE` only | `ALTER`/`CREATE` — never drop the old DB |
+| Additive migration | `MIGRATION_2_3` adds `catalogIndex`; `MIGRATION_3_4` creates `downloads` | `ALTER`/`CREATE` — never drop the old DB |
 | `CoverStore` | HTTP GET of cover into `filesDir/covers` | Save `img.src` to disk for offline `<img>` |
 | `NetworkMonitor` | Flow of “do we have INTERNET?” | `navigator.onLine` / a connectivity listener |
 | `WorkManager` `NetworkType.CONNECTED` | Do not run the listen PUT until online | A job queue with a network constraint |
@@ -37,8 +37,8 @@ Why not write the cache during normal streaming? Playback uses a **read-only** `
 
 ## Code to focus on
 
-1. [OfflinePlaybackPolicy.kt](../../core/model/src/main/java/com/anhtuta/lilimusic/core/model/OfflinePlaybackPolicy.kt) — playable iff online or `COMPLETED`; offline queue is the visible list filtered to completed paths.
-2. [DatabaseMigrations.kt](../../core/database/src/main/java/com/anhtuta/lilimusic/core/database/DatabaseMigrations.kt) — `MIGRATION_2_3` creates `downloads`; songs/lyrics rows stay.
+1. [OfflinePlaybackPolicy.kt](../../core/model/src/main/java/com/anhtuta/lilimusic/core/model/OfflinePlaybackPolicy.kt) — playable iff online or `COMPLETED`; online queue is the full playable catalog; offline queue is that catalog filtered to completed paths.
+2. [DatabaseMigrations.kt](../../core/database/src/main/java/com/anhtuta/lilimusic/core/database/DatabaseMigrations.kt) — `MIGRATION_2_3` adds `catalogIndex`; `MIGRATION_3_4` creates `downloads`; songs/lyrics rows stay.
 3. [DefaultDownloadRepository.kt](../../core/data/src/main/java/com/anhtuta/lilimusic/core/data/repository/DefaultDownloadRepository.kt) — enqueue audio, cache lyric + cover, follow engine snapshots.
 4. [FileCoverStore.kt](../../core/data/src/main/java/com/anhtuta/lilimusic/core/data/download/FileCoverStore.kt) — cover files keyed by song-path hash.
 5. [DownloadInfrastructure.kt](../../core/playback/src/main/java/com/anhtuta/lilimusic/core/playback/download/DownloadInfrastructure.kt) / [PlaybackCachePolicy.kt](../../core/playback/src/main/java/com/anhtuta/lilimusic/core/playback/download/PlaybackCachePolicy.kt) — shared `SimpleCache` + read-only playback factory.
@@ -56,13 +56,13 @@ fun isPlayable(
 ): Boolean = isOnline || status == DownloadStatus.COMPLETED
 
 fun playQueue(
-    songs: List<Song>,
+    catalog: List<Song>,
     isOnline: Boolean,
     completedPaths: Set<String>,
-): List<Song> = if (isOnline) songs else songs.filter { it.path in completedPaths }
+): List<Song> = if (isOnline) catalog else catalog.filter { it.path in completedPaths }
 ```
 
-Online, `playQueue` is the visible library list (web `BaiHat.js`). Offline it keeps only completed downloads so skip/next cannot land on a stream-only row.
+Online, `playQueue` is the full playable catalog in API order (web `BaiHat.js` / PR #19). Search only filters the library view. Offline it keeps only completed downloads so skip/next cannot land on a stream-only row.
 
 Listen PUT extra, from `RecordListenWorkRequests.kt`:
 
