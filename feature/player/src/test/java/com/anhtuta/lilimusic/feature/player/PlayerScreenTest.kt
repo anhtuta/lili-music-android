@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -325,7 +326,12 @@ class PlayerScreenTest {
     }
 
     @Test
-    fun previousLabelStaysOnOneLineWithoutClipping() {
+    fun transportIconsExposeWebMatchingContentDescriptions() {
+        var previous = 0
+        var rewind = 0
+        var playPause = 0
+        var forward = 0
+        var next = 0
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
@@ -334,18 +340,52 @@ class PlayerScreenTest {
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            isPlaying = false,
+                        ),
+                    callbacks =
+                        idlePlayerCallbacks().copy(
+                            onSkipPrevious = { previous++ },
+                            onSeekBack = { rewind++ },
+                            onPlayPause = { playPause++ },
+                            onSeekForward = { forward++ },
+                            onSkipNext = { next++ },
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Previous").assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("Previous").assertIsDisplayed().performClick()
+        composeRule.onNodeWithContentDescription("Seek back 5 seconds").assertIsDisplayed().performClick()
+        composeRule.onNodeWithContentDescription("Play").assertIsDisplayed().performClick()
+        composeRule.onNodeWithContentDescription("Seek forward 5 seconds").assertIsDisplayed().performClick()
+        composeRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
+        assertThat(previous).isEqualTo(1)
+        assertThat(rewind).isEqualTo(1)
+        assertThat(playPause).isEqualTo(1)
+        assertThat(forward).isEqualTo(1)
+        assertThat(next).isEqualTo(1)
+    }
+
+    @Test
+    fun playingTransportUsesPauseContentDescription() {
+        composeRule.setContent {
+            LiliTheme {
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            isPlaying = true,
                         ),
                     callbacks = idlePlayerCallbacks(),
                 )
             }
         }
 
-        val bounds =
-            composeRule
-                .onNodeWithTag(PlayerTestTags.PREVIOUS)
-                .getUnclippedBoundsInRoot()
-        assertThat(bounds.right.value - bounds.left.value).isGreaterThan(48f)
-        composeRule.onNodeWithText("Previous").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Pause").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Play").assertDoesNotExist()
     }
 }
 

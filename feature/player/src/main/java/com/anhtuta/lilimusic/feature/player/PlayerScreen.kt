@@ -14,8 +14,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Forward5
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Replay5
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -31,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -391,59 +401,56 @@ private fun PlayerTransport(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val rewindDescription = stringResource(R.string.player_rewind_cd)
-        val forwardDescription = stringResource(R.string.player_forward_cd)
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSkipPrevious,
-            label = stringResource(R.string.player_previous),
+            imageVector = Icons.Filled.SkipPrevious,
+            contentDescription = stringResource(R.string.player_previous_cd),
             modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSeekBack,
-            label = stringResource(R.string.player_rewind),
-            modifier =
-                Modifier
-                    .testTag(PlayerTestTags.REWIND)
-                    .semantics { contentDescription = rewindDescription },
+            imageVector = Icons.Filled.Replay5,
+            contentDescription = stringResource(R.string.player_rewind_cd),
+            modifier = Modifier.testTag(PlayerTestTags.REWIND),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onPlayPause,
-            label =
+            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+            contentDescription =
                 stringResource(
                     if (isPlaying) R.string.player_pause else R.string.player_play,
                 ),
             modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSeekForward,
-            label = stringResource(R.string.player_forward),
-            modifier =
-                Modifier
-                    .testTag(PlayerTestTags.FORWARD)
-                    .semantics { contentDescription = forwardDescription },
+            imageVector = Icons.Filled.Forward5,
+            contentDescription = stringResource(R.string.player_forward_cd),
+            modifier = Modifier.testTag(PlayerTestTags.FORWARD),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSkipNext,
-            label = stringResource(R.string.player_next),
+            imageVector = Icons.Filled.SkipNext,
+            contentDescription = stringResource(R.string.player_next_cd),
             modifier = Modifier.testTag(PlayerTestTags.NEXT),
         )
     }
 }
 
 @Composable
-private fun RowScope.TransportTextButton(
+private fun RowScope.TransportIconButton(
     onClick: () -> Unit,
-    label: String,
+    imageVector: ImageVector,
+    contentDescription: String,
     modifier: Modifier = Modifier,
 ) {
-    TextButton(
+    IconButton(
         onClick = onClick,
         modifier = modifier.weight(1f),
     ) {
-        Text(
-            text = label,
-            maxLines = 1,
-            textAlign = TextAlign.Center,
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
         )
     }
 }
