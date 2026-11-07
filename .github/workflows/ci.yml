@@ -77,3 +77,29 @@ jobs:
 
       - name: Assemble debug
         run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
+
+  assemble-release:
+    name: Minified release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Release smoke
+        run: bash scripts/test-release-smoke.sh
