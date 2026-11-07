@@ -1,3 +1,6 @@
+import java.io.File
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,10 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val appVersionCode = envOrVersion("VERSION_CODE").toInt()
+val appVersionName = envOrVersion("VERSION_NAME")
+val releaseSigning = loadReleaseSigning()
+
 android {
     namespace = "com.anhtuta.lilimusic"
     compileSdk = 37
@@ -15,8 +22,8 @@ android {
         applicationId = "com.anhtuta.lilimusic"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -27,13 +34,28 @@ android {
         )
     }
 
+    signingConfigs {
+        if (releaseSigning != null) {
+            create("release") {
+                storeFile = releaseSigning.storeFile
+                storePassword = releaseSigning.storePassword
+                keyAlias = releaseSigning.keyAlias
+                keyPassword = releaseSigning.keyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            if (releaseSigning != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
@@ -118,4 +140,69 @@ dependencies {
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.work.testing)
     kspTest(libs.hilt.compiler)
+}
+
+fun envOrVersion(name: String): String {
+    val fromEnv = System.getenv(name)?.trim().orEmpty()
+    if (fromEnv.isNotEmpty()) {
+        return fromEnv
+    }
+    val properties = Properties()
+    rootProject.file("version.properties").inputStream().use(properties::load)
+    val value = properties.getProperty(name)?.trim().orEmpty()
+    require(value.isNotEmpty()) { "Missing $name in version.properties" }
+    return value
+}
+
+data class ReleaseSigning(
+    val storeFile: File,
+    val storePassword: String,
+    val keyAlias: String,
+    val keyPassword: String,
+)
+
+fun loadReleaseSigning(): ReleaseSigning? {
+    val fileProps = Properties()
+    val propertiesFile = rootProject.file("keystore.properties")
+    if (propertiesFile.isFile) {
+        propertiesFile.inputStream().use(fileProps::load)
+    }
+
+    fun read(
+        propKey: String,
+        envKey: String,
+    ): String? {
+        val fromEnv = System.getenv(envKey)?.trim().orEmpty()
+        if (fromEnv.isNotEmpty()) {
+            return fromEnv
+        }
+        return fileProps.getProperty(propKey)?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    val storeFileValue = read("storeFile", "LILI_STORE_FILE")
+    val storePassword = read("storePassword", "LILI_STORE_PASSWORD")
+    val keyAlias = read("keyAlias", "LILI_KEY_ALIAS")
+    val keyPassword = read("keyPassword", "LILI_KEY_PASSWORD")
+    val present = listOf(storeFileValue, storePassword, keyAlias, keyPassword).count { it != null }
+    if (present == 0) {
+        return null
+    }
+    require(present == 4) {
+        "Release signing needs storeFile, storePassword, keyAlias, and keyPassword " +
+            "(keystore.properties or LILI_STORE_FILE / LILI_STORE_PASSWORD / " +
+            "LILI_KEY_ALIAS / LILI_KEY_PASSWORD)."
+    }
+    val storeFile = resolveStoreFile(storeFileValue!!)
+    return ReleaseSigning(storeFile, storePassword!!, keyAlias!!, keyPassword!!)
+}
+
+fun resolveStoreFile(path: String): File {
+    val specified = File(path)
+    val candidates =
+        listOfNotNull(
+            specified.takeIf { it.isAbsolute && it.isFile },
+            rootProject.file(path).takeIf { it.isFile },
+            file(path).takeIf { it.isFile },
+        )
+    return candidates.firstOrNull() ?: error("Release keystore not found: $path")
 }

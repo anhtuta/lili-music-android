@@ -34,6 +34,10 @@ fun LiliNavHost(
             deepLinks =
                 listOf(
                     navDeepLink { uriPattern = "lilimusic://bai-hat/{path}" },
+                    navDeepLink { uriPattern = "https://blog.nenmongvietnam.com/bai-hat/{path}" },
+                    navDeepLink {
+                        uriPattern = "https://anhtuta.github.io/lili-player/bai-hat/{path}"
+                    },
                 ),
         ) { entry ->
             val destination = entry.toRoute<PlayerDestination>()

@@ -29,4 +29,6 @@ object PlayerTestTags {
     const val SETTINGS = "player-settings"
     const val PALETTE = "player-palette"
     const val DOWNLOAD = "player-download"
+    const val LYRIC_CARD = "player-lyric-card"
+    const val LYRICS = "player-lyrics"
 }

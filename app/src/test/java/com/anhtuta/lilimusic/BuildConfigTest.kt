@@ -15,4 +15,10 @@ class BuildConfigTest {
         assertThat(BuildConfig.APPLICATION_ID)
             .isEqualTo("com.anhtuta.lilimusic")
     }
+
+    @Test
+    fun versionMatchesCommittedDefaults() {
+        assertThat(BuildConfig.VERSION_NAME).isEqualTo("1.0.0")
+        assertThat(BuildConfig.VERSION_CODE).isEqualTo(1)
+    }
 }

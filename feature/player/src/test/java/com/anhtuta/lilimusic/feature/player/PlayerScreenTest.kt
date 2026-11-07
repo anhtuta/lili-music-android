@@ -1,15 +1,20 @@
 package com.anhtuta.lilimusic.feature.player
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
@@ -285,4 +290,98 @@ class PlayerScreenTest {
         composeRule.onNodeWithTag(PlayerTestTags.DOWNLOAD).performClick()
         assertThat(downloads).isEqualTo(1)
     }
+
+    @Test
+    fun lyricCardActionFiresCallback() {
+        var cards = 0
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                            onLyricCard = { cards++ },
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.LYRIC_CARD).performClick()
+        assertThat(cards).isEqualTo(1)
+    }
+
+    @Test
+    fun lyricsSlotFillsViewportBelowAppBar() {
+        composeRule.setContent {
+            LiliTheme {
+                Box(modifier = Modifier.size(width = 400.dp, height = 720.dp)) {
+                    PlayerScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        state =
+                            PlayerUiState(
+                                song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            ),
+                        callbacks = idlePlayerCallbacks(),
+                    )
+                }
+            }
+        }
+
+        val bounds =
+            composeRule
+                .onNodeWithTag(PlayerTestTags.LYRICS)
+                .getUnclippedBoundsInRoot()
+        assertThat(bounds.bottom.value - bounds.top.value).isGreaterThan(400f)
+    }
+
+    @Test
+    fun previousLabelStaysOnOneLineWithoutClipping() {
+        composeRule.setContent {
+            LiliTheme {
+                Box(modifier = Modifier.size(width = 400.dp, height = 720.dp)) {
+                    PlayerScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        state =
+                            PlayerUiState(
+                                song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            ),
+                        callbacks = idlePlayerCallbacks(),
+                    )
+                }
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.PREVIOUS).performScrollTo()
+        val bounds =
+            composeRule
+                .onNodeWithTag(PlayerTestTags.PREVIOUS)
+                .getUnclippedBoundsInRoot()
+        assertThat(bounds.right.value - bounds.left.value).isGreaterThan(48f)
+        composeRule.onNodeWithText("Previous").assertIsDisplayed()
+    }
 }
+
+private fun idlePlayerCallbacks() =
+    PlayerCallbacks(
+        onBack = {},
+        onPlayPause = {},
+        onSkipNext = {},
+        onSkipPrevious = {},
+        onSeek = {},
+        onToggleShuffle = {},
+        onToggleRepeatOne = {},
+        onIncreaseSpeed = {},
+        onDecreaseSpeed = {},
+    )

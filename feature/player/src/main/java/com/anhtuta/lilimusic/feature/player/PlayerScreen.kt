@@ -2,8 +2,10 @@ package com.anhtuta.lilimusic.feature.player
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -78,6 +79,12 @@ fun PlayerScreen(
                         ) {
                             Text(text = downloadActionLabel(state))
                         }
+                        TextButton(
+                            onClick = callbacks.onLyricCard,
+                            modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
+                        ) {
+                            Text(stringResource(R.string.player_lyric_card))
+                        }
                     }
                     TextButton(
                         onClick = callbacks.onSettings,
@@ -125,43 +132,47 @@ private fun PlayerBody(
         }
         return
     }
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        PlayerCover(title = song.title, imageUrl = song.imageUrl)
-        Spacer(modifier = Modifier.height(24.dp))
-        PlayerSongHeadings(song = song)
-        Spacer(modifier = Modifier.height(16.dp))
-        PlayerSeekBar(
-            positionMs = state.positionMs,
-            durationMs = state.durationMs,
-            onSeek = callbacks.onSeek,
-        )
-        PlayerQueueMessages(state = state)
-        Spacer(modifier = Modifier.height(8.dp))
-        PlayerTransport(
-            isPlaying = state.isPlaying,
-            callbacks = callbacks,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        PlayerModeRow(
-            playMode = state.playMode,
-            speed = state.speed,
-            callbacks = callbacks,
-        )
-        Box(
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val lyricsHeight = maxHeight
+        Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
-                    .padding(top = 16.dp),
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            lyrics()
+            PlayerCover(title = song.title, imageUrl = song.imageUrl)
+            Spacer(modifier = Modifier.height(24.dp))
+            PlayerSongHeadings(song = song)
+            Spacer(modifier = Modifier.height(16.dp))
+            PlayerSeekBar(
+                positionMs = state.positionMs,
+                durationMs = state.durationMs,
+                onSeek = callbacks.onSeek,
+            )
+            PlayerQueueMessages(state = state)
+            Spacer(modifier = Modifier.height(8.dp))
+            PlayerTransport(
+                isPlaying = state.isPlaying,
+                callbacks = callbacks,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            PlayerModeRow(
+                playMode = state.playMode,
+                speed = state.speed,
+                callbacks = callbacks,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(lyricsHeight)
+                        .testTag(PlayerTestTags.LYRICS),
+            ) {
+                lyrics()
+            }
         }
     }
 }
@@ -285,52 +296,62 @@ private fun PlayerTransport(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(
-            onClick = callbacks.onSkipPrevious,
-            modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
-        ) {
-            Text(text = stringResource(R.string.player_previous))
-        }
         val rewindDescription = stringResource(R.string.player_rewind_cd)
-        IconButton(
+        val forwardDescription = stringResource(R.string.player_forward_cd)
+        TransportTextButton(
+            onClick = callbacks.onSkipPrevious,
+            label = stringResource(R.string.player_previous),
+            modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
+        )
+        TransportTextButton(
             onClick = callbacks.onSeekBack,
+            label = stringResource(R.string.player_rewind),
             modifier =
                 Modifier
                     .testTag(PlayerTestTags.REWIND)
                     .semantics { contentDescription = rewindDescription },
-        ) {
-            Text(text = stringResource(R.string.player_rewind))
-        }
-        TextButton(
+        )
+        TransportTextButton(
             onClick = callbacks.onPlayPause,
+            label =
+                stringResource(
+                    if (isPlaying) R.string.player_pause else R.string.player_play,
+                ),
             modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
-        ) {
-            Text(
-                text =
-                    stringResource(
-                        if (isPlaying) R.string.player_pause else R.string.player_play,
-                    ),
-            )
-        }
-        val forwardDescription = stringResource(R.string.player_forward_cd)
-        IconButton(
+        )
+        TransportTextButton(
             onClick = callbacks.onSeekForward,
+            label = stringResource(R.string.player_forward),
             modifier =
                 Modifier
                     .testTag(PlayerTestTags.FORWARD)
                     .semantics { contentDescription = forwardDescription },
-        ) {
-            Text(text = stringResource(R.string.player_forward))
-        }
-        IconButton(
+        )
+        TransportTextButton(
             onClick = callbacks.onSkipNext,
+            label = stringResource(R.string.player_next),
             modifier = Modifier.testTag(PlayerTestTags.NEXT),
-        ) {
-            Text(text = stringResource(R.string.player_next))
-        }
+        )
+    }
+}
+
+@Composable
+private fun RowScope.TransportTextButton(
+    onClick: () -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = modifier.weight(1f),
+    ) {
+        Text(
+            text = label,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 

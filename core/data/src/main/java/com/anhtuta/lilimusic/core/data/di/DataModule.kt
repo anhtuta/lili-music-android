@@ -5,9 +5,11 @@ import com.anhtuta.lilimusic.core.data.download.CoverStore
 import com.anhtuta.lilimusic.core.data.download.FileCoverStore
 import com.anhtuta.lilimusic.core.data.network.ConnectivityNetworkMonitor
 import com.anhtuta.lilimusic.core.data.network.NetworkMonitor
+import com.anhtuta.lilimusic.core.data.repository.DataStoreLyricCardSettingsRepository
 import com.anhtuta.lilimusic.core.data.repository.DataStoreSettingsRepository
 import com.anhtuta.lilimusic.core.data.repository.DefaultDownloadRepository
 import com.anhtuta.lilimusic.core.data.repository.DownloadRepository
+import com.anhtuta.lilimusic.core.data.repository.LyricCardSettingsRepository
 import com.anhtuta.lilimusic.core.data.repository.LyricRepository
 import com.anhtuta.lilimusic.core.data.repository.OfflineFirstLyricRepository
 import com.anhtuta.lilimusic.core.data.repository.OfflineFirstSongRepository
@@ -53,6 +55,9 @@ abstract class DataBindModule {
 
     @Binds
     abstract fun bindSettingsRepository(impl: DataStoreSettingsRepository): SettingsRepository
+
+    @Binds
+    abstract fun bindLyricCardSettingsRepository(impl: DataStoreLyricCardSettingsRepository): LyricCardSettingsRepository
 
     @Binds
     abstract fun bindDownloadRepository(impl: DefaultDownloadRepository): DownloadRepository

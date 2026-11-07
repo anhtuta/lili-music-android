@@ -7,17 +7,25 @@ GRADLEW := ./gradlew
 APP := :app
 DIST := dist
 APP_GRADLE := app/build.gradle.kts
+VERSION_FILE := version.properties
 
-VERSION_NAME := $(shell sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' $(APP_GRADLE) | head -n1)
+ifndef VERSION_NAME
+VERSION_NAME := $(shell sed -n 's/^VERSION_NAME=//p' $(VERSION_FILE) | head -n1)
+endif
 ifeq ($(strip $(VERSION_NAME)),)
 VERSION_NAME := 0.0.0
+endif
+
+ifndef VERSION_CODE
+VERSION_CODE := $(shell sed -n 's/^VERSION_CODE=//p' $(VERSION_FILE) | head -n1)
 endif
 
 DEBUG_APK_SRC := app/build/outputs/apk/debug/app-debug.apk
 DEBUG_APK_DST := $(DIST)/lili-music-$(VERSION_NAME)-debug.apk
 RELEASE_APK_DIR := app/build/outputs/apk/release
+RELEASE_AAB_SRC := app/build/outputs/bundle/release/app-release.aab
 
-HAS_SIGNING := $(shell grep -E 'signingConfigs[[:space:]]*\{' $(APP_GRADLE) >/dev/null 2>&1 && echo yes || echo no)
+HAS_SIGNING := $(shell if [ -f keystore.properties ] || { [ -n "$$LILI_STORE_FILE" ] && [ -n "$$LILI_STORE_PASSWORD" ] && [ -n "$$LILI_KEY_ALIAS" ] && [ -n "$$LILI_KEY_PASSWORD" ]; }; then echo yes; else echo no; fi)
 
 COMPILE_SDK := $(shell sed -n 's/^[[:space:]]*compileSdk = \([0-9][0-9]*\).*/\1/p' $(APP_GRADLE) | head -n1)
 ifeq ($(strip $(COMPILE_SDK)),)
@@ -27,7 +35,7 @@ endif
 SDKMANAGER_INSTALL := sdkmanager "platforms;android-$(COMPILE_SDK).0" "build-tools;$(COMPILE_SDK).0.0" "platform-tools"
 SDKMANAGER_DEPRECATION := sdkmanager may print a deprecation warning pointing to the new android sdk CLI; that warning is harmless.
 
-.PHONY: help doctor build apk release-apk install test lint check clean
+.PHONY: help doctor build apk release-apk bundle install test lint check clean smoke
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage: make <target>\n\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  %-14s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -103,8 +111,24 @@ release-apk: ## Assemble release APK and copy it to dist/
 	cp "$$src" "$$dst"; \
 	echo "$$dst"; \
 	if [ "$(HAS_SIGNING)" != "yes" ]; then \
-		echo "Unsigned release APK (no signingConfigs in $(APP_GRADLE))."; \
-		echo "Play Store signing is task 064."; \
+		echo "Unsigned release APK (no keystore.properties / LILI_* env)."; \
+		echo "See docs/play/signing.md."; \
+	fi
+
+bundle: ## Assemble the Play upload AAB and copy it to dist/
+	$(GRADLEW) $(APP):bundleRelease
+	mkdir -p $(DIST)
+	@if [ ! -f "$(RELEASE_AAB_SRC)" ]; then echo "No release AAB at $(RELEASE_AAB_SRC)"; exit 1; fi
+	@if [ "$(HAS_SIGNING)" = "yes" ]; then \
+		dst="$(DIST)/lili-music-$(VERSION_NAME).aab"; \
+	else \
+		dst="$(DIST)/lili-music-$(VERSION_NAME)-unsigned.aab"; \
+	fi; \
+	cp "$(RELEASE_AAB_SRC)" "$$dst"; \
+	echo "$$dst"; \
+	if [ "$(HAS_SIGNING)" != "yes" ]; then \
+		echo "Unsigned release AAB (no keystore.properties / LILI_* env)."; \
+		echo "See docs/play/signing.md."; \
 	fi
 
 install: apk ## adb install -r the debug APK
@@ -118,6 +142,9 @@ lint: ## Android Lint (debug)
 
 check: ## Tests + lint + ktlint + detekt
 	$(GRADLEW) check
+
+smoke: ## Minified release APK + aapt packaging checks
+	bash scripts/test-release-smoke.sh
 
 clean: ## Remove Gradle outputs and dist/
 	$(GRADLEW) clean

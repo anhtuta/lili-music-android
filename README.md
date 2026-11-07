@@ -18,10 +18,11 @@ Kotlin, Jetpack Compose + Material 3, Navigation Compose, Hilt, Media3, Retrofit
 
 ## Build
 
-JDK 17 and Android SDK 35 are required.
+JDK **21 or newer** (25 is fine) and Android SDK (`compileSdk` 37, `targetSdk` 35). App bytecode stays JVM 17. Prefer the Makefile if you are not using Android Studio: `make doctor`, `make apk`, `make bundle`. Release signing is optional and never committed; see [docs/play/signing.md](docs/play/signing.md).
 
 ```bash
 ./gradlew assembleDebug
+./gradlew :app:assembleRelease   # minified; unsigned unless keystore.properties / LILI_* is set
 ./gradlew testDebugUnitTest
 ./gradlew lintDebug
 ./gradlew ktlintCheck
@@ -29,7 +30,7 @@ JDK 17 and Android SDK 35 are required.
 ./gradlew check
 ```
 
-API base URL is `BuildConfig.API_BASE_URL` in `:app`.
+API base URL is `BuildConfig.API_BASE_URL` in `:app`. Version comes from [version.properties](version.properties) (`VERSION_CODE` / `VERSION_NAME` env overrides).
 
 ## Contributor workflow
 

@@ -3,6 +3,7 @@
     <string name="player_title">Now playing</string>
     <string name="player_back">Back</string>
     <string name="player_settings">Settings</string>
+    <string name="player_lyric_card">Card</string>
     <string name="player_download">Download</string>
     <string name="player_download_waiting">Waiting</string>
     <string name="player_download_progress">%1$d%%</string>
