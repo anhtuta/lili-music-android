@@ -1,8 +1,9 @@
 package com.anhtuta.lilimusic.core.model
 
 /**
- * Web `LyricDownloadModal` font-family `<select>` values.
- * Android maps these names to system typefaces; decorative Google Fonts are not bundled.
+ * Web `LyricDownloadModal` / `CardConfiguration` font-family `<select>` values.
+ * Decorative Google Fonts (Lavishly Yours, Lobster, Pacifico, Borel) are bundled as `res/font`.
+ * Open Sans, Verdana, and Georgia use the system sans/serif.
  */
 enum class LyricCardFont(
     val storageValue: String,

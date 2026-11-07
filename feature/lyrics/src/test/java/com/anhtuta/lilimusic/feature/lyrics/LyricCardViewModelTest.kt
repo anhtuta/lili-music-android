@@ -134,6 +134,7 @@ class LyricCardViewModelTest {
             coverLoader = FakeCoverLoader(),
             files = files,
             clipboard = clipboard,
+            fonts = LyricCardFonts(androidx.test.core.app.ApplicationProvider.getApplicationContext()),
             ioDispatcher = dispatcher,
         )
     }
