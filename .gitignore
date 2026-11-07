@@ -5,6 +5,7 @@ build/
 
 # Local SDK / secrets
 local.properties
+keystore.properties
 *.keystore
 *.jks
 !debug.keystore
