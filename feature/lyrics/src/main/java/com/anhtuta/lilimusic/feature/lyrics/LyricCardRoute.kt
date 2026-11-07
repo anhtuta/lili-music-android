@@ -27,46 +27,8 @@ fun LyricCardRoute(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
-    val context = LocalContext.current
-    val noLyric = stringResource(R.string.lyric_card_no_lyric)
-    val copied = stringResource(R.string.lyric_card_copied)
-    val shareFailed = stringResource(R.string.lyric_card_share_failed)
-    val chooser = stringResource(R.string.lyric_card_share_chooser)
-
-    LaunchedEffect(state.showNoLyricWarning) {
-        if (state.showNoLyricWarning) {
-            snackbar.showSnackbar(noLyric)
-            viewModel.consumeNoLyricWarning()
-        }
-    }
-    LaunchedEffect(state.copied) {
-        if (state.copied) {
-            snackbar.showSnackbar(copied)
-            viewModel.consumeCopied()
-        }
-    }
-    LaunchedEffect(state.shareFailed) {
-        if (state.shareFailed) {
-            snackbar.showSnackbar(shareFailed)
-            viewModel.consumeShareFailed()
-        }
-    }
-    LaunchedEffect(state.shareUri) {
-        val uri = state.shareUri ?: return@LaunchedEffect
-        val activity = context as? Activity
-        if (activity != null) {
-            val intent =
-                ShareCompat
-                    .IntentBuilder(activity)
-                    .setType("image/jpeg")
-                    .setStream(uri)
-                    .setChooserTitle(chooser)
-                    .createChooserIntent()
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            activity.startActivity(intent)
-        }
-        viewModel.consumeShare()
-    }
+    LyricCardMessageEffects(state = state, snackbar = snackbar, viewModel = viewModel)
+    LyricCardShareEffect(state = state, viewModel = viewModel)
 
     val showingCard = state.step != LyricCardStep.HIDDEN
     Box(
@@ -105,5 +67,59 @@ fun LyricCardRoute(
             hostState = snackbar,
             modifier = Modifier.testTag(LyricCardTestTags.NO_LYRIC),
         )
+    }
+}
+
+@Composable
+private fun LyricCardMessageEffects(
+    state: LyricCardUiState,
+    snackbar: SnackbarHostState,
+    viewModel: LyricCardViewModel,
+) {
+    val noLyric = stringResource(R.string.lyric_card_no_lyric)
+    val copied = stringResource(R.string.lyric_card_copied)
+    val shareFailed = stringResource(R.string.lyric_card_share_failed)
+    LaunchedEffect(state.showNoLyricWarning) {
+        if (state.showNoLyricWarning) {
+            snackbar.showSnackbar(noLyric)
+            viewModel.consumeNoLyricWarning()
+        }
+    }
+    LaunchedEffect(state.copied) {
+        if (state.copied) {
+            snackbar.showSnackbar(copied)
+            viewModel.consumeCopied()
+        }
+    }
+    LaunchedEffect(state.shareFailed) {
+        if (state.shareFailed) {
+            snackbar.showSnackbar(shareFailed)
+            viewModel.consumeShareFailed()
+        }
+    }
+}
+
+@Composable
+private fun LyricCardShareEffect(
+    state: LyricCardUiState,
+    viewModel: LyricCardViewModel,
+) {
+    val context = LocalContext.current
+    val chooser = stringResource(R.string.lyric_card_share_chooser)
+    LaunchedEffect(state.shareUri) {
+        val uri = state.shareUri ?: return@LaunchedEffect
+        val activity = context as? Activity
+        if (activity != null) {
+            val intent =
+                ShareCompat
+                    .IntentBuilder(activity)
+                    .setType("image/jpeg")
+                    .setStream(uri)
+                    .setChooserTitle(chooser)
+                    .createChooserIntent()
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            activity.startActivity(intent)
+        }
+        viewModel.consumeShare()
     }
 }

@@ -165,60 +165,76 @@ private fun LyricCardConfigureScreen(
                 onBackgroundColor = callbacks.onBackgroundColor,
             )
             FontRow(selected = config.fontFamily, onFontFamily = callbacks.onFontFamily)
-            LabeledSlider(
-                label = stringResource(R.string.lyric_card_font_size, config.fontSize),
-                value = config.fontSize.toFloat(),
-                range = LyricCardSettings.MIN_FONT_SIZE.toFloat()..LyricCardSettings.MAX_FONT_SIZE.toFloat(),
-                steps = LyricCardSettings.MAX_FONT_SIZE - LyricCardSettings.MIN_FONT_SIZE - 1,
-                testTag = LyricCardTestTags.FONT_SIZE,
-                onValue = { callbacks.onFontSize(it.toInt()) },
-            )
-            LabeledSlider(
-                label = stringResource(R.string.lyric_card_overlay, config.overlayOpacity),
-                value = config.overlayOpacity.toFloat(),
-                range = LyricCardSettings.MIN_OVERLAY.toFloat()..LyricCardSettings.MAX_OVERLAY.toFloat(),
-                steps =
-                    (LyricCardSettings.MAX_OVERLAY - LyricCardSettings.MIN_OVERLAY) /
-                        LyricCardSettings.OVERLAY_STEP - 1,
-                testTag = LyricCardTestTags.OVERLAY,
-                onValue = { callbacks.onOverlayOpacity(it.toInt()) },
-            )
-            LabeledSlider(
-                label = stringResource(R.string.lyric_card_brightness, config.brightnessBoost),
-                value = config.brightnessBoost.toFloat(),
-                range = LyricCardSettings.MIN_BRIGHTNESS.toFloat()..LyricCardSettings.MAX_BRIGHTNESS.toFloat(),
-                steps =
-                    (LyricCardSettings.MAX_BRIGHTNESS - LyricCardSettings.MIN_BRIGHTNESS) /
-                        LyricCardSettings.BRIGHTNESS_STEP - 1,
-                testTag = LyricCardTestTags.BRIGHTNESS,
-                onValue = { callbacks.onBrightnessBoost(it.toInt()) },
-                enabled = config.useSongImage,
-            )
-            Text(
-                text = state.selectedText,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 160.dp)
-                        .testTag(LyricCardTestTags.PREVIEW)
-                        .padding(16.dp),
-            )
-            Text(text = state.songTitle, style = MaterialTheme.typography.titleMedium)
-            Text(text = state.songArtist, style = MaterialTheme.typography.bodyMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TextButton(
-                    onClick = callbacks.onShare,
-                    modifier = Modifier.testTag(LyricCardTestTags.SHARE),
-                ) {
-                    Text(stringResource(R.string.lyric_card_share))
-                }
-                TextButton(
-                    onClick = callbacks.onCopy,
-                    modifier = Modifier.testTag(LyricCardTestTags.COPY),
-                ) {
-                    Text(stringResource(R.string.lyric_card_copy))
-                }
-            }
+            ConfigureSliders(config = config, callbacks = callbacks)
+            ConfigurePreviewAndShare(state = state, callbacks = callbacks)
+        }
+    }
+}
+
+@Composable
+private fun ConfigureSliders(
+    config: LyricCardSettings,
+    callbacks: LyricCardCallbacks,
+) {
+    LabeledSlider(
+        label = stringResource(R.string.lyric_card_font_size, config.fontSize),
+        value = config.fontSize.toFloat(),
+        range = LyricCardSettings.MIN_FONT_SIZE.toFloat()..LyricCardSettings.MAX_FONT_SIZE.toFloat(),
+        steps = LyricCardSettings.MAX_FONT_SIZE - LyricCardSettings.MIN_FONT_SIZE - 1,
+        testTag = LyricCardTestTags.FONT_SIZE,
+        onValue = { callbacks.onFontSize(it.toInt()) },
+    )
+    LabeledSlider(
+        label = stringResource(R.string.lyric_card_overlay, config.overlayOpacity),
+        value = config.overlayOpacity.toFloat(),
+        range = LyricCardSettings.MIN_OVERLAY.toFloat()..LyricCardSettings.MAX_OVERLAY.toFloat(),
+        steps =
+            (LyricCardSettings.MAX_OVERLAY - LyricCardSettings.MIN_OVERLAY) /
+                LyricCardSettings.OVERLAY_STEP - 1,
+        testTag = LyricCardTestTags.OVERLAY,
+        onValue = { callbacks.onOverlayOpacity(it.toInt()) },
+    )
+    LabeledSlider(
+        label = stringResource(R.string.lyric_card_brightness, config.brightnessBoost),
+        value = config.brightnessBoost.toFloat(),
+        range = LyricCardSettings.MIN_BRIGHTNESS.toFloat()..LyricCardSettings.MAX_BRIGHTNESS.toFloat(),
+        steps =
+            (LyricCardSettings.MAX_BRIGHTNESS - LyricCardSettings.MIN_BRIGHTNESS) /
+                LyricCardSettings.BRIGHTNESS_STEP - 1,
+        testTag = LyricCardTestTags.BRIGHTNESS,
+        onValue = { callbacks.onBrightnessBoost(it.toInt()) },
+        enabled = config.useSongImage,
+    )
+}
+
+@Composable
+private fun ConfigurePreviewAndShare(
+    state: LyricCardUiState,
+    callbacks: LyricCardCallbacks,
+) {
+    Text(
+        text = state.selectedText,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 160.dp)
+                .testTag(LyricCardTestTags.PREVIEW)
+                .padding(16.dp),
+    )
+    Text(text = state.songTitle, style = MaterialTheme.typography.titleMedium)
+    Text(text = state.songArtist, style = MaterialTheme.typography.bodyMedium)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        TextButton(
+            onClick = callbacks.onShare,
+            modifier = Modifier.testTag(LyricCardTestTags.SHARE),
+        ) {
+            Text(stringResource(R.string.lyric_card_share))
+        }
+        TextButton(
+            onClick = callbacks.onCopy,
+            modifier = Modifier.testTag(LyricCardTestTags.COPY),
+        ) {
+            Text(stringResource(R.string.lyric_card_copy))
         }
     }
 }
