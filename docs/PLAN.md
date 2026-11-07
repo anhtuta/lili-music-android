@@ -295,7 +295,7 @@ Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [
 
 ### Phase 7 — Compact now-playing, transport icons, lyric-card fonts, download cancel
 
-Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-compact-lyrics.md), [071](tasks/071-transport-icons.md), [072](tasks/072-lyric-card-fonts.md), [073](tasks/073-cancel-download.md).
+Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-compact-lyrics.md), [071](tasks/071-transport-icons.md), [072](tasks/072-lyric-card-fonts.md), [073](tasks/073-cancel-download.md), [074](tasks/074-download-action-icon.md).
 
 | ID | Task | Status |
 | --- | --- | --- |
@@ -303,6 +303,7 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 | 071 | Replace Previous / −5s / Play / +5s / Next text with icon buttons (web `ll-btn-prev` / `ll-btn-next` / play-pause) plus contentDescriptions | This PR |
 | 072 | Bundle web lyric-card Google Fonts (Lobster, Pacifico, Lavishly Yours, Borel; OFL) as `res/font` and use them in the font picker / JPEG export | This PR |
 | 073 | Cancel an in-progress download: stop Media3, remove partial audio/lyric/cover + Room row, update Downloads / library / player UI | This PR |
+| 074 | Replace the text Download action with a state icon (`Download` / progress / `DownloadDone`) plus contentDescriptions on library rows and Now playing | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -336,6 +337,7 @@ PR #21 (Phase 6 remainder: lyric card, App Links, Play packaging, karaoke wrap, 
 - **071** icon transport buttons with contentDescriptions
 - **072** bundle OFL Google Fonts for the lyric card
 - **073** cancel in-progress Media3 downloads and clear partial files
+- **074** Download action is an icon that shows idle / in-progress / done (tap in-progress to cancel)
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
@@ -352,7 +354,7 @@ These Android extras / choices are **kept as-is** (not bugs):
 | **13** | Tap a lyric line to seek | Lyric taps do not seek |
 | **20** | Cover Palette tints now-playing chrome | `getAverageRGB` only tinted waveform bars (not ported) |
 | **22** | Custom scheme `lilimusic://bai-hat/{path}` always; HTTPS path-style App Links after the owner hosts `assetlinks.json`. Hash URLs rewrite only when the fragment is in the Intent. | Hash route `#/bai-hat/{path}` |
-| **Downloads** | Media3 downloads + offline playback from cache (060/061) | No download / offline library |
+| **Downloads** | Media3 downloads + offline playback from cache (060/061). Per-song action is an icon (`Download` / spinner / `DownloadDone`) with contentDescriptions, not a “Download” text button (074). The Downloads screen still uses text Cancel / Delete / Retry | No download / offline library |
 | **Lyric card** | Tap-to-toggle whole lines; share sheet JPEG instead of a file download. Decorative Google Fonts are bundled (072); Open Sans / Verdana / Georgia still use the system sans/serif | Desktop `getSelection()` + Google Fonts (including Open Sans from `index.html`) + `html-to-image` download |
 | **App Links hosts** | Path-style `https://blog.nenmongvietnam.com/bai-hat/{path}` and `https://anhtuta.github.io/lili-player/bai-hat/{path}` (Android-first until the web host rewrites those paths) | Only `#/bai-hat/{path}` on the HashRouter origin |
 | **Transport icons** | Material Icons (`SkipPrevious`, `Replay5`, `PlayArrow`/`Pause`, `Forward5`, `SkipNext`) with contentDescriptions | CSS triangle arrows (`ll-btn-prev` / `ll-btn-next` / `.ll-play-pause .arrow`) |
