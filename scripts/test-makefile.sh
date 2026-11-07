@@ -13,7 +13,7 @@ fail() {
 help_out="$(make help)"
 echo "$help_out" | grep -q 'Usage: make <target>' || fail "help missing usage line"
 
-targets="help doctor build apk release-apk install test lint check clean"
+targets="help doctor build apk release-apk bundle install test lint check clean"
 for target in $targets; do
   echo "$help_out" | grep -Eq "^  ${target} " || fail "help missing target ${target}"
 done
@@ -35,7 +35,9 @@ make -n build | grep -q 'assembleDebug' || fail "make -n build should run assemb
 make -n apk | grep -q 'assembleDebug' || fail "make -n apk should run assembleDebug"
 make -n apk | grep -q 'dist/lili-music-' || fail "make -n apk should copy into dist/"
 make -n release-apk | grep -q 'assembleRelease' || fail "make -n release-apk should run assembleRelease"
-make -n release-apk | grep -q 'task 064' || fail "make -n release-apk should mention unsigned signing task 064"
+make -n release-apk | grep -q 'docs/play/signing.md' || fail "make -n release-apk should point unsigned builds at docs/play/signing.md"
+make -n bundle | grep -q 'bundleRelease' || fail "make -n bundle should run bundleRelease"
+make -n bundle | grep -q 'docs/play/signing.md' || fail "make -n bundle should point unsigned builds at docs/play/signing.md"
 make -n install | grep -q 'adb install -r' || fail "make -n install should adb install -r"
 make -n test | grep -q 'testDebugUnitTest' || fail "make -n test should run testDebugUnitTest"
 make -n lint | grep -q 'lintDebug' || fail "make -n lint should run lintDebug"
