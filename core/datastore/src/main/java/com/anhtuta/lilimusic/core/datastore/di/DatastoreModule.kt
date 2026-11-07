@@ -5,6 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.anhtuta.lilimusic.core.datastore.LyricCardPreferences
+import com.anhtuta.lilimusic.core.datastore.LyricCardPreferencesDataSource
 import com.anhtuta.lilimusic.core.datastore.PlaybackPreferences
 import com.anhtuta.lilimusic.core.datastore.PlaybackPreferencesDataSource
 import com.anhtuta.lilimusic.core.datastore.SettingsPreferences
@@ -45,4 +47,7 @@ abstract class DatastoreBindModule {
 
     @Binds
     abstract fun bindSettingsPreferences(impl: SettingsPreferencesDataSource): SettingsPreferences
+
+    @Binds
+    abstract fun bindLyricCardPreferences(impl: LyricCardPreferencesDataSource): LyricCardPreferences
 }
