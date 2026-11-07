@@ -11,6 +11,7 @@ object LyricsTestTags {
     const val MISSING_FB = "lyrics-missing-fb"
     const val ERROR = "lyrics-error"
     const val LINE = "lyrics-line"
+    const val LINE_WORDS = "lyrics-line-words"
     const val ACTIVE_LINE = "lyrics-active-line"
     const val TRANSLATION = "lyrics-translation"
     const val OFFSET_VALUE = "lyrics-offset-value"

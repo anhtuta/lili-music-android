@@ -33,10 +33,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.lyrics.LyricLineFrame
@@ -324,6 +327,7 @@ private fun SyncedLyricList(
                 style = style,
                 onSeek = { onSeekToLine(line.seekPositionMs) },
                 seekDescription = seekDescription,
+                modifier = Modifier.fillParentMaxWidth(),
             )
         }
         val meta = LyricMetaFooter.content(frame.meta)
@@ -398,11 +402,12 @@ private fun LyricLineRow(
     style: LyricVisualStyle,
     onSeek: () -> Unit,
     seekDescription: String,
+    modifier: Modifier = Modifier,
 ) {
     val lineAlpha = if (style.settings.lineAppear && !isActive) 0f else 1f
     Column(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clickable(onClick = onSeek)
                 .padding(vertical = 8.dp, horizontal = 16.dp)
@@ -411,11 +416,11 @@ private fun LyricLineRow(
                 .semantics { contentDescription = seekDescription },
         horizontalAlignment = style.horizontal,
     ) {
-        Row {
-            line.words.forEach { word ->
-                KaraokeWord(word = word, isActiveLine = isActive, style = style)
-            }
-        }
+        KaraokeLine(
+            line = line,
+            isActive = isActive,
+            style = style,
+        )
         if (style.settings.translate) {
             line.translations.forEach { translation ->
                 Text(
@@ -432,54 +437,78 @@ private fun LyricLineRow(
 }
 
 @Composable
-private fun KaraokeWord(
-    word: LyricWordFrame,
-    isActiveLine: Boolean,
+private fun KaraokeLine(
+    line: LyricLineFrame,
+    isActive: Boolean,
     style: LyricVisualStyle,
 ) {
-    val hideWord = (style.settings.wordAppear || style.settings.lineAppear) && !word.isPassed && !word.isActive
-    val displayText =
-        when {
-            hideWord -> ""
-            word.isEmpty && word.countdownDots > 0 -> "•".repeat(word.countdownDots)
-            word.isEmpty -> " "
-            else -> word.text
-        }
-    val fillColor = style.colors.karaokeFill
-    val restColor = if (isActiveLine) style.colors.activeText else style.colors.text
-    val brush = wordBrush(word, style.settings.karaokeMode, fillColor, restColor)
     val fontSize =
         MaterialTheme.typography.bodyLarge.fontSize *
-            if (style.settings.giganticLine && isActiveLine) 1.8f else 1f
-    val countdownDescription =
-        if (word.countdownDots > 0) {
-            stringResource(R.string.lyrics_countdown_cd, word.countdownDots)
+            if (style.settings.giganticLine && isActive) 1.8f else 1f
+    val fillColor = style.colors.karaokeFill
+    val restColor = if (isActive) style.colors.activeText else style.colors.text
+    val shadow =
+        if (style.settings.blurMode) {
+            Shadow(color = Color.White, offset = Offset.Zero, blurRadius = 8f)
         } else {
             null
         }
+    val annotated =
+        buildAnnotatedString {
+            line.words.forEach { word ->
+                val displayText = karaokeDisplayText(word, style)
+                if (displayText.isEmpty()) {
+                    return@forEach
+                }
+                withStyle(
+                    SpanStyle(
+                        brush = wordBrush(word, style.settings.karaokeMode, fillColor, restColor),
+                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+                        fontSize = fontSize,
+                        shadow = shadow,
+                    ),
+                ) {
+                    append(displayText)
+                }
+            }
+        }
+    val countdownDescription =
+        line.words.firstOrNull { it.countdownDots > 0 }?.let { word ->
+            stringResource(R.string.lyrics_countdown_cd, word.countdownDots)
+        }
     Text(
-        text = displayText,
-        style =
-            TextStyle(
-                brush = brush,
-                fontWeight = if (isActiveLine) FontWeight.Bold else FontWeight.Normal,
-                fontSize = fontSize,
-                shadow =
-                    if (style.settings.blurMode) {
-                        Shadow(color = Color.White, offset = Offset.Zero, blurRadius = 8f)
-                    } else {
-                        null
-                    },
-            ),
+        text = annotated,
+        textAlign = style.textAlign,
+        softWrap = true,
+        overflow = TextOverflow.Clip,
         modifier =
-            Modifier.then(
-                if (countdownDescription != null) {
-                    Modifier.semantics { contentDescription = countdownDescription }
-                } else {
-                    Modifier
-                },
-            ),
+            Modifier
+                .fillMaxWidth()
+                .testTag(LyricsTestTags.LINE_WORDS)
+                .then(
+                    if (countdownDescription != null) {
+                        Modifier.semantics { contentDescription = countdownDescription }
+                    } else {
+                        Modifier
+                    },
+                ),
     )
+}
+
+private fun karaokeDisplayText(
+    word: LyricWordFrame,
+    style: LyricVisualStyle,
+): String {
+    val hideWord =
+        (style.settings.wordAppear || style.settings.lineAppear) &&
+            !word.isPassed &&
+            !word.isActive
+    return when {
+        hideWord -> ""
+        word.isEmpty && word.countdownDots > 0 -> "•".repeat(word.countdownDots)
+        word.isEmpty -> " "
+        else -> word.text
+    }
 }
 
 private fun wordBrush(
