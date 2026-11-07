@@ -23,6 +23,9 @@ jobs:
       - name: Makefile dry-run
         run: bash scripts/test-makefile.sh
 
+      - name: Play Store packaging checks
+        run: bash scripts/test-play-store.sh
+
       - name: Lint commit messages
         if: github.event_name == 'pull_request'
         uses: wagoid/commitlint-github-action@v6
