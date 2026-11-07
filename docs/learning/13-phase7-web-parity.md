@@ -1,13 +1,14 @@
 # Phase 7 — compact now-playing, transport icons, lyric-card fonts, cancel download
 
-[Learning guide index](README.md) · Tasks [070](../tasks/070-compact-lyrics.md), [071](../tasks/071-transport-icons.md), [072](../tasks/072-lyric-card-fonts.md), [073](../tasks/073-cancel-download.md)
+[Learning guide index](README.md) · Tasks [070](../tasks/070-compact-lyrics.md), [071](../tasks/071-transport-icons.md), [072](../tasks/072-lyric-card-fonts.md), [073](../tasks/073-cancel-download.md), [074](../tasks/074-download-action-icon.md)
 
-**What was built.** Four owner-picked follow-ups after PR #21:
+**What was built.** Owner-picked follow-ups after PR #21:
 
 1. **Compact now-playing (070).** Web `BaiHat.css` hides `#div_left_wrapper` (the spinning cover) at `max-width: 720px`, so `#lyric_playground` (`calc(100vh - 100px)`) is lyrics immediately and `.ll_player` stays as the bar under it. Android now does the same at **&lt; 720.dp**: no cover, lyrics `weight(1f)` fill the body, seek / transport / speed pinned at the bottom. At **≥ 720.dp** cover and lyrics sit side by side with the same bar. The 067 “scroll past the cover to a full-height lyric slot” column is gone.
 2. **Transport icons (071).** Previous / −5s / Play / +5s / Next are `IconButton`s (`SkipPrevious`, `Replay5`, `PlayArrow`/`Pause`, `Forward5`, `SkipNext`) with contentDescriptions, matching web `ll-btn-prev` / `ll-btn-next` / play-pause as icons rather than text.
 3. **Lyric-card fonts (072).** The web card loads Google Fonts `Lavishly Yours`, `Lobster`, `Pacifico`, `Borel` (OFL). Those Regular TTFs are now `res/font` in `:feature:lyrics`. The picker and JPEG export use them. Open Sans / Verdana / Georgia stay system sans/serif so we do not ship extra families.
 4. **Cancel download (073).** Queued or downloading songs get **Cancel**. That stops Media3 (`engine.remove` → `DownloadService.sendRemoveDownload`), deletes the partial cover and lyric cache, and deletes the Room `downloads` row so the UI returns to not-downloaded. Completed/failed still use Delete (which keeps the lyric cache for online play).
+5. **Download action icons (074).** Library rows and Now playing no longer show a text **Download** button. Idle is `Icons.Filled.Download` (contentDescription **Download**), queued/downloading is a `CircularProgressIndicator` (**Cancel**, tap still runs 073), completed is `DownloadDone` (**Delete**), failed is `Refresh` (**Retry**). The Downloads screen still uses text Cancel / Delete / Retry.
 
 **Status:** This PR.
 
@@ -30,6 +31,8 @@
 | `DownloadService.sendRemoveDownload` | Tells Media3 to abort and drop the cache entry | `abort()` on a fetch + delete the partial blob |
 | `LyricRepository.deleteCached` | Delete the Room lyric **body** | Clearing `localStorage` for that lyric file; `remove()` of a completed download **keeps** this cache |
 | `item.isActive` | `QUEUED` or `DOWNLOADING` | A row still in the download queue |
+| `CircularProgressIndicator` | Material spinner; determinate takes `progress = { 0f..1f }` | A CSS spinner / `<progress>`; tap target is still the `IconButton` |
+| `DownloadDone` | Check-on-download Material icon | A “downloaded” badge, not a separate “Delete” text label |
 
 Why 720.dp and not Compact 600.dp? Web CSS is `max-width: 720px`. Material Compact would hide the cover on a 7″ tablet in portrait (~600–700.dp) while the web still showed it. `BoxWithConstraints.maxWidth` is the Now playing pane, which matches “how wide is this player” better than the activity’s window class.
 
@@ -45,6 +48,7 @@ Why cancel also deletes lyrics, but delete-completed does not? Online play still
 6. [DefaultDownloadRepository.kt](../../core/data/src/main/java/com/anhtuta/lilimusic/core/data/repository/DefaultDownloadRepository.kt) — `cancel` vs `remove`.
 7. [DownloadsScreen.kt](../../feature/downloads/src/main/java/com/anhtuta/lilimusic/feature/downloads/DownloadsScreen.kt) — Cancel on `isActive`, Delete otherwise.
 8. [LibraryViewModel.kt](../../feature/library/src/main/java/com/anhtuta/lilimusic/feature/library/LibraryViewModel.kt) / [PlayerViewModel.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerViewModel.kt) — download action on QUEUED/DOWNLOADING calls `cancel`.
+9. [DownloadActionButton.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/download/DownloadActionButton.kt) — shared icon; tests use `onNodeWithContentDescription("Download")`.
 
 Compact vs expanded (from `PlayerBody`):
 
@@ -80,3 +84,19 @@ override suspend fun cancel(songPath: String) {
 ```
 
 `remove()` is the same except it **does not** call `deleteCached`, so a completed download you delete still has lyrics when you play online.
+
+Idle download icon (from `DownloadActionButton`):
+
+```kotlin
+IconButton(
+    onClick = onClick,
+    modifier = modifier.semantics { contentDescription = description },
+) {
+    when (status) {
+        DownloadStatus.NONE -> Icon(Icons.Filled.Download, contentDescription = null)
+        DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> CircularProgressIndicator(/* … */)
+        DownloadStatus.COMPLETED -> Icon(Icons.Filled.DownloadDone, contentDescription = null)
+        DownloadStatus.FAILED -> Icon(Icons.Filled.Refresh, contentDescription = null)
+    }
+}
+```
