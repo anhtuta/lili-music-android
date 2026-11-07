@@ -295,7 +295,7 @@ Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [
 
 ### Phase 7 — Compact now-playing, transport icons, lyric-card fonts, download cancel
 
-Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-compact-lyrics.md), [071](tasks/071-transport-icons.md), [072](tasks/072-lyric-card-fonts.md), [073](tasks/073-cancel-download.md), [074](tasks/074-download-action-icon.md).
+Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-compact-lyrics.md), [071](tasks/071-transport-icons.md), [072](tasks/072-lyric-card-fonts.md), [073](tasks/073-cancel-download.md), [074](tasks/074-download-action-icon.md), [075](tasks/075-smooth-trc-karaoke.md).
 
 | ID | Task | Status |
 | --- | --- | --- |
@@ -304,6 +304,7 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 | 072 | Bundle web lyric-card Google Fonts (Lobster, Pacifico, Lavishly Yours, Borel; OFL) as `res/font` and use them in the font picker / JPEG export | This PR |
 | 073 | Cancel an in-progress download: stop Media3, remove partial audio/lyric/cover + Room row, update Downloads / library / player UI | This PR |
 | 074 | Replace the text Download action with a state icon (`Download` / progress / `DownloadDone`) plus contentDescriptions on library rows and Now playing | This PR |
+| 075 | Smooth `.trc` karaoke fill (interpolate playback position between ExoPlayer samples; draw-phase fill). `.xtrc` stays out of v1 (web: “future”) | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -338,6 +339,7 @@ PR #21 (Phase 6 remainder: lyric card, App Links, Play packaging, karaoke wrap, 
 - **072** bundle OFL Google Fonts for the lyric card
 - **073** cancel in-progress Media3 downloads and clear partial files
 - **074** Download action is an icon that shows idle / in-progress / done (tap in-progress to cancel)
+- **075** `.trc` karaoke fill interpolates between ExoPlayer position samples (web `currentTime` is continuous); fill is painted in draw so TRC `AnnotatedString`s stay stable
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
@@ -359,5 +361,6 @@ These Android extras / choices are **kept as-is** (not bugs):
 | **App Links hosts** | Path-style `https://blog.nenmongvietnam.com/bai-hat/{path}` and `https://anhtuta.github.io/lili-player/bai-hat/{path}` (Android-first until the web host rewrites those paths) | Only `#/bai-hat/{path}` on the HashRouter origin |
 | **Transport icons** | Material Icons (`SkipPrevious`, `Replay5`, `PlayArrow`/`Pause`, `Forward5`, `SkipNext`) with contentDescriptions | CSS triangle arrows (`ll-btn-prev` / `ll-btn-next` / `.ll-play-pause .arrow`) |
 | **Now-playing chrome** | Separate Now playing screen with a Material top app bar; compact controls are a Compose bottom bar | Cover/lyrics live in `#lyric_playground`; the player bar (`.ll_player`) sits under it on the same page |
+| **`.xtrc`** | `LyricFormat.fromFileName` maps `.xtrc` to the `.trc` parser (no `[tranN]` translations). Not a translation format in v1 | Comment in `BaiHat.js`: “Will support `.xtrc` in the future”. Unknown extensions also take the TRC DOM path with `hasTranslation = false` |
 
 The extra sort-order toggle (**11**) still talks to the API (`sortOrder`); it does not locally re-sort an unfiltered catalog. Online play uses the **full playable catalog** in API order (`catalogIndex`); search only filters the view. Offline play uses that same catalog filtered to completed downloads.
