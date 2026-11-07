@@ -21,6 +21,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [09 — Downloads / offline](09-downloads-offline.md) | Media3 downloads, Downloads screen, offline playback |
 | [10 — Debug launcher](10-debug-launcher.md) | Blank white `ComponentActivity` on Android 16; MainActivity is the only LAUNCHER |
 | [11 — Play Store](11-play-store.md) | Lyric card, App Links, R8/signing, `make smoke` |
+| [12 — Lyric wrap / height](12-now-playing-lyrics.md) | Long karaoke wrap, full-height lyric slot, Previous label |
 
 ## Status of phases
 
@@ -33,7 +34,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 - [x] [PR #18](https://github.com/anhtuta/lili-music-android/pull/18) — Player visuals / settings (Phase 5) (merged to main)
 - [x] [PR #19](https://github.com/anhtuta/lili-music-android/pull/19) — Web parity vs class BaiHat.js (task 010) (merged to main)
 - [x] [PR #20](https://github.com/anhtuta/lili-music-android/pull/20) — Downloads / offline (060/061), Makefile (012), debug launcher (013) (merged to main)
-- [ ] This PR — lyric card (062), App Links (063), Play packaging (064), release smoke (065)
+- [ ] This PR — lyric card (062), App Links (063), Play packaging (064), release smoke (065), lyric wrap (066), full-height lyrics (067)
 
 ## After a later phase
 
