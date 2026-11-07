@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -133,47 +132,141 @@ private fun PlayerBody(
         return
     }
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val lyricsHeight = maxHeight
-        Column(
+        if (PlayerLayout.isCompact(maxWidth)) {
+            CompactPlayerBody(
+                song = song,
+                state = state,
+                callbacks = callbacks,
+                lyrics = lyrics,
+            )
+        } else {
+            ExpandedPlayerBody(
+                song = song,
+                state = state,
+                callbacks = callbacks,
+                lyrics = lyrics,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompactPlayerBody(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    lyrics: @Composable () -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+    ) {
+        Box(
             modifier =
                 Modifier
+                    .weight(1f)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                    .testTag(PlayerTestTags.LYRICS),
         ) {
-            PlayerCover(title = song.title, imageUrl = song.imageUrl)
-            Spacer(modifier = Modifier.height(24.dp))
-            PlayerSongHeadings(song = song)
-            Spacer(modifier = Modifier.height(16.dp))
-            PlayerSeekBar(
-                positionMs = state.positionMs,
-                durationMs = state.durationMs,
-                onSeek = callbacks.onSeek,
-            )
-            PlayerQueueMessages(state = state)
-            Spacer(modifier = Modifier.height(8.dp))
-            PlayerTransport(
-                isPlaying = state.isPlaying,
-                callbacks = callbacks,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            PlayerModeRow(
-                playMode = state.playMode,
-                speed = state.speed,
-                callbacks = callbacks,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            lyrics()
+        }
+        PlayerControlsBar(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            showHeadings = true,
+        )
+    }
+}
+
+@Composable
+private fun ExpandedPlayerBody(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    lyrics: @Composable () -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(end = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                PlayerCover(title = song.title, imageUrl = song.imageUrl)
+                Spacer(modifier = Modifier.height(16.dp))
+                PlayerSongHeadings(song = song)
+            }
             Box(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .height(lyricsHeight)
+                        .weight(1f)
+                        .fillMaxHeight()
                         .testTag(PlayerTestTags.LYRICS),
             ) {
                 lyrics()
             }
         }
+        PlayerControlsBar(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            showHeadings = false,
+        )
+    }
+}
+
+@Composable
+private fun PlayerControlsBar(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    showHeadings: Boolean,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .testTag(PlayerTestTags.CONTROLS),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        if (showHeadings) {
+            PlayerSongHeadings(song = song)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        PlayerSeekBar(
+            positionMs = state.positionMs,
+            durationMs = state.durationMs,
+            onSeek = callbacks.onSeek,
+        )
+        PlayerQueueMessages(state = state)
+        Spacer(modifier = Modifier.height(8.dp))
+        PlayerTransport(
+            isPlaying = state.isPlaying,
+            callbacks = callbacks,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        PlayerModeRow(
+            playMode = state.playMode,
+            speed = state.speed,
+            callbacks = callbacks,
+        )
     }
 }
 

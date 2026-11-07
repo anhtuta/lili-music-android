@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -13,7 +14,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
@@ -23,8 +24,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(qualifiers = "w800dp-h720dp")
 class PlayerScreenTest {
     @get:Rule
     val composeRule = createComposeRule()
@@ -40,7 +43,9 @@ class PlayerScreenTest {
         var back = 0
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", artist = "Ann", imageUrl = null),
@@ -73,83 +78,65 @@ class PlayerScreenTest {
         composeRule.onNodeWithText("Ann").assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
         composeRule.onNodeWithText("(Album)").assertIsDisplayed()
-        composeRule.onNodeWithTag(PlayerTestTags.POSITION).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.POSITION).assertIsDisplayed()
         composeRule.onNodeWithText("0:15").assertIsDisplayed()
         composeRule.onNodeWithText("1:00").assertIsDisplayed()
 
-        composeRule.onNodeWithTag(PlayerTestTags.PLAY_PAUSE).performScrollTo().performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.PLAY_PAUSE).performClick()
         assertThat(playPause).isEqualTo(1)
-        composeRule.onNodeWithTag(PlayerTestTags.NEXT).performScrollTo().performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.NEXT).performClick()
         assertThat(next).isEqualTo(1)
-        composeRule.onNodeWithTag(PlayerTestTags.PREVIOUS).performScrollTo().performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.PREVIOUS).performClick()
         assertThat(previous).isEqualTo(1)
-        composeRule.onNodeWithTag(PlayerTestTags.REWIND).performScrollTo().performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.REWIND).performClick()
         assertThat(rewind).isEqualTo(1)
-        composeRule.onNodeWithTag(PlayerTestTags.FORWARD).performScrollTo().performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.FORWARD).performClick()
         assertThat(forward).isEqualTo(1)
-        composeRule.onNodeWithTag(PlayerTestTags.SHUFFLE).performScrollTo().performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.SHUFFLE).performClick()
         assertThat(shuffle).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.BACK).performClick()
         assertThat(back).isEqualTo(1)
     }
 
     @Test
-    fun missingCoverUsesPlaceholderAndShowsEndOfQueue() {
+    fun expandedMissingCoverUsesPlaceholderAndShowsEndOfQueue() {
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = EXPANDED_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 2, title = "Beta", path = "beta", imageUrl = null),
                             reachedEnd = true,
                         ),
-                    callbacks =
-                        PlayerCallbacks(
-                            onBack = {},
-                            onPlayPause = {},
-                            onSkipNext = {},
-                            onSkipPrevious = {},
-                            onSeek = {},
-                            onToggleShuffle = {},
-                            onToggleRepeatOne = {},
-                            onIncreaseSpeed = {},
-                            onDecreaseSpeed = {},
-                        ),
+                    callbacks = idlePlayerCallbacks(),
                 )
             }
         }
 
         composeRule.onNodeWithTag(PlayerTestTags.COVER_PLACEHOLDER).assertIsDisplayed()
-        composeRule.onNodeWithTag(PlayerTestTags.END_OF_QUEUE).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.END_OF_QUEUE).assertIsDisplayed()
     }
 
     @Test
     fun firstSongOfQueueShowsWebToastEquivalent() {
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
                             atStartOfQueue = true,
                         ),
-                    callbacks =
-                        PlayerCallbacks(
-                            onBack = {},
-                            onPlayPause = {},
-                            onSkipNext = {},
-                            onSkipPrevious = {},
-                            onSeek = {},
-                            onToggleShuffle = {},
-                            onToggleRepeatOne = {},
-                            onIncreaseSpeed = {},
-                            onDecreaseSpeed = {},
-                        ),
+                    callbacks = idlePlayerCallbacks(),
                 )
             }
         }
 
-        composeRule.onNodeWithTag(PlayerTestTags.FIRST_OF_QUEUE).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.FIRST_OF_QUEUE).assertIsDisplayed()
         composeRule.onNodeWithText("This is the first song of playing list!").assertIsDisplayed()
     }
 
@@ -157,7 +144,9 @@ class PlayerScreenTest {
     fun missingAlbumShowsNoAlbumFallback() {
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song =
@@ -169,18 +158,7 @@ class PlayerScreenTest {
                                     imageUrl = null,
                                 ),
                         ),
-                    callbacks =
-                        PlayerCallbacks(
-                            onBack = {},
-                            onPlayPause = {},
-                            onSkipNext = {},
-                            onSkipPrevious = {},
-                            onSeek = {},
-                            onToggleShuffle = {},
-                            onToggleRepeatOne = {},
-                            onIncreaseSpeed = {},
-                            onDecreaseSpeed = {},
-                        ),
+                    callbacks = idlePlayerCallbacks(),
                 )
             }
         }
@@ -193,23 +171,14 @@ class PlayerScreenTest {
     fun lyricsSlotIsComposedOnNowPlaying() {
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
                         ),
-                    callbacks =
-                        PlayerCallbacks(
-                            onBack = {},
-                            onPlayPause = {},
-                            onSkipNext = {},
-                            onSkipPrevious = {},
-                            onSeek = {},
-                            onToggleShuffle = {},
-                            onToggleRepeatOne = {},
-                            onIncreaseSpeed = {},
-                            onDecreaseSpeed = {},
-                        ),
+                    callbacks = idlePlayerCallbacks(),
                     lyrics = {
                         Text(
                             text = "Lyric slot",
@@ -220,7 +189,7 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithTag("lyric-slot").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag("lyric-slot").assertIsDisplayed()
     }
 
     @Test
@@ -228,24 +197,15 @@ class PlayerScreenTest {
         var settings = 0
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
                         ),
                     callbacks =
-                        PlayerCallbacks(
-                            onBack = {},
-                            onPlayPause = {},
-                            onSkipNext = {},
-                            onSkipPrevious = {},
-                            onSeek = {},
-                            onToggleShuffle = {},
-                            onToggleRepeatOne = {},
-                            onIncreaseSpeed = {},
-                            onDecreaseSpeed = {},
-                            onSettings = { settings++ },
-                        ),
+                        idlePlayerCallbacks().copy(onSettings = { settings++ }),
                     coverPaletteOverride =
                         CoverPaletteColors(
                             background = Color(0xFF112233),
@@ -265,24 +225,14 @@ class PlayerScreenTest {
         var downloads = 0
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
                         ),
-                    callbacks =
-                        PlayerCallbacks(
-                            onBack = {},
-                            onPlayPause = {},
-                            onSkipNext = {},
-                            onSkipPrevious = {},
-                            onSeek = {},
-                            onToggleShuffle = {},
-                            onToggleRepeatOne = {},
-                            onIncreaseSpeed = {},
-                            onDecreaseSpeed = {},
-                            onDownload = { downloads++ },
-                        ),
+                    callbacks = idlePlayerCallbacks().copy(onDownload = { downloads++ }),
                 )
             }
         }
@@ -296,24 +246,14 @@ class PlayerScreenTest {
         var cards = 0
         composeRule.setContent {
             LiliTheme {
-                PlayerScreen(
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
                         ),
-                    callbacks =
-                        PlayerCallbacks(
-                            onBack = {},
-                            onPlayPause = {},
-                            onSkipNext = {},
-                            onSkipPrevious = {},
-                            onSeek = {},
-                            onToggleShuffle = {},
-                            onToggleRepeatOne = {},
-                            onIncreaseSpeed = {},
-                            onDecreaseSpeed = {},
-                            onLyricCard = { cards++ },
-                        ),
+                    callbacks = idlePlayerCallbacks().copy(onLyricCard = { cards++ }),
                 )
             }
         }
@@ -323,53 +263,113 @@ class PlayerScreenTest {
     }
 
     @Test
-    fun lyricsSlotFillsViewportBelowAppBar() {
+    fun compactHidesCoverAndFillsBodyWithLyrics() {
         composeRule.setContent {
             LiliTheme {
-                Box(modifier = Modifier.size(width = 400.dp, height = 720.dp)) {
-                    PlayerScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        state =
-                            PlayerUiState(
-                                song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
-                            ),
-                        callbacks = idlePlayerCallbacks(),
-                    )
-                }
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                    lyrics = {
+                        Text(
+                            text = "Lyric slot",
+                            modifier = Modifier.testTag("lyric-slot"),
+                        )
+                    },
+                )
             }
         }
 
+        composeRule.onNodeWithTag(PlayerTestTags.COVER).assertDoesNotExist()
+        composeRule.onNodeWithTag(PlayerTestTags.COVER_PLACEHOLDER).assertDoesNotExist()
+        composeRule.onNodeWithTag("lyric-slot").assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.CONTROLS).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.SEEK).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.PLAY_PAUSE).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.SPEED_VALUE).assertIsDisplayed()
         val bounds =
             composeRule
                 .onNodeWithTag(PlayerTestTags.LYRICS)
                 .getUnclippedBoundsInRoot()
-        assertThat(bounds.bottom.value - bounds.top.value).isGreaterThan(400f)
+        assertThat(bounds.bottom.value - bounds.top.value).isGreaterThan(200f)
+    }
+
+    @Test
+    fun expandedShowsCoverBesideLyrics() {
+        composeRule.setContent {
+            LiliTheme {
+                SizedPlayer(
+                    width = EXPANDED_WIDTH,
+                    height = PHONE_HEIGHT,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.COVER_PLACEHOLDER).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.LYRICS).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.CONTROLS).assertIsDisplayed()
+        val bounds =
+            composeRule
+                .onNodeWithTag(PlayerTestTags.LYRICS)
+                .getUnclippedBoundsInRoot()
+        assertThat(bounds.bottom.value - bounds.top.value).isGreaterThan(200f)
     }
 
     @Test
     fun previousLabelStaysOnOneLineWithoutClipping() {
         composeRule.setContent {
             LiliTheme {
-                Box(modifier = Modifier.size(width = 400.dp, height = 720.dp)) {
-                    PlayerScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        state =
-                            PlayerUiState(
-                                song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
-                            ),
-                        callbacks = idlePlayerCallbacks(),
-                    )
-                }
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                )
             }
         }
 
-        composeRule.onNodeWithTag(PlayerTestTags.PREVIOUS).performScrollTo()
         val bounds =
             composeRule
                 .onNodeWithTag(PlayerTestTags.PREVIOUS)
                 .getUnclippedBoundsInRoot()
         assertThat(bounds.right.value - bounds.left.value).isGreaterThan(48f)
         composeRule.onNodeWithText("Previous").assertIsDisplayed()
+    }
+}
+
+private val COMPACT_WIDTH = 400.dp
+private val EXPANDED_WIDTH = 800.dp
+private val PHONE_HEIGHT = 720.dp
+
+@Composable
+private fun SizedPlayer(
+    width: Dp,
+    height: Dp,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    lyrics: @Composable () -> Unit = {},
+    coverPaletteOverride: CoverPaletteColors? = null,
+) {
+    Box(modifier = Modifier.size(width = width, height = height)) {
+        PlayerScreen(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            callbacks = callbacks,
+            lyrics = lyrics,
+            coverPaletteOverride = coverPaletteOverride,
+        )
     }
 }
 
