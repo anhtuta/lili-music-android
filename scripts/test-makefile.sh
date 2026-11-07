@@ -13,7 +13,7 @@ fail() {
 help_out="$(make help)"
 echo "$help_out" | grep -q 'Usage: make <target>' || fail "help missing usage line"
 
-targets="help doctor build apk release-apk bundle install test lint check clean"
+targets="help doctor build apk release-apk bundle install test lint check clean smoke"
 for target in $targets; do
   echo "$help_out" | grep -Eq "^  ${target} " || fail "help missing target ${target}"
 done
@@ -42,6 +42,7 @@ make -n install | grep -q 'adb install -r' || fail "make -n install should adb i
 make -n test | grep -q 'testDebugUnitTest' || fail "make -n test should run testDebugUnitTest"
 make -n lint | grep -q 'lintDebug' || fail "make -n lint should run lintDebug"
 make -n check | grep -q './gradlew check' || fail "make -n check should run ./gradlew check"
+make -n smoke | grep -q 'test-release-smoke' || fail "make -n smoke should run test-release-smoke.sh"
 make -n clean | grep -q './gradlew clean' || fail "make -n clean should run ./gradlew clean"
 make -n clean | grep -q 'dist' || fail "make -n clean should remove dist/"
 

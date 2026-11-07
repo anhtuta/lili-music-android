@@ -35,7 +35,7 @@ endif
 SDKMANAGER_INSTALL := sdkmanager "platforms;android-$(COMPILE_SDK).0" "build-tools;$(COMPILE_SDK).0.0" "platform-tools"
 SDKMANAGER_DEPRECATION := sdkmanager may print a deprecation warning pointing to the new android sdk CLI; that warning is harmless.
 
-.PHONY: help doctor build apk release-apk bundle install test lint check clean
+.PHONY: help doctor build apk release-apk bundle install test lint check clean smoke
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage: make <target>\n\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  %-14s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -142,6 +142,9 @@ lint: ## Android Lint (debug)
 
 check: ## Tests + lint + ktlint + detekt
 	$(GRADLEW) check
+
+smoke: ## Minified release APK + aapt packaging checks
+	bash scripts/test-release-smoke.sh
 
 clean: ## Remove Gradle outputs and dist/
 	$(GRADLEW) clean
