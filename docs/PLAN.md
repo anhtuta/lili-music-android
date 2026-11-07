@@ -290,6 +290,8 @@ Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [
 | 063 | **External** App Links / intent-filters for `bai-hat/{path}` (Play Store / HTTPS). In-app navigation to `bai-hat/{path}` already exists from **006**. | Done in this PR |
 | 064 | Play Store packaging: applicationId, icons, POST_NOTIFICATIONS, FOREGROUND_SERVICE_MEDIA_PLAYBACK, privacy policy, no `RECORD_AUDIO`, R8, optional upload-key signing | Done in this PR |
 | 065 | Release smoke: minified APK + aapt gate; manual arm64 emulator checklist | Done in this PR |
+| 066 | Wrap long karaoke lyric lines inside the pane (no one-glyph overflow column) | Done in this PR |
+| 067 | Full-height lyrics once Now playing is scrolled to the end; Previous label unclipped | Done in this PR |
 
 ## 7. Workflow (mandatory)
 
@@ -323,6 +325,8 @@ PR #20 (060/061 downloads, 012 Makefile, 013 launcher) is merged on main. This P
 - **063** external App Links / custom scheme (M9); owner hosts `assetlinks.json`
 - **064** Play Store packaging: R8, optional upload-key signing, version.properties, privacy policy
 - **065** minified release smoke (`make smoke`) + arm64 emulator checklist
+- **066** wrap long karaoke lines (single annotated `Text`, matching web inline spans)
+- **067** full-height lyric slot after scroll; Previous transport label on one line
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
@@ -342,5 +346,7 @@ These Android extras / choices are **kept as-is** (not bugs):
 | **Downloads** | Media3 downloads + offline playback from cache (060/061) | No download / offline library |
 | **Lyric card** | Tap-to-toggle whole lines; system fonts (no Google Fonts bundled); share sheet JPEG instead of a file download | Desktop `getSelection()` + Google Fonts + `html-to-image` download |
 | **App Links hosts** | Path-style `https://blog.nenmongvietnam.com/bai-hat/{path}` and `https://anhtuta.github.io/lili-player/bai-hat/{path}` (Android-first until the web host rewrites those paths) | Only `#/bai-hat/{path}` on the HashRouter origin |
+| **Now-playing layout** | One scrollable column: cover + controls, then lyrics. After scroll, lyrics fill the body under the app bar. | `#lyric_playground` is `calc(100vh - 100px)` always; at ≤720px `#div_left_wrapper` (spinning cover) is `display: none` so lyrics are the full playground immediately |
+| **Transport labels** | Text buttons (`Previous`, `Play`, `Next`, `±5s`) | Icon arrows (`ll-btn-prev` / `ll-btn-next`); “Previous” is only a `title` tooltip |
 
 The extra sort-order toggle (**11**) still talks to the API (`sortOrder`); it does not locally re-sort an unfiltered catalog. Online play uses the **full playable catalog** in API order (`catalogIndex`); search only filters the view. Offline play uses that same catalog filtered to completed downloads.
