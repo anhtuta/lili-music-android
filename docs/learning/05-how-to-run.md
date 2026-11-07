@@ -88,14 +88,16 @@ make apk       # dist/lili-music-<versionName>-debug.apk
 | `make doctor` | Check JDK 21+ and the SDK |
 | `make build` | `./gradlew :app:assembleDebug` |
 | `make apk` | Debug APK → `dist/lili-music-<versionName>-debug.apk` (prints the path) |
-| `make release-apk` | Release APK → `dist/`. Unsigned until Play signing in **064** |
+| `make release-apk` | Minified release APK → `dist/` (`-unsigned` without a keystore; see [signing.md](../play/signing.md)) |
+| `make bundle` | Play upload AAB → `dist/` |
+| `make smoke` | Minified `:app:assembleRelease` + `aapt` package/permission checks |
 | `make install` | `adb install -r` the debug APK (device or emulator) |
 | `make test` | `./gradlew testDebugUnitTest` |
 | `make lint` | `./gradlew lintDebug` |
 | `make check` | Same gate as CI |
 | `make clean` | Gradle `clean` and delete `dist/` |
 
-`dist/` is gitignored. `versionName` comes from `app/build.gradle.kts` (currently `0.1.0`).
+`dist/` is gitignored. `versionName` / `versionCode` come from [version.properties](../../version.properties) (currently `1.0.0` / `1`; `VERSION_NAME` / `VERSION_CODE` env overrides).
 
 ## Android Studio (optional)
 
@@ -125,4 +127,4 @@ After playback: tap a song → full player; lyrics should highlight with the see
 
 After visuals: Library / Player → Settings. Toggle lyric theme, translation, app dark mode; cover should tint now-playing.
 
-Next append after the following merge: Phase 6 offline / share / deep links / store. Same structure — built, terms, files. See [docs/PLAN.md](../PLAN.md) Phase 6 and [After a later phase](README.md#after-a-later-phase).
+Lyric card, App Links, signing, and `make smoke`: [11 — Play Store](11-play-store.md). Manual emulator checklist: [release-smoke.md](../play/release-smoke.md).
