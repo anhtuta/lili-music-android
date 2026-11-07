@@ -34,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
@@ -222,7 +221,8 @@ private fun LibraryCatalog(
                         soyYears = soyYears,
                         coverUrl = state.coverUrl(song),
                         unavailableOffline = state.isUnavailableOffline(song.path),
-                        downloadLabel = downloadActionLabel(state, song.path),
+                        downloadStatus = state.status(song.path),
+                        downloadProgress = state.progress(song.path),
                         onClick = { onSongClick(song) },
                         onCoverClick = {
                             if (state.coverUrl(song) != null) {
@@ -312,18 +312,6 @@ private fun SortRow(
         }
     }
 }
-
-@Composable
-private fun downloadActionLabel(
-    state: LibraryUiState,
-    path: String,
-): String =
-    when (state.status(path)) {
-        DownloadStatus.NONE -> stringResource(R.string.library_download)
-        DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> stringResource(R.string.library_download_cancel)
-        DownloadStatus.COMPLETED -> stringResource(R.string.library_download_delete)
-        DownloadStatus.FAILED -> stringResource(R.string.library_download_retry)
-    }
 
 private fun SongSort.labelRes(): Int =
     when (this) {

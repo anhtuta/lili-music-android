@@ -17,6 +17,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
@@ -238,8 +239,50 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithTag(PlayerTestTags.DOWNLOAD).performClick()
+        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Download").performClick()
         assertThat(downloads).isEqualTo(1)
+    }
+
+    @Test
+    fun downloadingActionShowsCancel() {
+        composeRule.setContent {
+            LiliTheme {
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            downloadStatus = DownloadStatus.DOWNLOADING,
+                            downloadProgress = 40,
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Cancel").assertIsDisplayed()
+    }
+
+    @Test
+    fun completedActionShowsDelete() {
+        composeRule.setContent {
+            LiliTheme {
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            downloadStatus = DownloadStatus.COMPLETED,
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Delete").assertIsDisplayed()
     }
 
     @Test

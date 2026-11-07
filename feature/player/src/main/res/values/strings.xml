@@ -4,10 +4,6 @@
     <string name="player_back">Back</string>
     <string name="player_settings">Settings</string>
     <string name="player_lyric_card">Card</string>
-    <string name="player_download">Download</string>
-    <string name="player_download_cancel">Cancel</string>
-    <string name="player_download_delete">Delete</string>
-    <string name="player_download_retry">Retry</string>
     <string name="player_play">Play</string>
     <string name="player_pause">Pause</string>
     <string name="player_previous_cd">Previous</string>

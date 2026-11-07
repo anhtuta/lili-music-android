@@ -39,8 +39,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -48,9 +48,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.Song
+import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import java.util.Locale
 
@@ -82,12 +82,12 @@ fun PlayerScreen(
                 },
                 actions = {
                     if (state.song != null) {
-                        TextButton(
+                        DownloadActionButton(
+                            status = state.downloadStatus,
+                            progressPercent = state.downloadProgress,
                             onClick = callbacks.onDownload,
                             modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
-                        ) {
-                            Text(text = downloadActionLabel(state))
-                        }
+                        )
                         TextButton(
                             onClick = callbacks.onLyricCard,
                             modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
@@ -506,12 +506,3 @@ private fun PlayerModeRow(
         }
     }
 }
-
-@Composable
-private fun downloadActionLabel(state: PlayerUiState): String =
-    when (state.downloadStatus) {
-        DownloadStatus.NONE -> stringResource(R.string.player_download)
-        DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> stringResource(R.string.player_download_cancel)
-        DownloadStatus.COMPLETED -> stringResource(R.string.player_download_delete)
-        DownloadStatus.FAILED -> stringResource(R.string.player_download_retry)
-    }

@@ -1,11 +1,15 @@
 package com.anhtuta.lilimusic.feature.library
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -251,8 +255,64 @@ class LibraryScreenTest {
             }
         }
 
-        composeRule.onNodeWithTag(LibraryTestTags.download(1)).performClick()
+        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Download").performClick()
         assertThat(downloadedId).isEqualTo(1L)
+    }
+
+    @Test
+    fun downloadingRowShowsCancelIcon() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha", path = "alpha")),
+                            isLoading = false,
+                            downloads =
+                                mapOf(
+                                    "alpha" to
+                                        libraryTestDownload(
+                                            path = "alpha",
+                                            status = DownloadStatus.DOWNLOADING,
+                                            progressPercent = 40,
+                                        ),
+                                ),
+                        ),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Cancel").assertIsDisplayed()
+        composeRule.onAllNodesWithContentDescription("Download").assertCountEquals(0)
+    }
+
+    @Test
+    fun completedRowShowsDeleteIcon() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha", path = "alpha")),
+                            isLoading = false,
+                            downloads = mapOf("alpha" to libraryTestDownload(path = "alpha")),
+                        ),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Delete").assertIsDisplayed()
     }
 
     @Test
