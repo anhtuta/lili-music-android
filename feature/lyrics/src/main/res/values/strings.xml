@@ -16,4 +16,34 @@
     <string name="lyrics_meta_creator">Lyric creator: %1$s</string>
     <string name="lyrics_meta_source">Source: %1$s</string>
     <string name="lyrics_meta_date">Date: %1$s</string>
+    <string name="lyric_card_open">Card</string>
+    <string name="lyric_card_no_lyric">No lyric available to create a card</string>
+    <string name="lyric_card_select_title">Select Lyric Text</string>
+    <string name="lyric_card_select_instruction">Select the lines you want to include in your lyric card:</string>
+    <string name="lyric_card_select_all">Select all</string>
+    <string name="lyric_card_generate">Generate Card</string>
+    <string name="lyric_card_selected">Selected Text:</string>
+    <string name="lyric_card_configure_title">Generate Lyric Card</string>
+    <string name="lyric_card_bg_source">Background Source:</string>
+    <string name="lyric_card_bg_color">Color</string>
+    <string name="lyric_card_bg_image">Song image</string>
+    <string name="lyric_card_align">Text Alignment:</string>
+    <string name="lyric_card_align_left">Left</string>
+    <string name="lyric_card_align_center">Center</string>
+    <string name="lyric_card_align_right">Right</string>
+    <string name="lyric_card_text_color">Text Color</string>
+    <string name="lyric_card_bold">Bold</string>
+    <string name="lyric_card_background_color">Background Color:</string>
+    <string name="lyric_card_font">Font Family:</string>
+    <string name="lyric_card_font_size">Font Size: %1$dpx</string>
+    <string name="lyric_card_overlay">Image Overlay: %1$d%%</string>
+    <string name="lyric_card_brightness">Image Brightness: +%1$d%%</string>
+    <string name="lyric_card_share">Download Card</string>
+    <string name="lyric_card_copy">Copy Text</string>
+    <string name="lyric_card_back">Back to Selection</string>
+    <string name="lyric_card_close">Close</string>
+    <string name="lyric_card_copied">Lyric text copied to clipboard!</string>
+    <string name="lyric_card_share_failed">Could not create lyric card image</string>
+    <string name="lyric_card_share_chooser">Share lyric card</string>
 </resources>
+

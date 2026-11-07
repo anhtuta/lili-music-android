@@ -1,5 +1,7 @@
 package com.anhtuta.lilimusic.navigation
 
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -96,6 +98,59 @@ class LiliNavHostTest {
         composeRule.runOnIdle {
             assertThat(navController.currentDestination?.hasRoute<SettingsDestination>()).isTrue()
         }
+    }
+
+    @Test
+    fun customSchemeDeepLinkOpensPlayerForPath() {
+        lateinit var navController: NavHostController
+        composeRule.setContent {
+            navController = rememberNavController()
+            LiliNavHost(
+                navController = navController,
+                libraryContent = { _, _, _ -> Text("Library screen") },
+                playerContent = { path, _, _ ->
+                    Text("Player for $path", modifier = Modifier.testTag("player-destination"))
+                },
+                settingsContent = { Text("Settings screen") },
+                downloadsContent = { _, _ -> Text("Downloads screen") },
+            )
+            LaunchedEffect(Unit) {
+                navController.handleDeepLink(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("lilimusic://bai-hat/hello-artist")),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("player-destination").assertIsDisplayed()
+        composeRule.onNodeWithText("Player for hello-artist").assertIsDisplayed()
+    }
+
+    @Test
+    fun httpsAppLinkDeepLinkOpensPlayerForPath() {
+        lateinit var navController: NavHostController
+        composeRule.setContent {
+            navController = rememberNavController()
+            LiliNavHost(
+                navController = navController,
+                libraryContent = { _, _, _ -> Text("Library screen") },
+                playerContent = { path, _, _ ->
+                    Text("Player for $path", modifier = Modifier.testTag("player-destination"))
+                },
+                settingsContent = { Text("Settings screen") },
+                downloadsContent = { _, _ -> Text("Downloads screen") },
+            )
+            LaunchedEffect(Unit) {
+                navController.handleDeepLink(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://blog.nenmongvietnam.com/bai-hat/hello-artist"),
+                    ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("player-destination").assertIsDisplayed()
+        composeRule.onNodeWithText("Player for hello-artist").assertIsDisplayed()
     }
 
     @Test
