@@ -285,4 +285,35 @@ class PlayerScreenTest {
         composeRule.onNodeWithTag(PlayerTestTags.DOWNLOAD).performClick()
         assertThat(downloads).isEqualTo(1)
     }
+
+    @Test
+    fun lyricCardActionFiresCallback() {
+        var cards = 0
+        composeRule.setContent {
+            LiliTheme {
+                PlayerScreen(
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                        ),
+                    callbacks =
+                        PlayerCallbacks(
+                            onBack = {},
+                            onPlayPause = {},
+                            onSkipNext = {},
+                            onSkipPrevious = {},
+                            onSeek = {},
+                            onToggleShuffle = {},
+                            onToggleRepeatOne = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                            onLyricCard = { cards++ },
+                        ),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(PlayerTestTags.LYRIC_CARD).performClick()
+        assertThat(cards).isEqualTo(1)
+    }
 }

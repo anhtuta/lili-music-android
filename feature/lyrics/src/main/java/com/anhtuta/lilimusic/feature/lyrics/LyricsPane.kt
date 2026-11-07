@@ -53,6 +53,7 @@ fun LyricsPane(
     onNudgeOffset: (Long) -> Unit,
     onSeekToLine: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    onLyricCardClick: () -> Unit = {},
 ) {
     val style = state.settings.toVisualStyle()
     Box(
@@ -67,6 +68,12 @@ fun LyricsPane(
         }
         Column(modifier = Modifier.fillMaxSize()) {
             VisualModeMarkers(settings = state.settings)
+            if (state.hasSong && !state.isLoading) {
+                LyricCardOpenRow(
+                    textColor = style.colors.text,
+                    onLyricCardClick = onLyricCardClick,
+                )
+            }
             if (state.frame != null) {
                 OffsetRow(
                     offsetMs = state.userOffsetMs,
@@ -226,6 +233,27 @@ private fun MissingLyricMessage(style: LyricVisualStyle) {
                     .testTag(LyricsTestTags.MISSING_FB)
                     .clickable { uriHandler.openUri(fbUri) },
         )
+    }
+}
+
+@Composable
+private fun LyricCardOpenRow(
+    textColor: Color,
+    onLyricCardClick: () -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        TextButton(
+            onClick = onLyricCardClick,
+            modifier = Modifier.testTag(LyricCardTestTags.OPEN),
+        ) {
+            Text(text = stringResource(R.string.lyric_card_open), color = textColor)
+        }
     }
 }
 

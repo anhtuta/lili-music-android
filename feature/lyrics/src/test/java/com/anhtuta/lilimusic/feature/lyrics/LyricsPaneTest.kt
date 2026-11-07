@@ -26,12 +26,14 @@ class LyricsPaneTest {
 
     @Test
     fun missingLyricShowsContributionCopy() {
+        var card = 0
         composeRule.setContent {
             LiliTheme {
                 LyricsPane(
                     state = LyricsUiState(hasSong = true, isMissing = true),
                     onNudgeOffset = {},
                     onSeekToLine = {},
+                    onLyricCardClick = { card++ },
                 )
             }
         }
@@ -41,6 +43,8 @@ class LyricsPaneTest {
         composeRule.onNodeWithTag(LyricsTestTags.MISSING_FB).assertIsDisplayed().assertHasClickAction()
         composeRule.onNodeWithText("Mail").assertIsDisplayed()
         composeRule.onNodeWithText("FB").assertIsDisplayed()
+        composeRule.onNodeWithTag(LyricCardTestTags.OPEN).assertIsDisplayed().performClick()
+        assertThat(card).isEqualTo(1)
     }
 
     @Test

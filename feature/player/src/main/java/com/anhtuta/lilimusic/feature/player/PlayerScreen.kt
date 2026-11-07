@@ -78,6 +78,12 @@ fun PlayerScreen(
                         ) {
                             Text(text = downloadActionLabel(state))
                         }
+                        TextButton(
+                            onClick = callbacks.onLyricCard,
+                            modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
+                        ) {
+                            Text(stringResource(R.string.player_lyric_card))
+                        }
                     }
                     TextButton(
                         onClick = callbacks.onSettings,
