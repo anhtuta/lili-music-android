@@ -317,14 +317,13 @@ private fun SortRow(
 private fun downloadActionLabel(
     state: LibraryUiState,
     path: String,
-): String {
-    return when (state.status(path)) {
+): String =
+    when (state.status(path)) {
         DownloadStatus.NONE -> stringResource(R.string.library_download)
         DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> stringResource(R.string.library_download_cancel)
         DownloadStatus.COMPLETED -> stringResource(R.string.library_download_delete)
         DownloadStatus.FAILED -> stringResource(R.string.library_download_retry)
     }
-}
 
 private fun SongSort.labelRes(): Int =
     when (this) {
