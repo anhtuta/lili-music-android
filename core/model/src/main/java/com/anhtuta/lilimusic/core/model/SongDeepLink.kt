@@ -23,10 +23,9 @@ object SongDeepLink {
 
     fun songPath(raw: String): String? {
         val uri = runCatching { URI(raw.trim()) }.getOrNull() ?: return null
-        fragmentSongPath(uri.rawFragment ?: uri.fragment)?.let { return it }
-        customSchemePath(uri)?.let { return it }
-        httpsPath(uri)?.let { return it }
-        return null
+        return fragmentSongPath(uri.rawFragment ?: uri.fragment)
+            ?: customSchemePath(uri)
+            ?: httpsPath(uri)
     }
 
     private fun fragmentSongPath(fragment: String?): String? {
