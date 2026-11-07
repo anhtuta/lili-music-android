@@ -1,12 +1,18 @@
 package com.anhtuta.lilimusic.feature.lyrics
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.lyrics.LyricParser
 import com.anhtuta.lilimusic.core.lyrics.LyricSynchronizer
 import com.anhtuta.lilimusic.core.model.LyricAlign
@@ -221,6 +227,55 @@ class LyricsPaneTest {
         }
 
         composeRule.onNodeWithTag(LyricsTestTags.FETCHING).assertIsDisplayed()
+    }
+
+    @Test
+    fun longKaraokeLineWrapsInsteadOfStackingCharacters() {
+        val frame =
+            LyricSynchronizer.sync(
+                LyricParser.parse(
+                    """
+                    [00:00.00]<100>You're <100>coming <100>back <100>down <100>and <100>you <100>really <100>don't <100>care <100>about <100>the <100>dirty
+                    """.trimIndent(),
+                    "song.trc",
+                ),
+                positionMs = 250L,
+                durationMs = 20_000L,
+            )
+        assertThat(
+            frame.lines
+                .first()
+                .words.size,
+        ).isAtLeast(10)
+        composeRule.setContent {
+            LiliTheme {
+                Box(
+                    modifier =
+                        Modifier
+                            .width(180.dp)
+                            .height(400.dp),
+                ) {
+                    LyricsPane(
+                        state = LyricsUiState(hasSong = true, frame = frame),
+                        onNudgeOffset = {},
+                        onSeekToLine = {},
+                    )
+                }
+            }
+        }
+
+        val bounds =
+            composeRule
+                .onNodeWithTag(LyricsTestTags.LINE_WORDS, useUnmergedTree = true)
+                .getUnclippedBoundsInRoot()
+        assertThat(bounds.right.value - bounds.left.value).isAtMost(180f)
+        composeRule
+            .onNodeWithTag(LyricsTestTags.LINE_WORDS, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithText("You're coming back down", substring = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("dirty", substring = true).assertIsDisplayed()
     }
 }
 
