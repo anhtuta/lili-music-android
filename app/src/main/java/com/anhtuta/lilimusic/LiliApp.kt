@@ -1,7 +1,9 @@
 package com.anhtuta.lilimusic
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -9,13 +11,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.util.Consumer
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.anhtuta.lilimusic.core.model.AppTheme
@@ -43,6 +49,7 @@ fun LiliApp(
     lyricCardViewModel: LyricCardViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
+    DeepLinkNewIntentEffect(navController)
     val playback by playerViewModel.uiState.collectAsStateWithLifecycle()
     val settings by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val downloads by downloadsViewModel.uiState.collectAsStateWithLifecycle()
@@ -105,6 +112,23 @@ fun LiliApp(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun DeepLinkNewIntentEffect(navController: NavHostController) {
+    val context = LocalContext.current
+    DisposableEffect(navController, context) {
+        val activity = context as? ComponentActivity
+        if (activity == null) {
+            return@DisposableEffect onDispose { }
+        }
+        val listener =
+            Consumer<Intent> { incoming ->
+                navController.handleDeepLink(incoming)
+            }
+        activity.addOnNewIntentListener(listener)
+        onDispose { activity.removeOnNewIntentListener(listener) }
     }
 }
 
