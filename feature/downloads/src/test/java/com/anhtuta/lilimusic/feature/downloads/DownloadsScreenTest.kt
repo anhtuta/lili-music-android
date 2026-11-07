@@ -1,7 +1,9 @@
 package com.anhtuta.lilimusic.feature.downloads
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import com.anhtuta.lilimusic.core.model.DownloadStatus
@@ -77,6 +79,26 @@ class DownloadsScreenTest {
         }
 
         composeRule.onNodeWithTag(DownloadsTestTags.progress("busy")).assertIsDisplayed()
+    }
+
+    @Test
+    fun cancelFiresCallbackOnDownloadingRow() {
+        var cancelled = 0
+        composeRule.setContent {
+            LiliTheme {
+                DownloadsScreen(
+                    state =
+                        DownloadsUiState(
+                            items = listOf(testDownload(path = "busy", status = DownloadStatus.DOWNLOADING, progressPercent = 40)),
+                        ),
+                    callbacks = noopCallbacks().copy(onCancel = { cancelled++ }),
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(DownloadsTestTags.cancel("busy")).performClick()
+        composeRule.onAllNodesWithTag(DownloadsTestTags.delete("busy")).assertCountEquals(0)
+        assertThat(cancelled).isEqualTo(1)
     }
 
     @Test

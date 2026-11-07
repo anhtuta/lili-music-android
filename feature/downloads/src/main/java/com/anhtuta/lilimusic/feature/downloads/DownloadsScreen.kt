@@ -85,6 +85,7 @@ fun DownloadsScreen(
                         item = item,
                         onPlay = { callbacks.onPlay(item) },
                         onRetry = { callbacks.onRetry(item) },
+                        onCancel = { callbacks.onCancel(item) },
                         onDelete = { callbacks.onDelete(item) },
                     )
                 }
@@ -126,6 +127,7 @@ private fun DownloadRow(
     item: SongDownload,
     onPlay: () -> Unit,
     onRetry: () -> Unit,
+    onCancel: () -> Unit,
     onDelete: () -> Unit,
 ) {
     Column(
@@ -165,11 +167,20 @@ private fun DownloadRow(
                     Text(stringResource(R.string.downloads_retry))
                 }
             }
-            TextButton(
-                onClick = onDelete,
-                modifier = Modifier.testTag(DownloadsTestTags.delete(item.songPath)),
-            ) {
-                Text(stringResource(R.string.downloads_delete))
+            if (item.isActive) {
+                TextButton(
+                    onClick = onCancel,
+                    modifier = Modifier.testTag(DownloadsTestTags.cancel(item.songPath)),
+                ) {
+                    Text(stringResource(R.string.downloads_cancel_item))
+                }
+            } else {
+                TextButton(
+                    onClick = onDelete,
+                    modifier = Modifier.testTag(DownloadsTestTags.delete(item.songPath)),
+                ) {
+                    Text(stringResource(R.string.downloads_delete))
+                }
             }
         }
     }

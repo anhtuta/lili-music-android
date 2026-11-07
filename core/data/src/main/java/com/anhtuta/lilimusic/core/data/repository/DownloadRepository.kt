@@ -19,5 +19,7 @@ interface DownloadRepository {
 
     suspend fun remove(songPath: String)
 
+    suspend fun cancel(songPath: String)
+
     suspend fun removeAll()
 }

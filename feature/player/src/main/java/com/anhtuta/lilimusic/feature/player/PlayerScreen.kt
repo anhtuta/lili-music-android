@@ -511,8 +511,7 @@ private fun PlayerModeRow(
 private fun downloadActionLabel(state: PlayerUiState): String =
     when (state.downloadStatus) {
         DownloadStatus.NONE -> stringResource(R.string.player_download)
-        DownloadStatus.QUEUED -> stringResource(R.string.player_download_waiting)
-        DownloadStatus.DOWNLOADING -> stringResource(R.string.player_download_progress, state.downloadProgress)
+        DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> stringResource(R.string.player_download_cancel)
         DownloadStatus.COMPLETED -> stringResource(R.string.player_download_delete)
         DownloadStatus.FAILED -> stringResource(R.string.player_download_retry)
     }

@@ -54,10 +54,15 @@ class FakeLyricRepository(
     var result: LyricLoadResult = LyricLoadResult.Missing,
 ) : LyricRepository {
     val requests = mutableListOf<String?>()
+    val deleted = mutableListOf<String?>()
 
     override suspend fun loadLyric(fileName: String?): LyricLoadResult {
         requests += fileName
         return result
+    }
+
+    override suspend fun deleteCached(fileName: String?) {
+        deleted += fileName
     }
 }
 

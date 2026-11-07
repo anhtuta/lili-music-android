@@ -318,12 +318,9 @@ private fun downloadActionLabel(
     state: LibraryUiState,
     path: String,
 ): String {
-    val download = state.downloads[path]
     return when (state.status(path)) {
         DownloadStatus.NONE -> stringResource(R.string.library_download)
-        DownloadStatus.QUEUED -> stringResource(R.string.library_download_waiting)
-        DownloadStatus.DOWNLOADING ->
-            stringResource(R.string.library_download_progress, download?.progressPercent ?: 0)
+        DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> stringResource(R.string.library_download_cancel)
         DownloadStatus.COMPLETED -> stringResource(R.string.library_download_delete)
         DownloadStatus.FAILED -> stringResource(R.string.library_download_retry)
     }

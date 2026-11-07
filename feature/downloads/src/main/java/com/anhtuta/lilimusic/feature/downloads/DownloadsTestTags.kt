@@ -13,6 +13,8 @@ object DownloadsTestTags {
 
     fun retry(path: String): String = "downloads-retry-$path"
 
+    fun cancel(path: String): String = "downloads-cancel-$path"
+
     fun delete(path: String): String = "downloads-delete-$path"
 
     fun play(path: String): String = "downloads-play-$path"

@@ -96,4 +96,25 @@ class OfflineFirstLyricRepositoryTest {
 
             assertThat(result).isInstanceOf(LyricLoadResult.Error::class.java)
         }
+
+    @Test
+    fun deleteCachedRemovesBody() =
+        runTest {
+            local.upsert("song.lrc", "[00:01.00]Hello")
+
+            repository.deleteCached("song.lrc")
+
+            assertThat(local.get("song.lrc")).isNull()
+        }
+
+    @Test
+    fun deleteCachedIgnoresBlank() =
+        runTest {
+            local.upsert("song.lrc", "[00:01.00]Hello")
+
+            repository.deleteCached(null)
+            repository.deleteCached("  ")
+
+            assertThat(local.get("song.lrc")?.body).isEqualTo("[00:01.00]Hello")
+        }
 }

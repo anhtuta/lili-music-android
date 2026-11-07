@@ -4,8 +4,7 @@
     <string name="library_settings">Settings</string>
     <string name="library_downloads">Downloads</string>
     <string name="library_download">Download</string>
-    <string name="library_download_waiting">Waiting</string>
-    <string name="library_download_progress">%1$d%%</string>
+    <string name="library_download_cancel">Cancel</string>
     <string name="library_download_delete">Delete</string>
     <string name="library_download_retry">Retry</string>
     <string name="library_unavailable_offline">Unavailable offline</string>
