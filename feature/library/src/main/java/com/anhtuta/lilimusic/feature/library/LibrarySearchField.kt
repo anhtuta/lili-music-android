@@ -40,7 +40,7 @@ internal fun LibrarySearchField(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = LibraryChromeInsets.Horizontal)
                 .height(LibrarySearchHeight)
                 .testTag(LibraryTestTags.SEARCH),
         singleLine = true,

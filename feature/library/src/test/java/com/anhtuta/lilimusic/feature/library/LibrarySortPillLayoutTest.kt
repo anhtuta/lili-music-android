@@ -25,7 +25,7 @@ class LibrarySortPillLayoutTest {
                 Column {
                     LibrarySearchField(query = "", onQueryChange = {})
                     LibrarySortPill(
-                        selected = SongSort.DATE,
+                        selected = SongSort.CREATED_DATE,
                         sortOrder = SortOrder.DESC,
                         onSortFieldChosen = {},
                     )

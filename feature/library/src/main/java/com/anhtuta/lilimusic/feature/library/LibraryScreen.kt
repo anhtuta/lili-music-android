@@ -10,15 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DownloadForOffline
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,31 +48,6 @@ fun LibraryScreen(
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.library_title)) },
-                actions = {
-                    LiliIconButton(
-                        icon = Icons.Filled.Refresh,
-                        label = stringResource(R.string.library_refresh),
-                        onClick = onRefresh,
-                        modifier = Modifier.testTag(LibraryTestTags.REFRESH),
-                    )
-                    LiliIconButton(
-                        icon = Icons.Filled.DownloadForOffline,
-                        label = stringResource(R.string.library_downloads),
-                        onClick = onDownloadsClick,
-                        modifier = Modifier.testTag(LibraryTestTags.DOWNLOADS),
-                    )
-                    LiliIconButton(
-                        icon = Icons.Filled.Settings,
-                        label = stringResource(R.string.library_settings),
-                        onClick = onSettingsClick,
-                        modifier = Modifier.testTag(LibraryTestTags.SETTINGS),
-                    )
-                },
-            )
-        },
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
@@ -92,6 +64,8 @@ fun LibraryScreen(
                 onRefresh = onRefresh,
                 onSongClick = onSongClick,
                 onDownloadAction = onDownloadAction,
+                onSettingsClick = onSettingsClick,
+                onDownloadsClick = onDownloadsClick,
             )
         }
     }
@@ -105,6 +79,8 @@ private fun LibraryContent(
     onRefresh: () -> Unit,
     onSongClick: (Song) -> Unit,
     onDownloadAction: (Song) -> Unit,
+    onSettingsClick: () -> Unit,
+    onDownloadsClick: () -> Unit,
 ) {
     when {
         state.isLoading -> LibraryLoading()
@@ -118,6 +94,9 @@ private fun LibraryContent(
                 onSortFieldChosen = onSortFieldChosen,
                 onSongClick = onSongClick,
                 onDownloadAction = onDownloadAction,
+                onRefresh = onRefresh,
+                onSettingsClick = onSettingsClick,
+                onDownloadsClick = onDownloadsClick,
             )
     }
 }
@@ -168,67 +147,82 @@ private fun LibraryCatalog(
     onSortFieldChosen: (SongSort) -> Unit,
     onSongClick: (Song) -> Unit,
     onDownloadAction: (Song) -> Unit,
+    onRefresh: () -> Unit,
+    onSettingsClick: () -> Unit,
+    onDownloadsClick: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        if (state.isOfflineError) {
-            Text(
-                text = stringResource(R.string.library_error),
-                color = MaterialTheme.colorScheme.error,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .testTag(LibraryTestTags.ERROR_BANNER)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+    val soyYears =
+        remember(state.songs) {
+            SongOfTheYearPalette.uniqueYearsDescending(state.songs.map { it.songOfTheYear })
         }
-        LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
-        LibrarySortPill(
-            selected = state.sort,
-            sortOrder = state.sortOrder,
-            onSortFieldChosen = onSortFieldChosen,
-        )
-        if (state.songs.isEmpty()) {
-            LibraryEmpty(query = state.query)
-        } else {
-            val soyYears =
-                remember(state.songs) {
-                    SongOfTheYearPalette.uniqueYearsDescending(state.songs.map { it.songOfTheYear })
-                }
-            var previewSong by remember { mutableStateOf<Song?>(null) }
-            LazyColumn(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .testTag(LibraryTestTags.LIST),
-                contentPadding = PaddingValues(vertical = 8.dp),
-            ) {
-                items(state.songs, key = { it.id }) { song ->
-                    LibrarySongRow(
-                        song = song,
-                        soyYears = soyYears,
-                        coverUrl = state.coverUrl(song),
-                        unavailableOffline = state.isUnavailableOffline(song.path),
-                        downloadStatus = state.status(song.path),
-                        downloadProgress = state.progress(song.path),
-                        onClick = { onSongClick(song) },
-                        onCoverClick = {
-                            if (state.coverUrl(song) != null) {
-                                previewSong = song
-                            }
-                        },
-                        onDownloadAction = { onDownloadAction(song) },
-                    )
-                }
-            }
-            previewSong?.let { preview ->
-                CoverPreviewDialog(
-                    song = preview,
-                    coverUrl = state.coverUrl(preview),
-                    onDismiss = { previewSong = null },
+    var previewSong by remember { mutableStateOf<Song?>(null) }
+    LazyColumn(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .testTag(LibraryTestTags.LIST),
+        contentPadding = PaddingValues(bottom = 8.dp),
+    ) {
+        if (state.isOfflineError) {
+            item(key = "offline-banner") {
+                Text(
+                    text = stringResource(R.string.library_error),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .testTag(LibraryTestTags.ERROR_BANNER)
+                            .padding(horizontal = LibraryChromeInsets.Horizontal, vertical = 8.dp),
                 )
             }
         }
+        item(key = "header") {
+            LibraryScrollableHeader(
+                onRefresh = onRefresh,
+                onDownloadsClick = onDownloadsClick,
+                onSettingsClick = onSettingsClick,
+            )
+        }
+        item(key = "search") {
+            LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
+        }
+        item(key = "sort") {
+            LibrarySortPill(
+                selected = state.sort,
+                sortOrder = state.sortOrder,
+                onSortFieldChosen = onSortFieldChosen,
+            )
+        }
+        if (state.songs.isEmpty()) {
+            item(key = "empty") {
+                LibraryEmpty(query = state.query)
+            }
+        } else {
+            items(state.songs, key = { it.id }) { song ->
+                LibrarySongRow(
+                    song = song,
+                    soyYears = soyYears,
+                    coverUrl = state.coverUrl(song),
+                    unavailableOffline = state.isUnavailableOffline(song.path),
+                    downloadStatus = state.status(song.path),
+                    downloadProgress = state.progress(song.path),
+                    onClick = { onSongClick(song) },
+                    onCoverClick = {
+                        if (state.coverUrl(song) != null) {
+                            previewSong = song
+                        }
+                    },
+                    onDownloadAction = { onDownloadAction(song) },
+                )
+            }
+        }
+    }
+    previewSong?.let { preview ->
+        CoverPreviewDialog(
+            song = preview,
+            coverUrl = state.coverUrl(preview),
+            onDismiss = { previewSong = null },
+        )
     }
 }
 
@@ -243,7 +237,8 @@ private fun LibraryEmpty(query: String) {
     Box(
         modifier =
             Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .padding(vertical = 48.dp)
                 .testTag(LibraryTestTags.EMPTY),
         contentAlignment = Alignment.Center,
     ) {
