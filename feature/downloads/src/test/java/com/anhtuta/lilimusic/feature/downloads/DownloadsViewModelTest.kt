@@ -43,6 +43,29 @@ class DownloadsViewModelTest {
         }
 
     @Test
+    fun cancelForwardsActiveDownloadToRepository() =
+        runTest {
+            val repository = FakeDownloadRepository()
+            val viewModel = DownloadsViewModel(repository, FakePlayerController())
+            val downloading = testDownload(status = DownloadStatus.DOWNLOADING, progressPercent = 40)
+
+            viewModel.cancel(downloading)
+
+            assertThat(repository.cancelled).containsExactly("hello-artist")
+        }
+
+    @Test
+    fun cancelIgnoresCompletedDownload() =
+        runTest {
+            val repository = FakeDownloadRepository()
+            val viewModel = DownloadsViewModel(repository, FakePlayerController())
+
+            viewModel.cancel(testDownload(status = DownloadStatus.COMPLETED))
+
+            assertThat(repository.cancelled).isEmpty()
+        }
+
+    @Test
     fun deleteAllRequiresConfirm() =
         runTest {
             val repository = FakeDownloadRepository()

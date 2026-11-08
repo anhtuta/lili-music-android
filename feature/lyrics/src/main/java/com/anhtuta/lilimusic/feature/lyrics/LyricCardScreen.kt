@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.LyricAlign
 import com.anhtuta.lilimusic.core.model.LyricCardFont
@@ -214,6 +215,7 @@ private fun ConfigurePreviewAndShare(
 ) {
     Text(
         text = state.selectedText,
+        fontFamily = LyricCardFontResources.composeFamily(state.config.fontFamily),
         modifier =
             Modifier
                 .fillMaxWidth()
@@ -349,10 +351,11 @@ private fun FontRow(
     Text(text = stringResource(R.string.lyric_card_font))
     Column {
         LyricCardFont.entries.forEach { font ->
+            val family: FontFamily = LyricCardFontResources.composeFamily(font)
             FilterChip(
                 selected = selected == font,
                 onClick = { onFontFamily(font) },
-                label = { Text(font.storageValue) },
+                label = { Text(text = font.storageValue, fontFamily = family) },
                 modifier = Modifier.testTag(LyricCardTestTags.font(font.storageValue)),
             )
         }

@@ -23,6 +23,7 @@ fun DownloadsRoute(
                     onPlay(item)
                 },
                 onRetry = viewModel::retry,
+                onCancel = viewModel::cancel,
                 onDelete = viewModel::remove,
                 onDeleteAllClick = viewModel::onDeleteAllClick,
                 onConfirmDeleteAll = viewModel::onConfirmDeleteAll,

@@ -12,6 +12,7 @@ class FakeDownloadRepository : DownloadRepository {
     private val items = MutableStateFlow<List<SongDownload>>(emptyList())
     val downloaded = mutableListOf<String>()
     val removed = mutableListOf<String>()
+    val cancelled = mutableListOf<String>()
 
     override fun observeDownloads(): Flow<List<SongDownload>> = items
 
@@ -36,6 +37,11 @@ class FakeDownloadRepository : DownloadRepository {
     override suspend fun remove(songPath: String) {
         removed += songPath
         items.value = items.value.filterNot { it.songPath == songPath }
+    }
+
+    override suspend fun cancel(songPath: String) {
+        cancelled += songPath
+        remove(songPath)
     }
 
     override suspend fun removeAll() {

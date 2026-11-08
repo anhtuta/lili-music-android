@@ -43,4 +43,12 @@ class OfflineFirstLyricRepository
                     }
                 }
             }
+
+        override suspend fun deleteCached(fileName: String?) {
+            withContext(ioDispatcher) {
+                if (!fileName.isNullOrBlank()) {
+                    local.delete(fileName)
+                }
+            }
+        }
     }

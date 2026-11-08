@@ -31,4 +31,5 @@ object PlayerTestTags {
     const val DOWNLOAD = "player-download"
     const val LYRIC_CARD = "player-lyric-card"
     const val LYRICS = "player-lyrics"
+    const val CONTROLS = "player-controls"
 }

@@ -21,6 +21,8 @@ data class LibraryUiState(
 ) {
     fun status(path: String): DownloadStatus = downloads[path]?.status ?: DownloadStatus.NONE
 
+    fun progress(path: String): Int = downloads[path]?.progressPercent ?: 0
+
     fun isUnavailableOffline(path: String): Boolean = OfflinePlaybackPolicy.isUnavailableOffline(isOnline, status(path))
 
     fun coverUrl(song: Song): String? = OfflinePlaybackPolicy.displayImageUrl(song.imageUrl, downloads[song.path]?.coverLocalUri)

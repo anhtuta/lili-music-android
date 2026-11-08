@@ -44,6 +44,11 @@ class DownloadsViewModel
             viewModelScope.launch { downloadRepository.retry(item.toSong()) }
         }
 
+        fun cancel(item: SongDownload) {
+            if (!item.isActive) return
+            viewModelScope.launch { downloadRepository.cancel(item.songPath) }
+        }
+
         fun remove(item: SongDownload) {
             viewModelScope.launch { downloadRepository.remove(item.songPath) }
         }

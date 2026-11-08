@@ -82,6 +82,16 @@ class DefaultDownloadRepository
             }
         }
 
+        override suspend fun cancel(songPath: String) {
+            withContext(ioDispatcher) {
+                val existing = local.getByPath(songPath) ?: return@withContext
+                engine.remove(songPath)
+                coverStore.delete(songPath)
+                lyricRepository.deleteCached(existing.lyricFileName)
+                local.deleteByPath(songPath)
+            }
+        }
+
         override suspend fun removeAll() {
             withContext(ioDispatcher) {
                 engine.removeAll()

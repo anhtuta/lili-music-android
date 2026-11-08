@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +27,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.Song
+import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
 
 @Composable
 fun LibrarySongRow(
@@ -39,7 +40,8 @@ fun LibrarySongRow(
     modifier: Modifier = Modifier,
     coverUrl: String? = song.imageUrl,
     unavailableOffline: Boolean = false,
-    downloadLabel: String? = null,
+    downloadStatus: DownloadStatus = DownloadStatus.NONE,
+    downloadProgress: Int = 0,
     onDownloadAction: (() -> Unit)? = null,
 ) {
     Row(
@@ -66,13 +68,13 @@ fun LibrarySongRow(
                 )
             }
         }
-        if (downloadLabel != null && onDownloadAction != null) {
-            TextButton(
+        if (onDownloadAction != null) {
+            DownloadActionButton(
+                status = downloadStatus,
+                progressPercent = downloadProgress,
                 onClick = onDownloadAction,
                 modifier = Modifier.testTag(LibraryTestTags.download(song.id)),
-            ) {
-                Text(text = downloadLabel)
-            }
+            )
         }
     }
 }

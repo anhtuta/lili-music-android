@@ -7,16 +7,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Forward5
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Replay5
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -31,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -39,9 +48,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.Song
+import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import java.util.Locale
 
@@ -73,12 +82,12 @@ fun PlayerScreen(
                 },
                 actions = {
                     if (state.song != null) {
-                        TextButton(
+                        DownloadActionButton(
+                            status = state.downloadStatus,
+                            progressPercent = state.downloadProgress,
                             onClick = callbacks.onDownload,
                             modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
-                        ) {
-                            Text(text = downloadActionLabel(state))
-                        }
+                        )
                         TextButton(
                             onClick = callbacks.onLyricCard,
                             modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
@@ -133,47 +142,141 @@ private fun PlayerBody(
         return
     }
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val lyricsHeight = maxHeight
-        Column(
+        if (PlayerLayout.isCompact(maxWidth)) {
+            CompactPlayerBody(
+                song = song,
+                state = state,
+                callbacks = callbacks,
+                lyrics = lyrics,
+            )
+        } else {
+            ExpandedPlayerBody(
+                song = song,
+                state = state,
+                callbacks = callbacks,
+                lyrics = lyrics,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompactPlayerBody(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    lyrics: @Composable () -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+    ) {
+        Box(
             modifier =
                 Modifier
+                    .weight(1f)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                    .testTag(PlayerTestTags.LYRICS),
         ) {
-            PlayerCover(title = song.title, imageUrl = song.imageUrl)
-            Spacer(modifier = Modifier.height(24.dp))
-            PlayerSongHeadings(song = song)
-            Spacer(modifier = Modifier.height(16.dp))
-            PlayerSeekBar(
-                positionMs = state.positionMs,
-                durationMs = state.durationMs,
-                onSeek = callbacks.onSeek,
-            )
-            PlayerQueueMessages(state = state)
-            Spacer(modifier = Modifier.height(8.dp))
-            PlayerTransport(
-                isPlaying = state.isPlaying,
-                callbacks = callbacks,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            PlayerModeRow(
-                playMode = state.playMode,
-                speed = state.speed,
-                callbacks = callbacks,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            lyrics()
+        }
+        PlayerControlsBar(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            showHeadings = true,
+        )
+    }
+}
+
+@Composable
+private fun ExpandedPlayerBody(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    lyrics: @Composable () -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(end = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                PlayerCover(title = song.title, imageUrl = song.imageUrl)
+                Spacer(modifier = Modifier.height(16.dp))
+                PlayerSongHeadings(song = song)
+            }
             Box(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .height(lyricsHeight)
+                        .weight(1f)
+                        .fillMaxHeight()
                         .testTag(PlayerTestTags.LYRICS),
             ) {
                 lyrics()
             }
         }
+        PlayerControlsBar(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            showHeadings = false,
+        )
+    }
+}
+
+@Composable
+private fun PlayerControlsBar(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    showHeadings: Boolean,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .testTag(PlayerTestTags.CONTROLS),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        if (showHeadings) {
+            PlayerSongHeadings(song = song)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        PlayerSeekBar(
+            positionMs = state.positionMs,
+            durationMs = state.durationMs,
+            onSeek = callbacks.onSeek,
+        )
+        PlayerQueueMessages(state = state)
+        Spacer(modifier = Modifier.height(8.dp))
+        PlayerTransport(
+            isPlaying = state.isPlaying,
+            callbacks = callbacks,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        PlayerModeRow(
+            playMode = state.playMode,
+            speed = state.speed,
+            callbacks = callbacks,
+        )
     }
 }
 
@@ -298,59 +401,56 @@ private fun PlayerTransport(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val rewindDescription = stringResource(R.string.player_rewind_cd)
-        val forwardDescription = stringResource(R.string.player_forward_cd)
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSkipPrevious,
-            label = stringResource(R.string.player_previous),
+            imageVector = Icons.Filled.SkipPrevious,
+            contentDescription = stringResource(R.string.player_previous_cd),
             modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSeekBack,
-            label = stringResource(R.string.player_rewind),
-            modifier =
-                Modifier
-                    .testTag(PlayerTestTags.REWIND)
-                    .semantics { contentDescription = rewindDescription },
+            imageVector = Icons.Filled.Replay5,
+            contentDescription = stringResource(R.string.player_rewind_cd),
+            modifier = Modifier.testTag(PlayerTestTags.REWIND),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onPlayPause,
-            label =
+            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+            contentDescription =
                 stringResource(
                     if (isPlaying) R.string.player_pause else R.string.player_play,
                 ),
             modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSeekForward,
-            label = stringResource(R.string.player_forward),
-            modifier =
-                Modifier
-                    .testTag(PlayerTestTags.FORWARD)
-                    .semantics { contentDescription = forwardDescription },
+            imageVector = Icons.Filled.Forward5,
+            contentDescription = stringResource(R.string.player_forward_cd),
+            modifier = Modifier.testTag(PlayerTestTags.FORWARD),
         )
-        TransportTextButton(
+        TransportIconButton(
             onClick = callbacks.onSkipNext,
-            label = stringResource(R.string.player_next),
+            imageVector = Icons.Filled.SkipNext,
+            contentDescription = stringResource(R.string.player_next_cd),
             modifier = Modifier.testTag(PlayerTestTags.NEXT),
         )
     }
 }
 
 @Composable
-private fun RowScope.TransportTextButton(
+private fun RowScope.TransportIconButton(
     onClick: () -> Unit,
-    label: String,
+    imageVector: ImageVector,
+    contentDescription: String,
     modifier: Modifier = Modifier,
 ) {
-    TextButton(
+    IconButton(
         onClick = onClick,
         modifier = modifier.weight(1f),
     ) {
-        Text(
-            text = label,
-            maxLines = 1,
-            textAlign = TextAlign.Center,
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
         )
     }
 }
@@ -406,13 +506,3 @@ private fun PlayerModeRow(
         }
     }
 }
-
-@Composable
-private fun downloadActionLabel(state: PlayerUiState): String =
-    when (state.downloadStatus) {
-        DownloadStatus.NONE -> stringResource(R.string.player_download)
-        DownloadStatus.QUEUED -> stringResource(R.string.player_download_waiting)
-        DownloadStatus.DOWNLOADING -> stringResource(R.string.player_download_progress, state.downloadProgress)
-        DownloadStatus.COMPLETED -> stringResource(R.string.player_download_delete)
-        DownloadStatus.FAILED -> stringResource(R.string.player_download_retry)
-    }

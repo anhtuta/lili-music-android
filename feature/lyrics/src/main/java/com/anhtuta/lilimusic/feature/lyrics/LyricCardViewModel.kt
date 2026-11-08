@@ -40,6 +40,7 @@ class LyricCardViewModel
         private val coverLoader: LyricCardCoverLoader,
         private val files: LyricCardFiles,
         private val clipboard: LyricCardClipboard,
+        private val fonts: LyricCardFonts,
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) : ViewModel() {
         private val loadResult = MutableStateFlow<LyricLoadResult?>(null)
@@ -217,6 +218,7 @@ class LyricCardViewModel
                         } else {
                             null
                         }
+                    val typeface = fonts.typeface(state.config.fontFamily, state.config.isBold)
                     val bitmap =
                         withContext(ioDispatcher) {
                             LyricCardRenderer.render(
@@ -226,6 +228,7 @@ class LyricCardViewModel
                                     title = state.songTitle,
                                     artist = state.songArtist,
                                     cover = cover,
+                                    typeface = typeface,
                                 ),
                             )
                         }

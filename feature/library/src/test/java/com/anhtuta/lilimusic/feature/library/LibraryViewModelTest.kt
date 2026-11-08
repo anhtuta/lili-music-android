@@ -266,6 +266,23 @@ class LibraryViewModelTest {
         }
 
     @Test
+    fun downloadingActionCancels() =
+        runTest {
+            val downloads = FakeDownloadRepository()
+            downloads.emit(libraryTestDownload(path = "alpha", status = DownloadStatus.DOWNLOADING, progressPercent = 40))
+            val viewModel = libraryViewModel(downloads = downloads)
+            val song = libraryTestSong(title = "Alpha", path = "alpha")
+            viewModel.uiState.test {
+                awaitItemUntil { it.status("alpha") == DownloadStatus.DOWNLOADING }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            viewModel.onDownloadAction(song)
+
+            assertThat(downloads.cancelled).containsExactly("alpha")
+        }
+
+    @Test
     fun offlineUnavailableSongDoesNotPlay() =
         runTest {
             val controller = FakePlayerController()

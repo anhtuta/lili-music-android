@@ -107,7 +107,7 @@ class LibraryViewModel
                 when (uiState.value.status(song.path)) {
                     DownloadStatus.NONE, DownloadStatus.FAILED -> downloadRepository.download(song)
                     DownloadStatus.COMPLETED -> downloadRepository.remove(song.path)
-                    DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> Unit
+                    DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> downloadRepository.cancel(song.path)
                 }
             }
         }

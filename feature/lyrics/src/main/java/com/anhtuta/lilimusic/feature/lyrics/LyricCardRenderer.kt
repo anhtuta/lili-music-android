@@ -12,7 +12,6 @@ import android.text.TextPaint
 import android.text.TextUtils
 import com.anhtuta.lilimusic.core.model.HexColor
 import com.anhtuta.lilimusic.core.model.LyricAlign
-import com.anhtuta.lilimusic.core.model.LyricCardFont
 import com.anhtuta.lilimusic.core.model.LyricCardSettings
 import java.io.ByteArrayOutputStream
 import kotlin.math.max
@@ -38,7 +37,7 @@ object LyricCardRenderer {
         }
         val scale = size / LyricCardSettings.WEB_CARD_CSS_PX.toFloat()
         val padding = LyricCardSettings.WEB_PADDING_CSS_PX * scale
-        val textPaint = textPaint(settings, scale)
+        val textPaint = textPaint(settings, scale, request.typeface)
         val footer = footerLayout(request, textPaint, size, padding, scale)
         val lyricBottom = size - padding - footer.height - padding / 2f
         val lyricWidth = (size - 2f * padding).toInt().coerceAtLeast(1)
@@ -158,32 +157,13 @@ object LyricCardRenderer {
     private fun textPaint(
         settings: LyricCardSettings,
         scale: Float,
+        typeface: Typeface?,
     ): TextPaint {
         val paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
         paint.color = color(settings.textColor, LyricCardSettings.DEFAULT_TEXT_COLOR)
         paint.textSize = settings.fontSize * scale
-        paint.typeface = typeface(settings.fontFamily, settings.isBold)
+        paint.typeface = typeface ?: LyricCardFonts.systemTypeface(settings.fontFamily, settings.isBold)
         return paint
-    }
-
-    private fun typeface(
-        font: LyricCardFont,
-        bold: Boolean,
-    ): Typeface {
-        val family =
-            when {
-                font.isSerif -> Typeface.SERIF
-                font.isScript -> Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC)
-                else -> Typeface.SANS_SERIF
-            }
-        val style =
-            when {
-                bold && font.isScript -> Typeface.BOLD_ITALIC
-                bold -> Typeface.BOLD
-                font.isScript -> Typeface.ITALIC
-                else -> Typeface.NORMAL
-            }
-        return Typeface.create(family, style)
     }
 
     private fun alignment(align: LyricAlign): Layout.Alignment =

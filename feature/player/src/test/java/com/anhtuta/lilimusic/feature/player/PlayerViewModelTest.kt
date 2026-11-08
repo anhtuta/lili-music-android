@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.player
 
 import app.cash.turbine.test
 import com.anhtuta.lilimusic.core.datastore.PlaybackPreferenceState
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.playback.FakePlayerController
 import com.google.common.truth.Truth.assertThat
@@ -132,6 +133,25 @@ class PlayerViewModelTest {
             viewModel.onDownloadAction()
 
             assertThat(downloads.downloaded).containsExactly("alpha")
+        }
+
+    @Test
+    fun downloadActionCancelsInProgressDownload() =
+        runTest {
+            val controller = FakePlayerController()
+            val repository = FakePlayerSongRepository().apply { emit(songs) }
+            val downloads = FakeDownloadRepository()
+            downloads.emit(playerTestDownload(path = "alpha", status = DownloadStatus.DOWNLOADING))
+            val viewModel = playerViewModel(controller, repository, downloads = downloads)
+            viewModel.ensurePlaying("alpha")
+            viewModel.uiState.test {
+                awaitItemUntil { it.song?.path == "alpha" && it.downloadStatus == DownloadStatus.DOWNLOADING }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            viewModel.onDownloadAction()
+
+            assertThat(downloads.cancelled).containsExactly("alpha")
         }
 
     @Test

@@ -133,6 +133,36 @@ class DefaultDownloadRepositoryTest {
         }
 
     @Test
+    fun cancelStopsEngineAndClearsPartialSidecars() =
+        runTest {
+            val song = downloadTestSong()
+            repository.download(song)
+            engine.emitProgress(song.path, percent = 40)
+            lyrics.loaded.clear()
+
+            repository.cancel(song.path)
+
+            assertThat(engine.removed).containsExactly(song.path)
+            assertThat(covers.deleted).containsExactly(song.path)
+            assertThat(lyrics.deleted).containsExactly("hello.lrc")
+            assertThat(local.getByPath(song.path)).isNull()
+            repository.observeDownload(song.path).test {
+                assertThat(awaitItem()).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun cancelWithNoRowDoesNotTouchEngine() =
+        runTest {
+            repository.cancel("missing")
+
+            assertThat(engine.removed).isEmpty()
+            assertThat(covers.deleted).isEmpty()
+            assertThat(lyrics.deleted).isEmpty()
+        }
+
+    @Test
     fun removeDeletesMetadataCoverAndAudio() =
         runTest {
             val song = downloadTestSong()

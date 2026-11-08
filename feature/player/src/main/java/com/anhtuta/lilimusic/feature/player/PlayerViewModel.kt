@@ -124,7 +124,7 @@ class PlayerViewModel
                 when (uiState.value.downloadStatus) {
                     DownloadStatus.NONE, DownloadStatus.FAILED -> downloadRepository.download(song)
                     DownloadStatus.COMPLETED -> downloadRepository.remove(song.path)
-                    DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> Unit
+                    DownloadStatus.QUEUED, DownloadStatus.DOWNLOADING -> downloadRepository.cancel(song.path)
                 }
             }
         }

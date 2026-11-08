@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.lyrics
 
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.test.core.app.ApplicationProvider
 import app.cash.turbine.test
 import com.anhtuta.lilimusic.core.data.repository.LyricCardSettingsRepository
 import com.anhtuta.lilimusic.core.data.repository.LyricLoadResult
@@ -134,6 +135,7 @@ class LyricCardViewModelTest {
             coverLoader = FakeCoverLoader(),
             files = files,
             clipboard = clipboard,
+            fonts = LyricCardFonts(ApplicationProvider.getApplicationContext()),
             ioDispatcher = dispatcher,
         )
     }
