@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 import javax.inject.Inject
@@ -34,6 +35,8 @@ interface SettingsPreferences {
     suspend fun setTranslate(enabled: Boolean)
 
     suspend fun setAppTheme(theme: AppTheme)
+
+    suspend fun setLyricFontSize(size: LyricFontSize)
 }
 
 @Singleton
@@ -55,6 +58,7 @@ class SettingsPreferencesDataSource
                         lineAppear = prefs[LINE_APPEAR],
                         translate = prefs[TRANSLATE],
                         appTheme = prefs[APP_THEME],
+                        lyricFontSize = prefs[LYRIC_FONT_SIZE],
                     ),
                 )
             }
@@ -95,6 +99,10 @@ class SettingsPreferencesDataSource
             dataStore.edit { prefs -> prefs[APP_THEME] = theme.storageValue }
         }
 
+        override suspend fun setLyricFontSize(size: LyricFontSize) {
+            dataStore.edit { prefs -> prefs[LYRIC_FONT_SIZE] = size.storageValue }
+        }
+
         private companion object {
             val LYRIC_ALIGN = stringPreferencesKey("settings_lyric_align")
             val LYRIC_THEME = stringPreferencesKey("settings_lyric_theme")
@@ -105,5 +113,6 @@ class SettingsPreferencesDataSource
             val LINE_APPEAR = booleanPreferencesKey("settings_line_appear")
             val TRANSLATE = booleanPreferencesKey("settings_translate")
             val APP_THEME = stringPreferencesKey("settings_app_theme")
+            val LYRIC_FONT_SIZE = stringPreferencesKey("settings_lyric_font_size")
         }
     }

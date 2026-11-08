@@ -18,6 +18,7 @@ fun SettingsRoute(
                 onBack = onBack,
                 onLyricAlign = viewModel::setLyricAlign,
                 onLyricTheme = viewModel::setLyricTheme,
+                onLyricFontSize = viewModel::setLyricFontSize,
                 onKaraokeMode = viewModel::setKaraokeMode,
                 onBlurMode = viewModel::setBlurMode,
                 onWordAppear = viewModel::setWordAppear,

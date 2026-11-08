@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.core.datastore
 
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 
@@ -15,6 +16,7 @@ data class SettingsPreferenceSnapshot(
     val lineAppear: Boolean? = null,
     val translate: Boolean? = null,
     val appTheme: String? = null,
+    val lyricFontSize: String? = null,
 )
 
 object SettingsPreferencesParser {
@@ -30,6 +32,7 @@ object SettingsPreferencesParser {
             lineAppear = raw.lineAppear ?: defaults.lineAppear,
             translate = raw.translate ?: defaults.translate,
             appTheme = AppTheme.fromStorage(raw.appTheme),
+            lyricFontSize = LyricFontSize.fromStorage(raw.lyricFontSize),
         )
     }
 }

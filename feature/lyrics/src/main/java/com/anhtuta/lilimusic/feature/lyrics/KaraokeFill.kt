@@ -95,8 +95,11 @@ internal fun KaraokeLine(
     isPlaying: Boolean,
 ) {
     val fontSize =
-        MaterialTheme.typography.bodyLarge.fontSize *
-            if (style.settings.giganticLine && isActive) 1.8f else 1f
+        LyricFontMetrics.bodyFontSize(
+            typography = MaterialTheme.typography,
+            settings = style.settings,
+            giganticActive = isActive,
+        )
     val fillColor = style.colors.karaokeFill
     val sungColor = style.colors.sungText
     val restColor = if (isActive) style.colors.activeText else style.colors.text

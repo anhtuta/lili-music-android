@@ -443,10 +443,16 @@ private fun LyricLineRow(
         )
         if (style.settings.translate) {
             line.translations.forEach { translation ->
+                val translationSize =
+                    LyricFontMetrics.bodyFontSize(
+                        typography = MaterialTheme.typography,
+                        settings = style.settings,
+                        giganticActive = false,
+                    )
                 Text(
                     text = translation.text,
                     color = style.colors.text.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = LyricFontMetrics.translationStyle(translationSize),
                     fontStyle = FontStyle.Italic,
                     textAlign = style.textAlign,
                     modifier = Modifier.testTag(LyricsTestTags.TRANSLATION),

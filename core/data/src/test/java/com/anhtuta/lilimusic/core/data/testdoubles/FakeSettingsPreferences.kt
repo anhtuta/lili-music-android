@@ -3,6 +3,7 @@ package com.anhtuta.lilimusic.core.data.testdoubles
 import com.anhtuta.lilimusic.core.datastore.SettingsPreferences
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 import kotlinx.coroutines.flow.Flow
@@ -48,5 +49,9 @@ class FakeSettingsPreferences(
 
     override suspend fun setAppTheme(theme: AppTheme) {
         state.value = state.value.copy(appTheme = theme)
+    }
+
+    override suspend fun setLyricFontSize(size: LyricFontSize) {
+        state.value = state.value.copy(lyricFontSize = size)
     }
 }

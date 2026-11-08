@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.anhtuta.lilimusic.core.data.testdoubles.FakeSettingsPreferences
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 import com.google.common.truth.Truth.assertThat
@@ -46,6 +47,9 @@ class DataStoreSettingsRepositoryTest {
 
                 repository.setAppTheme(AppTheme.DARK)
                 assertThat(awaitItem().appTheme).isEqualTo(AppTheme.DARK)
+
+                repository.setLyricFontSize(LyricFontSize.LARGE)
+                assertThat(awaitItem().lyricFontSize).isEqualTo(LyricFontSize.LARGE)
                 cancelAndIgnoreRemainingEvents()
             }
         }

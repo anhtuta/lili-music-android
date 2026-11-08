@@ -111,6 +111,10 @@ class FakeSettingsRepository(
         state.value = state.value.copy(appTheme = theme)
     }
 
+    override suspend fun setLyricFontSize(size: com.anhtuta.lilimusic.core.model.LyricFontSize) {
+        state.value = state.value.copy(lyricFontSize = size)
+    }
+
     fun emit(value: PlayerSettings) {
         state.value = value
     }

@@ -2,12 +2,14 @@ package com.anhtuta.lilimusic.feature.settings
 
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 
 data class SettingsCallbacks(
     val onBack: () -> Unit,
     val onLyricAlign: (LyricAlign) -> Unit,
     val onLyricTheme: (LyricTheme) -> Unit,
+    val onLyricFontSize: (LyricFontSize) -> Unit,
     val onKaraokeMode: (Boolean) -> Unit,
     val onBlurMode: (Boolean) -> Unit,
     val onWordAppear: (Boolean) -> Unit,
