@@ -1,59 +1,51 @@
 package com.anhtuta.lilimusic.feature.player
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Forward5
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Replay5
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
+import com.anhtuta.lilimusic.core.ui.palette.CoverPalette
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,43 +58,29 @@ fun PlayerScreen(
 ) {
     val loadedPalette = rememberCoverPalette(state.song?.imageUrl)
     val palette = coverPaletteOverride ?: loadedPalette
+    var lyricsExpanded by remember { mutableStateOf(false) }
+    val dismissScroll = rememberNowPlayingDismissScroll(enabled = !lyricsExpanded, onDismiss = callbacks.onBack)
+    BackHandler(enabled = lyricsExpanded) { lyricsExpanded = false }
+    val isDark = !CoverPalette.isLight(MaterialTheme.colorScheme.background)
+    val gradient = CoverPalette.nowPlayingGradient(palette?.background, isDark)
     Scaffold(
-        modifier = modifier.testTag(PlayerTestTags.SCREEN),
-        containerColor = palette?.background ?: MaterialTheme.colorScheme.background,
-        contentColor = palette?.onBackground ?: MaterialTheme.colorScheme.onBackground,
+        modifier =
+            modifier
+                .testTag(PlayerTestTags.SCREEN)
+                .nestedScroll(dismissScroll),
+        containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f),
+        contentColor = palette?.onBackground ?: MaterialTheme.colorScheme.onSurface,
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.player_title)) },
-                navigationIcon = {
-                    LiliIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        label = stringResource(R.string.player_back),
-                        onClick = callbacks.onBack,
-                        modifier = Modifier.testTag(PlayerTestTags.BACK),
-                    )
-                },
-                actions = {
-                    if (state.song != null) {
-                        DownloadActionButton(
-                            status = state.downloadStatus,
-                            progressPercent = state.downloadProgress,
-                            onClick = callbacks.onDownload,
-                            modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
-                        )
-                        LiliIconButton(
-                            icon = Icons.Filled.Image,
-                            label = stringResource(R.string.player_lyric_card),
-                            onClick = callbacks.onLyricCard,
-                            modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
-                        )
+            NowPlayingTopBar(
+                state = state,
+                onCollapseOrBack = {
+                    if (lyricsExpanded) {
+                        lyricsExpanded = false
+                    } else {
+                        callbacks.onBack()
                     }
-                    LiliIconButton(
-                        icon = Icons.Filled.Settings,
-                        label = stringResource(R.string.player_settings),
-                        onClick = callbacks.onSettings,
-                        modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
-                    )
                 },
+                callbacks = callbacks,
             )
         },
     ) { innerPadding ->
@@ -110,7 +88,9 @@ fun PlayerScreen(
             modifier =
                 Modifier
                     .padding(innerPadding)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .background(gradient)
+                    .testTag(PlayerTestTags.BACKGROUND),
         ) {
             if (palette != null) {
                 Box(modifier = Modifier.testTag(PlayerTestTags.PALETTE))
@@ -119,9 +99,117 @@ fun PlayerScreen(
                 state = state,
                 callbacks = callbacks,
                 lyrics = lyrics,
+                lyricsExpanded = lyricsExpanded,
+                onLyricsExpandedChange = { lyricsExpanded = it },
                 modifier = Modifier.fillMaxSize(),
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NowPlayingTopBar(
+    state: PlayerUiState,
+    onCollapseOrBack: () -> Unit,
+    callbacks: PlayerCallbacks,
+) {
+    TopAppBar(
+        title = { NowPlayingAppBarTitle(song = state.song) },
+        navigationIcon = {
+            LiliIconButton(
+                icon = Icons.AutoMirrored.Filled.ArrowBack,
+                label = stringResource(R.string.player_back),
+                onClick = onCollapseOrBack,
+                modifier = Modifier.testTag(PlayerTestTags.BACK),
+            )
+        },
+        actions = {
+            if (state.song != null) {
+                DownloadActionButton(
+                    status = state.downloadStatus,
+                    progressPercent = state.downloadProgress,
+                    onClick = callbacks.onDownload,
+                    modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
+                )
+                LiliIconButton(
+                    icon = Icons.Filled.Image,
+                    label = stringResource(R.string.player_lyric_card),
+                    onClick = callbacks.onLyricCard,
+                    modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
+                )
+            }
+            LiliIconButton(
+                icon = Icons.Filled.Settings,
+                label = stringResource(R.string.player_settings),
+                onClick = callbacks.onSettings,
+                modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
+            )
+        },
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+            ),
+    )
+}
+
+@Composable
+private fun NowPlayingAppBarTitle(song: Song?) {
+    if (song == null) {
+        return
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        NowPlayingAppBarCover(song = song)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = song.title,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.testTag(PlayerTestTags.APP_BAR_TITLE),
+            )
+            Text(
+                text = song.artist,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.testTag(PlayerTestTags.APP_BAR_ARTIST),
+            )
+        }
+    }
+}
+
+@Composable
+private fun NowPlayingAppBarCover(song: Song) {
+    val shape = RoundedCornerShape(8.dp)
+    if (song.imageUrl == null) {
+        Box(
+            modifier =
+                Modifier
+                    .size(36.dp)
+                    .clip(shape)
+                    .testTag(PlayerTestTags.APP_BAR_COVER),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = song.title.take(1), style = MaterialTheme.typography.labelLarge)
+        }
+    } else {
+        AsyncImage(
+            model = song.imageUrl,
+            contentDescription = stringResource(R.string.player_cover_cd, song.title),
+            modifier =
+                Modifier
+                    .size(36.dp)
+                    .clip(shape)
+                    .testTag(PlayerTestTags.APP_BAR_COVER),
+            contentScale = ContentScale.Crop,
+        )
     }
 }
 
@@ -130,6 +218,8 @@ private fun PlayerBody(
     state: PlayerUiState,
     callbacks: PlayerCallbacks,
     lyrics: @Composable () -> Unit,
+    lyricsExpanded: Boolean,
+    onLyricsExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val song = state.song
@@ -149,6 +239,8 @@ private fun PlayerBody(
                 state = state,
                 callbacks = callbacks,
                 lyrics = lyrics,
+                lyricsExpanded = lyricsExpanded,
+                onLyricsExpandedChange = onLyricsExpandedChange,
             )
         } else {
             ExpandedPlayerBody(
@@ -156,6 +248,8 @@ private fun PlayerBody(
                 state = state,
                 callbacks = callbacks,
                 lyrics = lyrics,
+                lyricsExpanded = lyricsExpanded,
+                onLyricsExpandedChange = onLyricsExpandedChange,
             )
         }
     }
@@ -167,28 +261,33 @@ private fun CompactPlayerBody(
     state: PlayerUiState,
     callbacks: PlayerCallbacks,
     lyrics: @Composable () -> Unit,
+    lyricsExpanded: Boolean,
+    onLyricsExpandedChange: (Boolean) -> Unit,
 ) {
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .animateContentSize(),
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .testTag(PlayerTestTags.LYRICS),
-        ) {
-            lyrics()
-        }
-        PlayerControlsBar(
-            song = song,
-            state = state,
-            callbacks = callbacks,
-            showHeadings = true,
+        LyricSlot(
+            lyrics = lyrics,
+            expanded = lyricsExpanded,
+            modifier = Modifier.weight(1f).fillMaxWidth(),
         )
+        PlayerLyricHandle(
+            expanded = lyricsExpanded,
+            onExpandedChange = onLyricsExpandedChange,
+        )
+        if (!lyricsExpanded) {
+            PlayerControlsBar(
+                song = song,
+                state = state,
+                callbacks = callbacks,
+                showHeadings = false,
+            )
+        }
     }
 }
 
@@ -198,12 +297,15 @@ private fun ExpandedPlayerBody(
     state: PlayerUiState,
     callbacks: PlayerCallbacks,
     lyrics: @Composable () -> Unit,
+    lyricsExpanded: Boolean,
+    onLyricsExpandedChange: (Boolean) -> Unit,
 ) {
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .animateContentSize(),
     ) {
         Row(
             modifier =
@@ -211,118 +313,56 @@ private fun ExpandedPlayerBody(
                     .weight(1f)
                     .fillMaxWidth(),
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .padding(end = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                PlayerCover(title = song.title, imageUrl = song.imageUrl)
-                Spacer(modifier = Modifier.height(16.dp))
-                PlayerSongHeadings(song = song)
+            if (!lyricsExpanded) {
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .padding(end = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    PlayerCover(title = song.title, imageUrl = song.imageUrl)
+                }
             }
-            Box(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .testTag(PlayerTestTags.LYRICS),
-            ) {
-                lyrics()
-            }
+            LyricSlot(
+                lyrics = lyrics,
+                expanded = lyricsExpanded,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+            )
         }
-        PlayerControlsBar(
-            song = song,
-            state = state,
-            callbacks = callbacks,
-            showHeadings = false,
+        PlayerLyricHandle(
+            expanded = lyricsExpanded,
+            onExpandedChange = onLyricsExpandedChange,
         )
+        if (!lyricsExpanded) {
+            PlayerControlsBar(
+                song = song,
+                state = state,
+                callbacks = callbacks,
+                showHeadings = false,
+            )
+        }
     }
 }
 
 @Composable
-private fun PlayerControlsBar(
-    song: Song,
-    state: PlayerUiState,
-    callbacks: PlayerCallbacks,
-    showHeadings: Boolean,
+private fun LyricSlot(
+    lyrics: @Composable () -> Unit,
+    expanded: Boolean,
+    modifier: Modifier = Modifier,
 ) {
-    Column(
+    Box(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .testTag(PlayerTestTags.CONTROLS),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            modifier
+                .clip(RoundedCornerShape(LyricPaneShape.CornerRadius))
+                .testTag(PlayerTestTags.LYRICS),
     ) {
-        if (showHeadings) {
-            PlayerSongHeadings(song = song)
-            Spacer(modifier = Modifier.height(8.dp))
+        if (expanded) {
+            Box(modifier = Modifier.testTag(PlayerTestTags.LYRICS_EXPANDED))
         }
-        PlayerSeekBar(
-            positionMs = state.positionMs,
-            durationMs = state.durationMs,
-            onSeek = callbacks.onSeek,
-        )
-        PlayerQueueMessages(state = state)
-        Spacer(modifier = Modifier.height(8.dp))
-        PlayerTransport(
-            isPlaying = state.isPlaying,
-            callbacks = callbacks,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        PlayerModeRow(
-            playMode = state.playMode,
-            speed = state.speed,
-            callbacks = callbacks,
-        )
-    }
-}
-
-@Composable
-private fun PlayerSongHeadings(song: Song) {
-    Text(
-        text = song.title,
-        style = MaterialTheme.typography.headlineSmall,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.testTag(PlayerTestTags.TITLE),
-    )
-    Text(
-        text = song.artist,
-        style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.testTag(PlayerTestTags.ARTIST),
-    )
-    val album = song.album?.takeIf { it.isNotBlank() } ?: stringResource(R.string.player_no_album)
-    Text(
-        text = stringResource(R.string.player_album, album),
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.testTag(PlayerTestTags.ALBUM),
-    )
-}
-
-@Composable
-private fun PlayerQueueMessages(state: PlayerUiState) {
-    if (state.reachedEnd) {
-        Text(
-            text = stringResource(R.string.player_end_of_queue),
-            color = MaterialTheme.colorScheme.error,
-            modifier =
-                Modifier
-                    .padding(top = 8.dp)
-                    .testTag(PlayerTestTags.END_OF_QUEUE),
-        )
-    }
-    if (state.atStartOfQueue) {
-        Text(
-            text = stringResource(R.string.player_first_of_queue),
-            color = MaterialTheme.colorScheme.error,
-            modifier =
-                Modifier
-                    .padding(top = 8.dp)
-                    .testTag(PlayerTestTags.FIRST_OF_QUEUE),
-        )
+        lyrics()
     }
 }
 
@@ -354,138 +394,6 @@ private fun PlayerCover(
                     .clip(RoundedCornerShape(16.dp))
                     .testTag(PlayerTestTags.COVER),
             contentScale = ContentScale.Crop,
-        )
-    }
-}
-
-@Composable
-private fun PlayerSeekBar(
-    positionMs: Long,
-    durationMs: Long,
-    onSeek: (Long) -> Unit,
-) {
-    var sliderValue by remember(positionMs, durationMs) {
-        mutableFloatStateOf(if (durationMs > 0L) positionMs.toFloat() / durationMs.toFloat() else 0f)
-    }
-    Slider(
-        value = sliderValue.coerceIn(0f, 1f),
-        onValueChange = { sliderValue = it },
-        onValueChangeFinished = {
-            onSeek((sliderValue * durationMs).toLong().coerceAtLeast(0L))
-        },
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .testTag(PlayerTestTags.SEEK),
-    )
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(
-            text = PlayerTimeFormatter.format(positionMs),
-            modifier = Modifier.testTag(PlayerTestTags.POSITION),
-        )
-        Text(
-            text = PlayerTimeFormatter.format(durationMs),
-            modifier = Modifier.testTag(PlayerTestTags.DURATION),
-        )
-    }
-}
-
-@Composable
-private fun PlayerTransport(
-    isPlaying: Boolean,
-    callbacks: PlayerCallbacks,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        LiliIconButton(
-            icon = Icons.Filled.SkipPrevious,
-            label = stringResource(R.string.player_previous_cd),
-            onClick = callbacks.onSkipPrevious,
-            modifier = Modifier.testTag(PlayerTestTags.PREVIOUS).weight(1f),
-        )
-        LiliIconButton(
-            icon = Icons.Filled.Replay5,
-            label = stringResource(R.string.player_rewind_cd),
-            onClick = callbacks.onSeekBack,
-            modifier = Modifier.testTag(PlayerTestTags.REWIND).weight(1f),
-        )
-        LiliIconButton(
-            icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-            label =
-                stringResource(
-                    if (isPlaying) R.string.player_pause else R.string.player_play,
-                ),
-            onClick = callbacks.onPlayPause,
-            modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE).weight(1f),
-        )
-        LiliIconButton(
-            icon = Icons.Filled.Forward5,
-            label = stringResource(R.string.player_forward_cd),
-            onClick = callbacks.onSeekForward,
-            modifier = Modifier.testTag(PlayerTestTags.FORWARD).weight(1f),
-        )
-        LiliIconButton(
-            icon = Icons.Filled.SkipNext,
-            label = stringResource(R.string.player_next_cd),
-            onClick = callbacks.onSkipNext,
-            modifier = Modifier.testTag(PlayerTestTags.NEXT).weight(1f),
-        )
-    }
-}
-
-@Composable
-private fun PlayerModeRow(
-    playMode: PlayMode,
-    speed: Float,
-    callbacks: PlayerCallbacks,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        FilterChip(
-            selected = playMode == PlayMode.SHUFFLE,
-            onClick = callbacks.onToggleShuffle,
-            label = { Text(stringResource(R.string.player_shuffle)) },
-            modifier = Modifier.testTag(PlayerTestTags.SHUFFLE),
-        )
-        FilterChip(
-            selected = playMode == PlayMode.REPEAT_ONE,
-            onClick = callbacks.onToggleRepeatOne,
-            label = { Text(stringResource(R.string.player_repeat_one)) },
-            modifier = Modifier.testTag(PlayerTestTags.REPEAT_ONE),
-        )
-    }
-    Row(
-        modifier = Modifier.padding(top = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        LiliIconButton(
-            icon = Icons.Filled.Remove,
-            label = stringResource(R.string.player_speed_down),
-            onClick = callbacks.onDecreaseSpeed,
-            modifier = Modifier.testTag(PlayerTestTags.SPEED_DOWN),
-        )
-        Text(
-            text =
-                stringResource(
-                    R.string.player_speed_value,
-                    String.format(Locale.US, "%.1f", speed),
-                ),
-            modifier = Modifier.testTag(PlayerTestTags.SPEED_VALUE),
-        )
-        LiliIconButton(
-            icon = Icons.Filled.Add,
-            label = stringResource(R.string.player_speed_up),
-            onClick = callbacks.onIncreaseSpeed,
-            modifier = Modifier.testTag(PlayerTestTags.SPEED_UP),
         )
     }
 }

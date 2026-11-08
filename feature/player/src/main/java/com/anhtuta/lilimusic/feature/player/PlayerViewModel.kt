@@ -110,12 +110,23 @@ class PlayerViewModel
             )
         }
 
+        fun cyclePlayMode() {
+            playerController.setPlayMode(
+                playerController.state.value.playMode
+                    .cycle(),
+            )
+        }
+
         fun increaseSpeed() {
             playerController.setSpeed(PlaybackSpeed.increase(playerController.state.value.speed))
         }
 
         fun decreaseSpeed() {
             playerController.setSpeed(PlaybackSpeed.decrease(playerController.state.value.speed))
+        }
+
+        fun setSpeed(speed: Float) {
+            playerController.setSpeed(PlaybackSpeed.coerce(speed))
         }
 
         fun onDownloadAction() {

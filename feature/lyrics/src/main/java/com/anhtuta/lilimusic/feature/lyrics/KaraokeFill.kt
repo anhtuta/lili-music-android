@@ -98,10 +98,11 @@ internal fun KaraokeLine(
         MaterialTheme.typography.bodyLarge.fontSize *
             if (style.settings.giganticLine && isActive) 1.8f else 1f
     val fillColor = style.colors.karaokeFill
+    val sungColor = style.colors.sungText
     val restColor = if (isActive) style.colors.activeText else style.colors.text
     val layout =
-        remember(lineStructureKey(line), isActive, style, fontSize, fillColor, restColor) {
-            buildKaraokeSpanLayout(line, isActive, style, fontSize, fillColor, restColor)
+        remember(lineStructureKey(line), isActive, style, fontSize, fillColor, sungColor, restColor) {
+            buildKaraokeSpanLayout(line, isActive, style, fontSize, fillColor, sungColor, restColor)
         }
     val countdownDescription =
         line.words.firstOrNull { it.countdownDots > 0 }?.let { word ->
@@ -187,6 +188,7 @@ internal fun buildKaraokeSpanLayout(
     style: LyricVisualStyle,
     fontSize: TextUnit,
     fillColor: Color,
+    sungColor: Color,
     restColor: Color,
 ): KaraokeSpanLayout {
     val shadow =
@@ -213,6 +215,7 @@ internal fun buildKaraokeSpanLayout(
                                 word = word,
                                 karaokeMode = style.settings.karaokeMode,
                                 fillColor = fillColor,
+                                sungColor = sungColor,
                                 restColor = restColor,
                             ),
                         fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
@@ -253,10 +256,11 @@ internal fun wordBrush(
     karaokeMode: Boolean,
     fillColor: Color,
     restColor: Color,
+    sungColor: Color = fillColor.copy(alpha = 0.55f),
 ) = when {
     !karaokeMode && (word.isActive || word.isPassed) -> SolidColor(fillColor)
     !karaokeMode -> SolidColor(restColor)
-    word.isPassed -> SolidColor(fillColor)
+    word.isPassed -> SolidColor(sungColor)
     else -> SolidColor(restColor)
 }
 

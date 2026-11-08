@@ -304,8 +304,34 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 | 072 | Bundle web lyric-card Google Fonts (Lobster, Pacifico, Lavishly Yours, Borel; OFL) as `res/font` and use them in the font picker / JPEG export | Done in PR #22 |
 | 073 | Cancel an in-progress download: stop Media3, remove partial audio/lyric/cover + Room row, update Downloads / library / player UI | Done in PR #22 |
 | 074 | Replace the text Download action with a state icon (`Download` / progress / `DownloadDone`) plus contentDescriptions on library rows and Now playing | Done in PR #22 |
-| 075 | Smooth `.trc` karaoke fill (interpolate playback position between ExoPlayer samples; draw-phase fill). `.xtrc` stays out of v1 (web: “future”) | This PR |
-| 076 | Replace remaining text action buttons with Material Icons + long-press `PlainTooltip` via a shared `LiliIconButton`. Keep non-button text (labels, `1.0×`, sort chips, switches) | This PR |
+| 075 | Smooth `.trc` karaoke fill (interpolate playback position between ExoPlayer samples; draw-phase fill). `.xtrc` stays out of v1 (web: “future”) | Done in PR #23 |
+| 076 | Replace remaining text action buttons with Material Icons + long-press `PlainTooltip` via a shared `LiliIconButton`. Keep non-button text (labels, `1.0×`, sort chips, switches) | Done in PR #23 |
+
+### Phase 8 — Now Playing polish *(this PR)*
+
+Owner review of compact Now Playing screenshots (dark + light phone). Task plan: [080–098](tasks/080-098-now-playing-polish.md). Web player remains `BaiHat.js` / `Player.js`.
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 080 | One cycling play-mode icon after Next: Sequence (`Repeat`) → Shuffle (`Shuffle`) → Repeat one (`RepeatOne`). Tooltip `Play mode: {current}`. Keep shuffle-current-first | This PR |
+| 081 | Keep `=====` lyric lines as plain lyric text (no chrome change) | This PR |
+| 082 | Fade top and bottom edges of the lyric pane (gradient mask) | This PR |
+| 083 | Drag handle between lyrics and controls: drag down expands lyrics fullscreen; drag up / Back / tap restores | This PR |
+| 084 | Single control row: speed chip, previous, −5s, play, +5s, next, play mode. Speed ±0.1 in 0.5–2.0 | This PR |
+| 085 | Large filled circular Play/Pause (~64.dp, primary container) | This PR |
+| 086 | Lyric offset hidden until pane tap; auto-hide; minus/plus icons only; session/per-song, never persisted | This PR |
+| 087 | Remove the in-pane lyric-card button; keep the app-bar one | This PR |
+| 088 | Hide album text everywhere on Now Playing | This PR |
+| 089 | Thinner seek bar (~4.dp track, small thumb, played vs remaining contrast) | This PR |
+| 090 | Subtle cover Palette **gradient** on Now Playing; theme-based gradient fallback; never flat grey | This PR |
+| 091 | Transport icons full `onSurface`; active state uses the accent | This PR |
+| 092 | Dim already-sung karaoke text; light effective theme uses `#2199F9` + dark-grey unsung; dark keeps `#FC0` | This PR |
+| 093 | App-bar back / download / lyric card / settings: contentDescription + long-press tooltip (`LiliIconButton`) | This PR |
+| 094 | Swipe down on Now Playing closes to the previous screen / mini player (no conflict with 083 or lyric scroll) | This PR |
+| 095 | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons | This PR |
+| 096 | `enableEdgeToEdge` + `SystemBarStyle` from **in-app** theme; light status-bar icons dark on light | This PR |
+| 097 | App bar shows cover thumbnail + title/artist; drop “Now playing” title and the duplicate block below lyrics | This PR |
+| 098 | ~16.dp corner radius on the lyric pane; clip content | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -333,10 +359,7 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 
 ## 9. This-run deliverable
 
-PR #22 merged Phase 7 **070–074** on main. This PR is **075–076**:
-
-- **075** `.trc` karaoke fill interpolates between ExoPlayer position samples (web `currentTime` is continuous); fill is painted in draw so TRC `AnnotatedString`s stay stable. `.xtrc` stays documented-only (web: “future”; Android already parses it as TRC without translations)
-- **076** every action is a Material icon with a long-press tooltip (same string as `contentDescription`); FilterChips / switches / values stay text
+PR #23 merged Phase 7 **075–076** on main. This PR is Phase 8 **080–098**: Now Playing polish from the owner’s compact-phone screenshots. See [080–098](tasks/080-098-now-playing-polish.md) for web diffs and the per-item approach.
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
@@ -358,7 +381,11 @@ These Android extras / choices are **kept as-is** (not bugs):
 | **App Links hosts** | Path-style `https://blog.nenmongvietnam.com/bai-hat/{path}` and `https://anhtuta.github.io/lili-player/bai-hat/{path}` (Android-first until the web host rewrites those paths) | Only `#/bai-hat/{path}` on the HashRouter origin |
 | **Transport icons** | Material Icons (`SkipPrevious`, `Replay5`, `PlayArrow`/`Pause`, `Forward5`, `SkipNext`) via `LiliIconButton` (contentDescription + long-press tooltip) | CSS triangle arrows (`ll-btn-prev` / `ll-btn-next` / `.ll-play-pause .arrow`) |
 | **Icon-only chrome** | App bar, speed ±, lyric offset ±, lyric-card / downloads / mini-player actions are icons with tooltips. Sort **field** chips, settings chips, and switches stay labeled | Web mix of text (`Back`, `Settings`) and CSS arrows; no Material tooltips |
-| **Now-playing chrome** | Separate Now playing screen with a Material top app bar; compact controls are a Compose bottom bar | Cover/lyrics live in `#lyric_playground`; the player bar (`.ll_player`) sits under it on the same page |
+| **Now-playing chrome** | Separate Now playing screen; app bar is cover + title/artist (097); compact controls are one Compose row (084) | Cover/lyrics live in `#lyric_playground`; `.ll_player` under it has title/artist/album plus shuffle \| prev \| play \| next \| repeat |
+| **Play mode control** | One cycling icon after Next (080): Sequence → Shuffle → Repeat one. `PlayMode.cycle()`. Shuffle still current-first | Two toggles in `Player.js` (`.ll-shuffle` / `.ll-repeat`); unused `playTypeList` in `Constants.js` is the cycle Android uses |
+| **Album on Now Playing** | Hidden (088), even when `song.album` is set | `.song_album` shows `({album})` or `(No Album)` |
+| **Lyric offset UI** | Hidden until the pane is tapped; auto-hides; minus/plus icons only (086). Line tap still seeks (Android extra) | Settings overlay caret-up/down (`−100` / `+100` ms, client only) |
+| **Lyric edge fade / handle / swipe-down** | Fade mask (082), drag handle to fullscreen lyrics (083), swipe down to close the route (094) | Overflow clip only; `fa-arrows-alt` fullscreen; single-page (no now-playing route) |
 | **`.xtrc`** | `LyricFormat.fromFileName` maps `.xtrc` to the `.trc` parser (no `[tranN]` translations). Not a translation format in v1 | Comment in `BaiHat.js`: “Will support `.xtrc` in the future”. Unknown extensions also take the TRC DOM path with `hasTranslation = false` |
 
 The extra sort-order toggle (**11**) still talks to the API (`sortOrder`); it does not locally re-sort an unfiltered catalog. Online play uses the **full playable catalog** in API order (`catalogIndex`); search only filters the view. Offline play uses that same catalog filtered to completed downloads.

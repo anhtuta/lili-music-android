@@ -10,14 +10,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun LyricsRoute(
     modifier: Modifier = Modifier,
     viewModel: LyricsViewModel = hiltViewModel(),
-    onLyricCardClick: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LyricsPane(
         state = state,
         onNudgeOffset = viewModel::nudgeOffset,
         onSeekToLine = viewModel::seekToLine,
-        onLyricCardClick = onLyricCardClick,
         modifier = modifier,
     )
 }

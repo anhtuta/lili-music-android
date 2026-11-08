@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.lyrics
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -105,5 +106,31 @@ class LyricCardScreenTest {
         composeRule.onNodeWithTag(LyricCardTestTags.COPY).performScrollTo().performClick()
         assertThat(share).isEqualTo(1)
         assertThat(copy).isEqualTo(1)
+    }
+
+    @Test
+    fun darkThemeCloseIconStaysFindable() {
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                LyricCardScreen(
+                    state =
+                        LyricCardUiState(
+                            step = LyricCardStep.SELECT,
+                            lines = listOf(LyricCardSelectableLine(0, "First line", selected = false)),
+                        ),
+                    callbacks =
+                        LyricCardCallbacks(
+                            onClose = {},
+                            onToggleLine = {},
+                            onSelectAll = {},
+                            onGenerate = {},
+                            onBackToSelection = {},
+                            onShare = {},
+                            onCopy = {},
+                        ),
+                )
+            }
+        }
+        composeRule.onNodeWithContentDescription("Close").assertIsDisplayed()
     }
 }

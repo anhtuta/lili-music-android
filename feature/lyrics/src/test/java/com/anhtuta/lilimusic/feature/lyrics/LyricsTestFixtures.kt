@@ -70,9 +70,12 @@ class FakeSettingsRepository(
     initial: PlayerSettings = PlayerSettings(),
 ) : SettingsRepository {
     private val state = MutableStateFlow(initial)
+    var writeCount = 0
+        private set
     override val settings: Flow<PlayerSettings> = state
 
     override suspend fun setLyricAlign(align: LyricAlign) {
+        writeCount += 1
         state.value = state.value.copy(lyricAlign = align)
     }
 

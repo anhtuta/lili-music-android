@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import com.anhtuta.lilimusic.core.model.DownloadStatus
@@ -119,6 +120,16 @@ class DownloadsScreenTest {
 
         composeRule.onNodeWithTag(DownloadsTestTags.CONFIRM_DELETE_ALL).performClick()
         assertThat(confirmed).isEqualTo(1)
+    }
+
+    @Test
+    fun darkThemeBackIconStaysFindable() {
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                DownloadsScreen(state = DownloadsUiState(), callbacks = noopCallbacks())
+            }
+        }
+        composeRule.onNodeWithContentDescription("Back").assertIsDisplayed()
     }
 
     private fun noopCallbacks(): DownloadsCallbacks =

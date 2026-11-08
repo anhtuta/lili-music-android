@@ -82,8 +82,19 @@ class PlayerViewModelTest {
             viewModel.toggleShuffle()
             assertThat(controller.state.value.playMode).isEqualTo(PlayMode.SHUFFLE)
 
+            viewModel.cyclePlayMode()
+            assertThat(controller.state.value.playMode).isEqualTo(PlayMode.REPEAT_ONE)
+            viewModel.cyclePlayMode()
+            assertThat(controller.state.value.playMode).isEqualTo(PlayMode.SEQUENCE)
+            viewModel.cyclePlayMode()
+            assertThat(controller.state.value.playMode).isEqualTo(PlayMode.SHUFFLE)
+
             viewModel.increaseSpeed()
             assertThat(controller.state.value.speed).isEqualTo(1.1f)
+            viewModel.setSpeed(0.5f)
+            assertThat(controller.state.value.speed).isEqualTo(0.5f)
+            viewModel.setSpeed(2.4f)
+            assertThat(controller.state.value.speed).isEqualTo(2.0f)
         }
 
     @Test

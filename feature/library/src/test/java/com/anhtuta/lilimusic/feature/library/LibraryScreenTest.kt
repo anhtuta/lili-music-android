@@ -359,4 +359,23 @@ class LibraryScreenTest {
 
         composeRule.onNodeWithText("Unavailable offline").assertIsDisplayed()
     }
+
+    @Test
+    fun darkThemeAppBarIconsStayFindable() {
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                LibraryScreen(
+                    state = LibraryUiState(songs = emptyList(), isLoading = false),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+        composeRule.onNodeWithContentDescription("Refresh catalog").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Downloads").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+    }
 }

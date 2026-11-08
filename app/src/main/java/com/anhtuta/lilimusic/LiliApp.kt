@@ -1,6 +1,7 @@
 package com.anhtuta.lilimusic
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import androidx.activity.ComponentActivity
@@ -13,11 +14,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.core.util.Consumer
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -26,6 +30,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
+import com.anhtuta.lilimusic.core.ui.theme.SystemBarAppearance
 import com.anhtuta.lilimusic.feature.downloads.DownloadsRoute
 import com.anhtuta.lilimusic.feature.downloads.DownloadsViewModel
 import com.anhtuta.lilimusic.feature.library.LibraryRoute
@@ -61,7 +66,9 @@ fun LiliApp(
         request = playback.isPlaying || downloads.items.any { it.isActive },
     )
 
-    LiliTheme(darkTheme = settings.settings.appTheme == AppTheme.DARK) {
+    val darkTheme = settings.settings.appTheme == AppTheme.DARK
+    ApplySystemBarAppearance(darkTheme = darkTheme)
+    LiliTheme(darkTheme = darkTheme) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -80,7 +87,7 @@ fun LiliApp(
                                 path = path,
                                 onBack = onBack,
                                 viewModel = playerViewModel,
-                                lyrics = { LyricsRoute(onLyricCardClick = lyricCardViewModel::open) },
+                                lyrics = { LyricsRoute() },
                                 onSettingsClick = onSettings,
                                 onLyricCardClick = lyricCardViewModel::open,
                             )
@@ -111,6 +118,19 @@ fun LiliApp(
                     viewModel = lyricCardViewModel,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ApplySystemBarAppearance(darkTheme: Boolean) {
+    val view = LocalView.current
+    SideEffect {
+        val window = (view.context as? Activity)?.window ?: return@SideEffect
+        val lightIcons = SystemBarAppearance.isAppearanceLightStatusBars(darkTheme)
+        WindowCompat.getInsetsController(window, view).apply {
+            isAppearanceLightStatusBars = lightIcons
+            isAppearanceLightNavigationBars = lightIcons
         }
     }
 }

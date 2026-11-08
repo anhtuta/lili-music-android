@@ -3,6 +3,7 @@ package com.anhtuta.lilimusic.core.ui.button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
@@ -34,7 +35,12 @@ fun LiliIconButton(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = tint,
+            tint =
+                if (tint == Color.Unspecified) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    tint
+                },
         )
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -32,14 +33,12 @@ class LyricsPaneTest {
 
     @Test
     fun missingLyricShowsContributionCopy() {
-        var card = 0
         composeRule.setContent {
             LiliTheme {
                 LyricsPane(
                     state = LyricsUiState(hasSong = true, isMissing = true),
                     onNudgeOffset = {},
                     onSeekToLine = {},
-                    onLyricCardClick = { card++ },
                 )
             }
         }
@@ -49,8 +48,7 @@ class LyricsPaneTest {
         composeRule.onNodeWithTag(LyricsTestTags.MISSING_FB).assertIsDisplayed().assertHasClickAction()
         composeRule.onNodeWithText("Mail").assertIsDisplayed()
         composeRule.onNodeWithText("FB").assertIsDisplayed()
-        composeRule.onNodeWithTag(LyricCardTestTags.OPEN).assertIsDisplayed().performClick()
-        assertThat(card).isEqualTo(1)
+        composeRule.onNodeWithTag(LyricCardTestTags.OPEN).assertDoesNotExist()
     }
 
     @Test
@@ -91,12 +89,17 @@ class LyricsPaneTest {
             }
         }
 
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertDoesNotExist()
+        composeRule.onNodeWithText("Offset: 0ms").assertDoesNotExist()
         composeRule.onNodeWithText("First").performClick()
         assertThat(seekTo).isEqualTo(0L)
-        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).performClick()
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertIsDisplayed().performClick()
+        composeRule.onNodeWithContentDescription("Lyric 100ms later").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Lyric 100ms earlier").assertIsDisplayed()
         assertThat(nudged).isEqualTo(100L)
-        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_EARLIER).performClick()
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_EARLIER).assertIsDisplayed().performClick()
         assertThat(nudged).isEqualTo(-100L)
+        composeRule.onNodeWithText("Offset: 0ms").assertDoesNotExist()
         assertThat(composeRule.onAllNodesWithText("Primero").fetchSemanticsNodes()).isEmpty()
     }
 
@@ -212,6 +215,21 @@ class LyricsPaneTest {
         composeRule.onNodeWithText("Lyric creator: Tuzaku").assertIsDisplayed()
         composeRule.onNodeWithText("Source: manual").assertIsDisplayed()
         composeRule.onNodeWithText("Date: 6/2021").assertIsDisplayed()
+    }
+
+    @Test
+    fun lyricListUsesEdgeFadeMask() {
+        composeRule.setContent {
+            LiliTheme {
+                LyricsPane(
+                    state = LyricsUiState(hasSong = true, frame = sampleFrame()),
+                    onNudgeOffset = {},
+                    onSeekToLine = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag(LyricsTestTags.EDGE_FADE).assertExists()
+        composeRule.onNodeWithText("First").assertIsDisplayed()
     }
 
     @Test

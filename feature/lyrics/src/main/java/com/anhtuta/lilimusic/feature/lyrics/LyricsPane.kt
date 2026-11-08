@@ -3,6 +3,7 @@ package com.anhtuta.lilimusic.feature.lyrics
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,18 +16,23 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableLongState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
@@ -45,6 +51,11 @@ import com.anhtuta.lilimusic.core.lyrics.LyricSynchronizer
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
+import kotlinx.coroutines.delay
+
+private object LyricOffsetUi {
+    const val AUTO_HIDE_MS = 3_000L
+}
 
 @Composable
 fun LyricsPane(
@@ -52,9 +63,19 @@ fun LyricsPane(
     onNudgeOffset: (Long) -> Unit,
     onSeekToLine: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    onLyricCardClick: () -> Unit = {},
 ) {
-    val style = state.settings.toVisualStyle()
+    val style = state.settings.toVisualStyle(hasCover = state.coverUrl != null)
+    var offsetVisible by remember { mutableStateOf(false) }
+    var offsetGeneration by remember { mutableIntStateOf(0) }
+    val revealOffset = {
+        offsetVisible = true
+        offsetGeneration += 1
+    }
+    LaunchedEffect(offsetVisible, offsetGeneration) {
+        if (!offsetVisible) return@LaunchedEffect
+        delay(LyricOffsetUi.AUTO_HIDE_MS)
+        offsetVisible = false
+    }
     Box(
         modifier =
             modifier
@@ -62,36 +83,39 @@ fun LyricsPane(
                 .testTag(LyricsTestTags.PANE)
                 .background(style.colors.background),
     ) {
-        if (state.settings.lyricTheme == LyricTheme.PICTURE_BG) {
+        if (state.settings.lyricTheme == LyricTheme.PICTURE_BG && state.coverUrl != null) {
             PictureBackdrop(coverUrl = state.coverUrl, overlay = style.colors.overlay)
         }
         Column(modifier = Modifier.fillMaxSize()) {
             VisualModeMarkers(settings = state.settings)
-            if (state.hasSong && !state.isLoading) {
-                LyricCardOpenRow(
-                    textColor = style.colors.text,
-                    onLyricCardClick = onLyricCardClick,
-                )
-            }
-            if (state.frame != null) {
-                OffsetRow(
-                    offsetMs = state.userOffsetMs,
-                    onNudgeOffset = onNudgeOffset,
-                    textColor = style.colors.text,
-                )
-            }
             Box(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .testTag(LyricsTestTags.EDGE_FADE)
+                        .lyricEdgeFade(),
                 contentAlignment = Alignment.Center,
             ) {
                 LyricsBody(
                     state = state,
                     style = style,
-                    onSeekToLine = onSeekToLine,
+                    onSeekToLine = { position ->
+                        revealOffset()
+                        onSeekToLine(position)
+                    },
+                    onRevealOffset = revealOffset,
                 )
+                if (state.frame != null && offsetVisible) {
+                    OffsetRow(
+                        onNudgeOffset = { delta ->
+                            revealOffset()
+                            onNudgeOffset(delta)
+                        },
+                        textColor = style.colors.text,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                    )
+                }
             }
         }
     }
@@ -159,6 +183,7 @@ private fun LyricsBody(
     state: LyricsUiState,
     style: LyricVisualStyle,
     onSeekToLine: (Long) -> Unit,
+    onRevealOffset: () -> Unit,
 ) {
     when {
         !state.hasSong -> Unit
@@ -184,6 +209,7 @@ private fun LyricsBody(
                 frame = state.frame,
                 style = style,
                 onSeekToLine = onSeekToLine,
+                onRevealOffset = onRevealOffset,
                 clock =
                     KaraokeClock(
                         sampledPositionMs = state.positionMs,
@@ -244,38 +270,17 @@ private fun MissingLyricMessage(style: LyricVisualStyle) {
 }
 
 @Composable
-private fun LyricCardOpenRow(
-    textColor: Color,
-    onLyricCardClick: () -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        LiliIconButton(
-            icon = Icons.Filled.Image,
-            label = stringResource(R.string.lyric_card_open),
-            onClick = onLyricCardClick,
-            modifier = Modifier.testTag(LyricCardTestTags.OPEN),
-            tint = textColor,
-        )
-    }
-}
-
-@Composable
 private fun OffsetRow(
-    offsetMs: Long,
     onNudgeOffset: (Long) -> Unit,
     textColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .testTag(LyricsTestTags.OFFSET_ROW),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -284,19 +289,14 @@ private fun OffsetRow(
             label = stringResource(R.string.lyrics_offset_earlier),
             onClick = { onNudgeOffset(-LyricSynchronizer.USER_OFFSET_STEP_MS) },
             modifier = Modifier.testTag(LyricsTestTags.OFFSET_EARLIER),
-            tint = textColor,
-        )
-        Text(
-            text = stringResource(R.string.lyrics_offset_value, offsetMs),
-            color = textColor,
-            modifier = Modifier.testTag(LyricsTestTags.OFFSET_VALUE),
+            tint = textColor.copy(alpha = 0.45f),
         )
         LiliIconButton(
             icon = Icons.Filled.Add,
             label = stringResource(R.string.lyrics_offset_later),
             onClick = { onNudgeOffset(LyricSynchronizer.USER_OFFSET_STEP_MS) },
             modifier = Modifier.testTag(LyricsTestTags.OFFSET_LATER),
-            tint = textColor,
+            tint = textColor.copy(alpha = 0.45f),
         )
     }
 }
@@ -306,6 +306,7 @@ private fun SyncedLyricList(
     frame: LyricSyncFrame,
     style: LyricVisualStyle,
     onSeekToLine: (Long) -> Unit,
+    onRevealOffset: () -> Unit,
     clock: KaraokeClock,
 ) {
     val listState = rememberLazyListState()
@@ -318,7 +319,12 @@ private fun SyncedLyricList(
     val seekDescription = stringResource(R.string.lyrics_line_cd)
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxSize(),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .pointerInput(onRevealOffset) {
+                    detectTapGestures(onTap = { onRevealOffset() })
+                },
         horizontalAlignment = style.horizontal,
     ) {
         itemsIndexed(

@@ -14,10 +14,10 @@ data class LyricVisualStyle(
     val horizontal: Alignment.Horizontal,
 )
 
-fun PlayerSettings.toVisualStyle(): LyricVisualStyle =
+fun PlayerSettings.toVisualStyle(hasCover: Boolean = false): LyricVisualStyle =
     LyricVisualStyle(
         settings = this,
-        colors = lyricTheme.colors(),
+        colors = lyricTheme.colors(appTheme = appTheme, hasCover = hasCover),
         textAlign =
             when (lyricAlign) {
                 LyricAlign.LEFT -> TextAlign.Start

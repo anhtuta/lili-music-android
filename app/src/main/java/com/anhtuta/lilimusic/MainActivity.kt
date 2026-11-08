@@ -1,9 +1,11 @@
 package com.anhtuta.lilimusic
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.anhtuta.lilimusic.core.model.SongDeepLink
@@ -14,7 +16,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applySongDeepLink(intent)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle =
+                SystemBarStyle.auto(
+                    lightScrim = Color.TRANSPARENT,
+                    darkScrim = Color.TRANSPARENT,
+                ),
+            navigationBarStyle =
+                SystemBarStyle.auto(
+                    lightScrim = Color.argb(0xE6, 0xFF, 0xFF, 0xFF),
+                    darkScrim = Color.argb(0x80, 0x1B, 0x1B, 0x1B),
+                ),
+        )
         setContent {
             LiliApp()
         }

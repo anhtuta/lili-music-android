@@ -15,6 +15,14 @@ enum class PlayMode(
 
     fun toggleRepeatOne(): PlayMode = if (this == REPEAT_ONE) SEQUENCE else REPEAT_ONE
 
+    /** Web `playTypeList`: Sequence → Shuffle → Repeat one → Sequence. */
+    fun cycle(): PlayMode =
+        when (this) {
+            SEQUENCE -> SHUFFLE
+            SHUFFLE -> REPEAT_ONE
+            REPEAT_ONE -> SEQUENCE
+        }
+
     companion object {
         fun fromStorage(value: String?): PlayMode = entries.find { it.storageValue == value } ?: SEQUENCE
     }

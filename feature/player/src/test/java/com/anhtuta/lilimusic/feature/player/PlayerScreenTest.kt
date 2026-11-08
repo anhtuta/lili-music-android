@@ -1,10 +1,6 @@
 package com.anhtuta.lilimusic.feature.player
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -17,8 +13,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
@@ -43,13 +37,13 @@ class PlayerScreenTest {
         var previous = 0
         var rewind = 0
         var forward = 0
-        var shuffle = 0
+        var playMode = 0
         var back = 0
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", artist = "Ann", imageUrl = null),
@@ -68,8 +62,7 @@ class PlayerScreenTest {
                             onSeek = {},
                             onSeekBack = { rewind++ },
                             onSeekForward = { forward++ },
-                            onToggleShuffle = { shuffle++ },
-                            onToggleRepeatOne = {},
+                            onCyclePlayMode = { playMode++ },
                             onIncreaseSpeed = {},
                             onDecreaseSpeed = {},
                         ),
@@ -77,11 +70,12 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithTag(PlayerTestTags.TITLE).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.APP_BAR_TITLE).assertIsDisplayed()
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithText("Ann").assertIsDisplayed()
-        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
-        composeRule.onNodeWithText("(Album)").assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertDoesNotExist()
+        composeRule.onNodeWithText("(Album)").assertDoesNotExist()
+        composeRule.onNodeWithText("Now playing").assertDoesNotExist()
         composeRule.onNodeWithTag(PlayerTestTags.POSITION).assertIsDisplayed()
         composeRule.onNodeWithText("0:15").assertIsDisplayed()
         composeRule.onNodeWithText("1:00").assertIsDisplayed()
@@ -96,8 +90,8 @@ class PlayerScreenTest {
         assertThat(rewind).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.FORWARD).performClick()
         assertThat(forward).isEqualTo(1)
-        composeRule.onNodeWithTag(PlayerTestTags.SHUFFLE).performClick()
-        assertThat(shuffle).isEqualTo(1)
+        composeRule.onNodeWithTag(PlayerTestTags.PLAY_MODE).performClick()
+        assertThat(playMode).isEqualTo(1)
         composeRule.onNodeWithTag(PlayerTestTags.BACK).performClick()
         assertThat(back).isEqualTo(1)
     }
@@ -107,8 +101,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = EXPANDED_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenExpandedWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 2, title = "Beta", path = "beta", imageUrl = null),
@@ -128,8 +122,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -149,8 +143,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song =
@@ -167,8 +161,9 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertIsDisplayed()
-        composeRule.onNodeWithText("(No Album)").assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.ALBUM).assertDoesNotExist()
+        composeRule.onNodeWithText("(No Album)").assertDoesNotExist()
+        composeRule.onNodeWithText("Gamma").assertIsDisplayed()
     }
 
     @Test
@@ -176,8 +171,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -202,8 +197,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -220,6 +215,7 @@ class PlayerScreenTest {
         }
 
         composeRule.onNodeWithTag(PlayerTestTags.PALETTE).assertExists()
+        composeRule.onNodeWithTag(PlayerTestTags.BACKGROUND).assertExists()
         composeRule.onNodeWithTag(PlayerTestTags.SETTINGS).performClick()
         assertThat(settings).isEqualTo(1)
     }
@@ -230,8 +226,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -251,8 +247,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -272,8 +268,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -293,8 +289,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -313,8 +309,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -336,7 +332,9 @@ class PlayerScreenTest {
         composeRule.onNodeWithTag(PlayerTestTags.CONTROLS).assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.SEEK).assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.PLAY_PAUSE).assertIsDisplayed()
-        composeRule.onNodeWithTag(PlayerTestTags.SPEED_VALUE).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.SPEED_CHIP).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.SPEED_DOWN).assertDoesNotExist()
+        composeRule.onNodeWithTag(PlayerTestTags.SPEED_UP).assertDoesNotExist()
         val bounds =
             composeRule
                 .onNodeWithTag(PlayerTestTags.LYRICS)
@@ -349,8 +347,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = EXPANDED_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenExpandedWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -380,8 +378,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -417,8 +415,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -438,8 +436,8 @@ class PlayerScreenTest {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
-                    width = COMPACT_WIDTH,
-                    height = PHONE_HEIGHT,
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
                     state =
                         PlayerUiState(
                             song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
@@ -454,40 +452,3 @@ class PlayerScreenTest {
         composeRule.onNodeWithContentDescription("Play").assertDoesNotExist()
     }
 }
-
-private val COMPACT_WIDTH = 400.dp
-private val EXPANDED_WIDTH = 800.dp
-private val PHONE_HEIGHT = 720.dp
-
-@Composable
-private fun SizedPlayer(
-    width: Dp,
-    height: Dp,
-    state: PlayerUiState,
-    callbacks: PlayerCallbacks,
-    lyrics: @Composable () -> Unit = {},
-    coverPaletteOverride: CoverPaletteColors? = null,
-) {
-    Box(modifier = Modifier.size(width = width, height = height)) {
-        PlayerScreen(
-            modifier = Modifier.fillMaxSize(),
-            state = state,
-            callbacks = callbacks,
-            lyrics = lyrics,
-            coverPaletteOverride = coverPaletteOverride,
-        )
-    }
-}
-
-private fun idlePlayerCallbacks() =
-    PlayerCallbacks(
-        onBack = {},
-        onPlayPause = {},
-        onSkipNext = {},
-        onSkipPrevious = {},
-        onSeek = {},
-        onToggleShuffle = {},
-        onToggleRepeatOne = {},
-        onIncreaseSpeed = {},
-        onDecreaseSpeed = {},
-    )
