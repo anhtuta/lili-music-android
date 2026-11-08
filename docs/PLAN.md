@@ -391,17 +391,17 @@ Owner screenshots: Now Playing ⋮ trigger; library sort left, scrollable chrome
 | 121 | Vertical scrollbar on library list. See [121](tasks/121-library-scrollbar.md) | Done |
 | 122 | Row ⋮ aligns with search/settings right edge. See [122](tasks/122-library-row-more-align.md) | Done |
 
-### Phase 14 — Library playback chrome *(this run)*
+### Phase 14 — Library playback chrome *(done on `tuta`)*
 
-Now Playing: no pull-dismiss. Library: search inset, thicker scrollbar, playing/pause cover badges, auto-scroll to current track. Task plans: [123](tasks/123-remove-now-playing-pull-dismiss.md)–[127](tasks/127-library-scroll-to-now-playing.md).
+Now Playing: no pull-dismiss. Library: search inset, thicker scrollbar, playing/pause cover badges, auto-scroll to current track. Task plans: [123](tasks/123-remove-now-playing-pull-dismiss.md)–[127](tasks/127-library-scroll-to-now-playing.md). Learning: [18 — Library playback UX](learning/18-phase14-library-playback-ux.md).
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 123 | Remove Now Playing pull-down back gesture. See [123](tasks/123-remove-now-playing-pull-dismiss.md) | This run |
-| 124 | Search right edge clears scrollbar; align with settings. See [124](tasks/124-library-search-scrollbar-inset.md) | This run |
-| 125 | Thicker library scrollbar thumb. See [125](tasks/125-library-scrollbar-thumb-width.md) | This run |
-| 126 | Playing/pause GIF overlay on current song cover. See [126](tasks/126-library-now-playing-cover-badge.md) | This run |
-| 127 | Scroll library to now-playing song on show. See [127](tasks/127-library-scroll-to-now-playing.md) | This run |
+| 123 | Remove Now Playing pull-down back gesture. See [123](tasks/123-remove-now-playing-pull-dismiss.md) | Done |
+| 124 | Search right edge clears scrollbar; align with settings. See [124](tasks/124-library-search-scrollbar-inset.md) | Done |
+| 125 | Thicker library scrollbar thumb. See [125](tasks/125-library-scrollbar-thumb-width.md) | Done |
+| 126 | Playing/pause GIF overlay on current song cover. See [126](tasks/126-library-now-playing-cover-badge.md) | Done |
+| 127 | Scroll library to now-playing song on show. See [127](tasks/127-library-scroll-to-now-playing.md) | Done |
 
 ## 7. Workflow (mandatory)
 
