@@ -13,9 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableLongState
@@ -41,6 +44,7 @@ import com.anhtuta.lilimusic.core.lyrics.LyricSyncFrame
 import com.anhtuta.lilimusic.core.lyrics.LyricSynchronizer
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @Composable
 fun LyricsPane(
@@ -251,12 +255,13 @@ private fun LyricCardOpenRow(
                 .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Image,
+            label = stringResource(R.string.lyric_card_open),
             onClick = onLyricCardClick,
             modifier = Modifier.testTag(LyricCardTestTags.OPEN),
-        ) {
-            Text(text = stringResource(R.string.lyric_card_open), color = textColor)
-        }
+            tint = textColor,
+        )
     }
 }
 
@@ -274,31 +279,25 @@ private fun OffsetRow(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val earlier = stringResource(R.string.lyrics_offset_earlier)
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Remove,
+            label = stringResource(R.string.lyrics_offset_earlier),
             onClick = { onNudgeOffset(-LyricSynchronizer.USER_OFFSET_STEP_MS) },
-            modifier =
-                Modifier
-                    .testTag(LyricsTestTags.OFFSET_EARLIER)
-                    .semantics { contentDescription = earlier },
-        ) {
-            Text("−100ms", color = textColor)
-        }
+            modifier = Modifier.testTag(LyricsTestTags.OFFSET_EARLIER),
+            tint = textColor,
+        )
         Text(
             text = stringResource(R.string.lyrics_offset_value, offsetMs),
             color = textColor,
             modifier = Modifier.testTag(LyricsTestTags.OFFSET_VALUE),
         )
-        val later = stringResource(R.string.lyrics_offset_later)
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Add,
+            label = stringResource(R.string.lyrics_offset_later),
             onClick = { onNudgeOffset(LyricSynchronizer.USER_OFFSET_STEP_MS) },
-            modifier =
-                Modifier
-                    .testTag(LyricsTestTags.OFFSET_LATER)
-                    .semantics { contentDescription = later },
-        ) {
-            Text("+100ms", color = textColor)
-        }
+            modifier = Modifier.testTag(LyricsTestTags.OFFSET_LATER),
+            tint = textColor,
+        )
     }
 }
 

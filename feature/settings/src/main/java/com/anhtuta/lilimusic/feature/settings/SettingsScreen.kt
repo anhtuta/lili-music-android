@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +29,7 @@ import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,12 +46,12 @@ fun SettingsScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
-                    TextButton(
+                    LiliIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        label = stringResource(R.string.settings_back),
                         onClick = callbacks.onBack,
                         modifier = Modifier.testTag(SettingsTestTags.BACK),
-                    ) {
-                        Text(stringResource(R.string.settings_back))
-                    }
+                    )
                 },
             )
         },
@@ -207,12 +211,12 @@ private fun SpeedSection(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Remove,
+            label = stringResource(R.string.settings_speed_down),
             onClick = onDecreaseSpeed,
             modifier = Modifier.testTag(SettingsTestTags.SPEED_DOWN),
-        ) {
-            Text(stringResource(R.string.settings_speed_down))
-        }
+        )
         Text(
             text =
                 stringResource(
@@ -221,12 +225,12 @@ private fun SpeedSection(
                 ),
             modifier = Modifier.testTag(SettingsTestTags.SPEED_VALUE),
         )
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Add,
+            label = stringResource(R.string.settings_speed_up),
             onClick = onIncreaseSpeed,
             modifier = Modifier.testTag(SettingsTestTags.SPEED_UP),
-        ) {
-            Text(stringResource(R.string.settings_speed_up))
-        }
+        )
     }
 }
 

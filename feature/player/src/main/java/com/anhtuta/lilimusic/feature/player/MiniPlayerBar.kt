@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @Composable
 fun MiniPlayerBar(
@@ -75,17 +78,15 @@ fun MiniPlayerBar(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            TextButton(
+            LiliIconButton(
+                icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                label =
+                    stringResource(
+                        if (isPlaying) R.string.player_pause else R.string.player_play,
+                    ),
                 onClick = onPlayPause,
                 modifier = Modifier.testTag(PlayerTestTags.MINI_PLAY_PAUSE),
-            ) {
-                Text(
-                    text =
-                        stringResource(
-                            if (isPlaying) R.string.player_pause else R.string.player_play,
-                        ),
-                )
-            }
+            )
         }
     }
 }

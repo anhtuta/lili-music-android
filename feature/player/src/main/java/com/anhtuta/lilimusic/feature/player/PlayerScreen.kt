@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,21 +14,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Forward5
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Replay5
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.Song
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import java.util.Locale
@@ -73,12 +74,12 @@ fun PlayerScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.player_title)) },
                 navigationIcon = {
-                    TextButton(
+                    LiliIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        label = stringResource(R.string.player_back),
                         onClick = callbacks.onBack,
                         modifier = Modifier.testTag(PlayerTestTags.BACK),
-                    ) {
-                        Text(stringResource(R.string.player_back))
-                    }
+                    )
                 },
                 actions = {
                     if (state.song != null) {
@@ -88,19 +89,19 @@ fun PlayerScreen(
                             onClick = callbacks.onDownload,
                             modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
                         )
-                        TextButton(
+                        LiliIconButton(
+                            icon = Icons.Filled.Image,
+                            label = stringResource(R.string.player_lyric_card),
                             onClick = callbacks.onLyricCard,
                             modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
-                        ) {
-                            Text(stringResource(R.string.player_lyric_card))
-                        }
+                        )
                     }
-                    TextButton(
+                    LiliIconButton(
+                        icon = Icons.Filled.Settings,
+                        label = stringResource(R.string.player_settings),
                         onClick = callbacks.onSettings,
                         modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
-                    ) {
-                        Text(stringResource(R.string.player_settings))
-                    }
+                    )
                 },
             )
         },
@@ -401,56 +402,38 @@ private fun PlayerTransport(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TransportIconButton(
+        LiliIconButton(
+            icon = Icons.Filled.SkipPrevious,
+            label = stringResource(R.string.player_previous_cd),
             onClick = callbacks.onSkipPrevious,
-            imageVector = Icons.Filled.SkipPrevious,
-            contentDescription = stringResource(R.string.player_previous_cd),
-            modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
+            modifier = Modifier.testTag(PlayerTestTags.PREVIOUS).weight(1f),
         )
-        TransportIconButton(
+        LiliIconButton(
+            icon = Icons.Filled.Replay5,
+            label = stringResource(R.string.player_rewind_cd),
             onClick = callbacks.onSeekBack,
-            imageVector = Icons.Filled.Replay5,
-            contentDescription = stringResource(R.string.player_rewind_cd),
-            modifier = Modifier.testTag(PlayerTestTags.REWIND),
+            modifier = Modifier.testTag(PlayerTestTags.REWIND).weight(1f),
         )
-        TransportIconButton(
-            onClick = callbacks.onPlayPause,
-            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-            contentDescription =
+        LiliIconButton(
+            icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+            label =
                 stringResource(
                     if (isPlaying) R.string.player_pause else R.string.player_play,
                 ),
-            modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
+            onClick = callbacks.onPlayPause,
+            modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE).weight(1f),
         )
-        TransportIconButton(
+        LiliIconButton(
+            icon = Icons.Filled.Forward5,
+            label = stringResource(R.string.player_forward_cd),
             onClick = callbacks.onSeekForward,
-            imageVector = Icons.Filled.Forward5,
-            contentDescription = stringResource(R.string.player_forward_cd),
-            modifier = Modifier.testTag(PlayerTestTags.FORWARD),
+            modifier = Modifier.testTag(PlayerTestTags.FORWARD).weight(1f),
         )
-        TransportIconButton(
+        LiliIconButton(
+            icon = Icons.Filled.SkipNext,
+            label = stringResource(R.string.player_next_cd),
             onClick = callbacks.onSkipNext,
-            imageVector = Icons.Filled.SkipNext,
-            contentDescription = stringResource(R.string.player_next_cd),
-            modifier = Modifier.testTag(PlayerTestTags.NEXT),
-        )
-    }
-}
-
-@Composable
-private fun RowScope.TransportIconButton(
-    onClick: () -> Unit,
-    imageVector: ImageVector,
-    contentDescription: String,
-    modifier: Modifier = Modifier,
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier.weight(1f),
-    ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = contentDescription,
+            modifier = Modifier.testTag(PlayerTestTags.NEXT).weight(1f),
         )
     }
 }
@@ -484,12 +467,12 @@ private fun PlayerModeRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Remove,
+            label = stringResource(R.string.player_speed_down),
             onClick = callbacks.onDecreaseSpeed,
             modifier = Modifier.testTag(PlayerTestTags.SPEED_DOWN),
-        ) {
-            Text(stringResource(R.string.player_speed_down))
-        }
+        )
         Text(
             text =
                 stringResource(
@@ -498,11 +481,11 @@ private fun PlayerModeRow(
                 ),
             modifier = Modifier.testTag(PlayerTestTags.SPEED_VALUE),
         )
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Add,
+            label = stringResource(R.string.player_speed_up),
             onClick = callbacks.onIncreaseSpeed,
             modifier = Modifier.testTag(PlayerTestTags.SPEED_UP),
-        ) {
-            Text(stringResource(R.string.player_speed_up))
-        }
+        )
     }
 }

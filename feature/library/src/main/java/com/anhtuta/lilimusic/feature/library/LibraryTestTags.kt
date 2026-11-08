@@ -13,6 +13,8 @@ object LibraryTestTags {
     const val ERROR_BANNER = "library-error-banner"
     const val SETTINGS = "library-settings"
     const val DOWNLOADS = "library-downloads"
+    const val REFRESH = "library-refresh"
+    const val CLEAR_SEARCH = "library-clear-search"
 
     const val COVER_PREVIEW = "library-cover-preview"
 

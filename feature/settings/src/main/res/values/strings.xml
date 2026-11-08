@@ -21,7 +21,7 @@
     <string name="settings_app_light">Light</string>
     <string name="settings_app_dark">Dark</string>
     <string name="settings_speed">Speed</string>
-    <string name="settings_speed_up">Faster</string>
-    <string name="settings_speed_down">Slower</string>
+    <string name="settings_speed_up">Increase speed by 0.1x</string>
+    <string name="settings_speed_down">Decrease speed by 0.1x</string>
     <string name="settings_speed_value">%1$s×</string>
 </resources>

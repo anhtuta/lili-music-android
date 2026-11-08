@@ -235,6 +235,28 @@ class LibraryScreenTest {
     }
 
     @Test
+    fun refreshAndSettingsAreIconActions() {
+        var refresh = 0
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = { refresh++ },
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Refresh catalog").assertIsDisplayed().performClick()
+        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Downloads").assertIsDisplayed()
+        assertThat(refresh).isEqualTo(1)
+    }
+
+    @Test
     fun downloadButtonFiresCallback() {
         var downloadedId: Long? = null
         composeRule.setContent {
