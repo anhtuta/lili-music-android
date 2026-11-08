@@ -14,17 +14,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DownloadForOffline
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -246,43 +242,6 @@ private fun LibraryCatalog(
             }
         }
     }
-}
-
-@Composable
-private fun LibrarySearchField(
-    query: String,
-    onQueryChange: (String) -> Unit,
-) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .testTag(LibraryTestTags.SEARCH),
-        singleLine = true,
-        label = { Text(stringResource(R.string.library_search_hint)) },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Filled.Search,
-                contentDescription = null,
-            )
-        },
-        trailingIcon =
-            if (query.isNotEmpty()) {
-                {
-                    LiliIconButton(
-                        icon = Icons.Filled.Close,
-                        label = stringResource(R.string.library_clear_search),
-                        onClick = { onQueryChange("") },
-                        modifier = Modifier.testTag(LibraryTestTags.CLEAR_SEARCH),
-                    )
-                }
-            } else {
-                null
-            },
-    )
 }
 
 @Composable

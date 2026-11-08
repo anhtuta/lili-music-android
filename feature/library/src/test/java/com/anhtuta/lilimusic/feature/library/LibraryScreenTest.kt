@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.library
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -133,6 +134,29 @@ class LibraryScreenTest {
 
         composeRule.onNodeWithTag(LibraryTestTags.SEARCH).performTextInput("hello")
         assertThat(query).isEqualTo("hello")
+    }
+
+    @Test
+    fun searchFieldIsCompactWithPlaceholder() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false),
+                    onQueryChange = {},
+                    onSortSelected = {},
+                    onSortOrderToggle = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Search title or artist").assertIsDisplayed()
+        val bounds = composeRule.onNodeWithTag(LibraryTestTags.SEARCH).getUnclippedBoundsInRoot()
+        val height = bounds.bottom.value - bounds.top.value
+        assertThat(height).isAtLeast(44f)
+        assertThat(height).isAtMost(52f)
+        assertThat(LibrarySearchHeight.value).isEqualTo(48f)
     }
 
     @Test
