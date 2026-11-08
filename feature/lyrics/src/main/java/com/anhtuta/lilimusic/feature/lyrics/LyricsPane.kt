@@ -331,8 +331,7 @@ private fun SyncedLyricList(
                 isActive = index == frame.activeLineIndex,
                 style = style,
                 displayPosition = displayPosition,
-                offsetMs = clock.offsetMs,
-                isPlaying = clock.isPlaying,
+                clock = clock,
                 onSeek = { onSeekToLine(line.seekPositionMs) },
                 seekDescription = seekDescription,
                 modifier = Modifier.fillParentMaxWidth(),
@@ -409,8 +408,7 @@ private fun LyricLineRow(
     isActive: Boolean,
     style: LyricVisualStyle,
     displayPosition: MutableLongState,
-    offsetMs: Long,
-    isPlaying: Boolean,
+    clock: KaraokeClock,
     onSeek: () -> Unit,
     seekDescription: String,
     modifier: Modifier = Modifier,
@@ -432,8 +430,8 @@ private fun LyricLineRow(
             isActive = isActive,
             style = style,
             displayPosition = displayPosition,
-            offsetMs = offsetMs,
-            isPlaying = isPlaying,
+            offsetMs = clock.offsetMs,
+            isPlaying = clock.isPlaying,
         )
         if (style.settings.translate) {
             line.translations.forEach { translation ->

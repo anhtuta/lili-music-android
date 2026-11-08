@@ -154,7 +154,7 @@ object LyricSynchronizer {
         return ceil(timeLeftMs / 1000.0).toInt().coerceIn(0, 5)
     }
 
-    internal fun karaokeFill(
+    fun karaokeFill(
         startMs: Long,
         endMs: Long,
         positionMs: Long,

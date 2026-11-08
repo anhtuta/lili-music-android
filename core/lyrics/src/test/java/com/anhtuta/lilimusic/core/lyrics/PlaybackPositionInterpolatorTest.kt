@@ -33,7 +33,7 @@ class PlaybackPositionInterpolatorTest {
 
     @Test
     fun playingAtOnePointFiveTimesScalesElapsed() {
-        val clock = FakeElapsedClock(0L)
+        val clock = FakeElapsedClock(1_000L)
         val snapshot =
             PlaybackPositionInterpolator.Snapshot(
                 positionMs = 0L,
