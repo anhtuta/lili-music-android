@@ -8,13 +8,15 @@
     <string name="library_unavailable_offline">Unavailable offline</string>
     <string name="library_search_hint">Search title or artist</string>
     <string name="library_sort_label">Sort</string>
-    <string name="library_sort_title">Song</string>
+    <string name="library_sort_title">Name</string>
     <string name="library_sort_listens">Listens</string>
     <string name="library_sort_song_of_the_year">Song of the year</string>
     <string name="library_sort_type">Type</string>
     <string name="library_sort_created_date">Date</string>
     <string name="library_sort_order_asc">Ascending</string>
     <string name="library_sort_order_desc">Descending</string>
+    <string name="library_sort_tooltip">Sort: %1$s, %2$s. Tap to change</string>
+    <string name="library_sort_current">Current sort</string>
     <string name="library_loading">Loading songs</string>
     <string name="library_empty">No playable songs yet</string>
     <string name="library_empty_search">No songs match “%1$s”</string>

@@ -4,22 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.DownloadForOffline
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,7 +34,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
-import com.anhtuta.lilimusic.core.model.SortOrder
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,8 +41,7 @@ import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 fun LibraryScreen(
     state: LibraryUiState,
     onQueryChange: (String) -> Unit,
-    onSortSelected: (SongSort) -> Unit,
-    onSortOrderToggle: () -> Unit,
+    onSortFieldChosen: (SongSort) -> Unit,
     onRefresh: () -> Unit,
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
@@ -95,8 +88,7 @@ fun LibraryScreen(
             LibraryContent(
                 state = state,
                 onQueryChange = onQueryChange,
-                onSortSelected = onSortSelected,
-                onSortOrderToggle = onSortOrderToggle,
+                onSortFieldChosen = onSortFieldChosen,
                 onRefresh = onRefresh,
                 onSongClick = onSongClick,
                 onDownloadAction = onDownloadAction,
@@ -109,8 +101,7 @@ fun LibraryScreen(
 private fun LibraryContent(
     state: LibraryUiState,
     onQueryChange: (String) -> Unit,
-    onSortSelected: (SongSort) -> Unit,
-    onSortOrderToggle: () -> Unit,
+    onSortFieldChosen: (SongSort) -> Unit,
     onRefresh: () -> Unit,
     onSongClick: (Song) -> Unit,
     onDownloadAction: (Song) -> Unit,
@@ -124,8 +115,7 @@ private fun LibraryContent(
             LibraryCatalog(
                 state = state,
                 onQueryChange = onQueryChange,
-                onSortSelected = onSortSelected,
-                onSortOrderToggle = onSortOrderToggle,
+                onSortFieldChosen = onSortFieldChosen,
                 onSongClick = onSongClick,
                 onDownloadAction = onDownloadAction,
             )
@@ -175,8 +165,7 @@ private fun LibraryError(onRetry: () -> Unit) {
 private fun LibraryCatalog(
     state: LibraryUiState,
     onQueryChange: (String) -> Unit,
-    onSortSelected: (SongSort) -> Unit,
-    onSortOrderToggle: () -> Unit,
+    onSortFieldChosen: (SongSort) -> Unit,
     onSongClick: (Song) -> Unit,
     onDownloadAction: (Song) -> Unit,
 ) {
@@ -193,11 +182,10 @@ private fun LibraryCatalog(
             )
         }
         LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
-        SortRow(
+        LibrarySortPill(
             selected = state.sort,
             sortOrder = state.sortOrder,
-            onSortSelected = onSortSelected,
-            onSortOrderToggle = onSortOrderToggle,
+            onSortFieldChosen = onSortFieldChosen,
         )
         if (state.songs.isEmpty()) {
             LibraryEmpty(query = state.query)
@@ -262,65 +250,3 @@ private fun LibraryEmpty(query: String) {
         Text(text = emptyText)
     }
 }
-
-@Composable
-private fun SortRow(
-    selected: SongSort,
-    sortOrder: SortOrder,
-    onSortSelected: (SongSort) -> Unit,
-    onSortOrderToggle: () -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 8.dp, top = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.library_sort_label),
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(end = 8.dp),
-        )
-        LazyRow(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(SongSort.entries, key = { it.name }) { sort ->
-                FilterChip(
-                    selected = sort == selected,
-                    onClick = { onSortSelected(sort) },
-                    label = { Text(stringResource(sort.labelRes())) },
-                    modifier = Modifier.testTag(LibraryTestTags.sort(sort)),
-                )
-            }
-        }
-        LiliIconButton(
-            icon =
-                if (sortOrder == SortOrder.ASC) {
-                    Icons.Filled.ArrowUpward
-                } else {
-                    Icons.Filled.ArrowDownward
-                },
-            label =
-                stringResource(
-                    if (sortOrder == SortOrder.ASC) {
-                        R.string.library_sort_order_asc
-                    } else {
-                        R.string.library_sort_order_desc
-                    },
-                ),
-            onClick = onSortOrderToggle,
-            modifier = Modifier.testTag(LibraryTestTags.SORT_ORDER),
-        )
-    }
-}
-
-private fun SongSort.labelRes(): Int =
-    when (this) {
-        SongSort.TITLE -> R.string.library_sort_title
-        SongSort.LISTENS -> R.string.library_sort_listens
-        SongSort.SONG_OF_THE_YEAR -> R.string.library_sort_song_of_the_year
-        SongSort.TYPE -> R.string.library_sort_type
-        SongSort.CREATED_DATE -> R.string.library_sort_created_date
-    }

@@ -10,6 +10,8 @@ object LibraryTestTags {
     const val EMPTY = "library-empty"
     const val RETRY = "library-retry"
     const val SORT_ORDER = "library-sort-order"
+    const val SORT_PILL = "library-sort-pill"
+    const val SORT_MENU = "library-sort-menu"
     const val ERROR_BANNER = "library-error-banner"
     const val SETTINGS = "library-settings"
     const val DOWNLOADS = "library-downloads"

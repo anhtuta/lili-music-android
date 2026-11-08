@@ -81,6 +81,20 @@ class LibraryViewModel
             }
         }
 
+        fun onSortFieldChosen(sort: SongSort) {
+            viewModelScope.launch {
+                val current = sortPreferences.preferences.first()
+                val order =
+                    if (sort == current.sort) {
+                        current.order.toggle()
+                    } else {
+                        sort.defaultOrder
+                    }
+                sortPreferences.setSort(sort, order)
+                refreshCatalog()
+            }
+        }
+
         fun onRefresh() {
             viewModelScope.launch { refreshCatalog() }
         }

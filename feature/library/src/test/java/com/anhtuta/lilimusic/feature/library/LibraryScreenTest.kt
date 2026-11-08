@@ -11,6 +11,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.anhtuta.lilimusic.core.model.DownloadStatus
+import com.anhtuta.lilimusic.core.model.SongSort
+import com.anhtuta.lilimusic.core.model.SortOrder
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -39,8 +41,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = { clickedId = it.id },
                 )
@@ -77,8 +78,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = { clickedId = it.id },
                 )
@@ -104,8 +104,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -124,8 +123,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = { query = it },
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -143,8 +141,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -160,14 +157,78 @@ class LibraryScreenTest {
     }
 
     @Test
+    fun sortPillShowsNameAndOpensAllFields() {
+        var chosen: SongSort? = null
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false, sort = SongSort.TITLE, sortOrder = SortOrder.ASC),
+                    onQueryChange = {},
+                    onSortFieldChosen = { chosen = it },
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("NAME").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Ascending", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.SORT_PILL).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.SORT_MENU).assertIsDisplayed()
+        SongSort.entries.forEach { sort ->
+            composeRule.onNodeWithTag(LibraryTestTags.sort(sort)).assertIsDisplayed()
+        }
+        composeRule.onNodeWithText("Listens").performClick()
+        assertThat(chosen).isEqualTo(SongSort.LISTENS)
+    }
+
+    @Test
+    fun reselectingCurrentSortFieldFromMenuToggles() {
+        var chosen: SongSort? = null
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false, sort = SongSort.TITLE, sortOrder = SortOrder.ASC),
+                    onQueryChange = {},
+                    onSortFieldChosen = { chosen = it },
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.SORT_PILL).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.sort(SongSort.TITLE)).performClick()
+        assertThat(chosen).isEqualTo(SongSort.TITLE)
+    }
+
+    @Test
+    fun sortPillShowsListensDescending() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false, sort = SongSort.LISTENS, sortOrder = SortOrder.DESC),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("LISTENS").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Descending", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Sort: Listens, descending. Tap to change").assertIsDisplayed()
+    }
+
+    @Test
     fun emptyStateIsShown() {
         composeRule.setContent {
             LiliTheme {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -185,8 +246,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false, isOfflineError = true),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = { retried = true },
                     onSongClick = {},
                 )
@@ -205,8 +265,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = true),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -224,8 +283,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                     onSettingsClick = { settings++ },
@@ -245,8 +303,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                     onDownloadsClick = { downloads++ },
@@ -266,8 +323,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = { refresh++ },
                     onSongClick = {},
                 )
@@ -292,8 +348,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                     onDownloadAction = { downloadedId = it.id },
@@ -326,8 +381,7 @@ class LibraryScreenTest {
                                 ),
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -350,8 +404,7 @@ class LibraryScreenTest {
                             downloads = mapOf("alpha" to libraryTestDownload(path = "alpha")),
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -373,8 +426,7 @@ class LibraryScreenTest {
                             isOnline = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -391,8 +443,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(songs = emptyList(), isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
