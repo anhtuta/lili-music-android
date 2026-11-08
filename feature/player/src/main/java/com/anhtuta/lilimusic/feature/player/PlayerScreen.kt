@@ -32,13 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
@@ -46,6 +47,7 @@ import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
 import com.anhtuta.lilimusic.core.ui.palette.CoverPalette
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
+import com.anhtuta.lilimusic.core.ui.text.MarqueeText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +109,17 @@ fun PlayerScreen(
     }
 }
 
+internal object AppBarActionMetrics {
+    val IconSize = 20.dp
+    val ContainerSize = 40.dp
+}
+
+internal object NowPlayingAppBarStyle {
+    const val ARTIST_ALPHA = 0.65f
+
+    fun artistColor(onSurface: Color): Color = onSurface.copy(alpha = ARTIST_ALPHA)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NowPlayingTopBar(
@@ -131,12 +144,16 @@ private fun NowPlayingTopBar(
                     progressPercent = state.downloadProgress,
                     onClick = callbacks.onDownload,
                     modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
+                    iconSize = AppBarActionMetrics.IconSize,
+                    containerSize = AppBarActionMetrics.ContainerSize,
                 )
                 LiliIconButton(
                     icon = Icons.Filled.Image,
                     label = stringResource(R.string.player_lyric_card),
                     onClick = callbacks.onLyricCard,
                     modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
+                    iconSize = AppBarActionMetrics.IconSize,
+                    containerSize = AppBarActionMetrics.ContainerSize,
                 )
             }
             LiliIconButton(
@@ -144,6 +161,8 @@ private fun NowPlayingTopBar(
                 label = stringResource(R.string.player_settings),
                 onClick = callbacks.onSettings,
                 modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
+                iconSize = AppBarActionMetrics.IconSize,
+                containerSize = AppBarActionMetrics.ContainerSize,
             )
         },
         colors =
@@ -167,18 +186,15 @@ private fun NowPlayingAppBarTitle(song: Song?) {
     ) {
         NowPlayingAppBarCover(song = song)
         Column(modifier = Modifier.weight(1f)) {
-            Text(
+            MarqueeText(
                 text = song.title,
                 style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.testTag(PlayerTestTags.APP_BAR_TITLE),
             )
-            Text(
+            MarqueeText(
                 text = song.artist,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                color = NowPlayingAppBarStyle.artistColor(MaterialTheme.colorScheme.onSurface),
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Normal),
                 modifier = Modifier.testTag(PlayerTestTags.APP_BAR_ARTIST),
             )
         }

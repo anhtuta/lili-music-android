@@ -2,14 +2,18 @@ package com.anhtuta.lilimusic.feature.library
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.anhtuta.lilimusic.core.model.DownloadStatus
+import com.anhtuta.lilimusic.core.model.SongSort
+import com.anhtuta.lilimusic.core.model.SortOrder
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -38,8 +42,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = { clickedId = it.id },
                 )
@@ -49,10 +52,70 @@ class LibraryScreenTest {
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithText("Bob").assertIsDisplayed()
         composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.type(1), useUnmergedTree = true).assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.date(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.type(1), useUnmergedTree = true).assertDoesNotExist()
+        composeRule.onNodeWithTag(LibraryTestTags.date(1), useUnmergedTree = true).assertDoesNotExist()
+        composeRule.onNodeWithText("Vietnam").assertDoesNotExist()
+        composeRule.onNodeWithText("2021/06/09").assertDoesNotExist()
         composeRule.onNodeWithTag(LibraryTestTags.song(1)).performClick()
         assertThat(clickedId).isEqualTo(1L)
+    }
+
+    @Test
+    fun songRowHidesTypeAndDateEvenWhenPresent() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs =
+                                listOf(
+                                    libraryTestSong(
+                                        id = 1,
+                                        title = "Alpha",
+                                        artist = "Ann",
+                                        type = "Electronic Dance",
+                                        formatCreatedDate = "2021/06/09",
+                                    ),
+                                ),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Alpha").assertIsDisplayed()
+        composeRule.onNodeWithText("Ann").assertIsDisplayed()
+        composeRule.onNodeWithText("Electronic Dance").assertDoesNotExist()
+        composeRule.onNodeWithText("2021/06/09").assertDoesNotExist()
+        composeRule.onNodeWithTag(LibraryTestTags.type(1)).assertDoesNotExist()
+        composeRule.onNodeWithTag(LibraryTestTags.date(1)).assertDoesNotExist()
+    }
+
+    @Test
+    fun missingSoyHidesTheBadge() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha", songOfTheYear = null)),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.soy(1)).assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("Listens").assertIsDisplayed()
     }
 
     @Test
@@ -76,8 +139,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = { clickedId = it.id },
                 )
@@ -86,6 +148,10 @@ class LibraryScreenTest {
 
         composeRule.onNodeWithTag(LibraryTestTags.soy(1), useUnmergedTree = true).assertIsDisplayed()
         composeRule.onNodeWithText("2024").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Listens").assertIsDisplayed()
+        val listens = composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val soy = composeRule.onNodeWithTag(LibraryTestTags.soy(1), useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertThat(listens.left.value).isLessThan(soy.left.value)
         composeRule.onNodeWithTag(LibraryTestTags.cover(1), useUnmergedTree = true).performClick()
         composeRule.onNodeWithTag(LibraryTestTags.COVER_PREVIEW).assertIsDisplayed()
         composeRule.onNodeWithText("Ann - Alpha").assertIsDisplayed()
@@ -103,8 +169,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -123,8 +188,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = { query = it },
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -136,14 +200,100 @@ class LibraryScreenTest {
     }
 
     @Test
+    fun searchFieldIsCompactWithPlaceholder() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Search title or artist").assertIsDisplayed()
+        val bounds = composeRule.onNodeWithTag(LibraryTestTags.SEARCH).getUnclippedBoundsInRoot()
+        val height = bounds.bottom.value - bounds.top.value
+        assertThat(height).isAtLeast(44f)
+        assertThat(height).isAtMost(52f)
+        assertThat(LibrarySearchHeight.value).isEqualTo(48f)
+    }
+
+    @Test
+    fun sortPillShowsNameAndOpensAllFields() {
+        var chosen: SongSort? = null
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false, sort = SongSort.TITLE, sortOrder = SortOrder.ASC),
+                    onQueryChange = {},
+                    onSortFieldChosen = { chosen = it },
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("NAME").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Ascending", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.SORT_PILL).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.SORT_MENU).assertIsDisplayed()
+        SongSort.entries.forEach { sort ->
+            composeRule.onNodeWithTag(LibraryTestTags.sort(sort)).assertIsDisplayed()
+        }
+        composeRule.onNodeWithText("Listens").performClick()
+        assertThat(chosen).isEqualTo(SongSort.LISTENS)
+    }
+
+    @Test
+    fun reselectingCurrentSortFieldFromMenuToggles() {
+        var chosen: SongSort? = null
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false, sort = SongSort.TITLE, sortOrder = SortOrder.ASC),
+                    onQueryChange = {},
+                    onSortFieldChosen = { chosen = it },
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.SORT_PILL).performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.sort(SongSort.TITLE)).performClick()
+        assertThat(chosen).isEqualTo(SongSort.TITLE)
+    }
+
+    @Test
+    fun sortPillShowsListensDescending() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state = LibraryUiState(isLoading = false, sort = SongSort.LISTENS, sortOrder = SortOrder.DESC),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("LISTENS").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Descending", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Sort: Listens, descending. Tap to change").assertIsDisplayed()
+    }
+
+    @Test
     fun emptyStateIsShown() {
         composeRule.setContent {
             LiliTheme {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -161,8 +311,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false, isOfflineError = true),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = { retried = true },
                     onSongClick = {},
                 )
@@ -181,8 +330,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = true),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -200,8 +348,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                     onSettingsClick = { settings++ },
@@ -221,8 +368,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                     onDownloadsClick = { downloads++ },
@@ -242,8 +388,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = { refresh++ },
                     onSongClick = {},
                 )
@@ -268,8 +413,7 @@ class LibraryScreenTest {
                             isLoading = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                     onDownloadAction = { downloadedId = it.id },
@@ -277,8 +421,11 @@ class LibraryScreenTest {
             }
         }
 
-        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Download").performClick()
+        composeRule.onNodeWithContentDescription("More options").assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Song info").assertIsDisplayed()
+        composeRule.onNodeWithText("Download").assertIsDisplayed()
+        composeRule.onNodeWithText("Download").performClick()
         assertThat(downloadedId).isEqualTo(1L)
     }
 
@@ -302,16 +449,16 @@ class LibraryScreenTest {
                                 ),
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
             }
         }
 
-        composeRule.onNodeWithContentDescription("Cancel").assertIsDisplayed()
-        composeRule.onAllNodesWithContentDescription("Download").assertCountEquals(0)
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Cancel").assertIsDisplayed()
+        composeRule.onAllNodesWithText("Download").assertCountEquals(0)
     }
 
     @Test
@@ -326,15 +473,44 @@ class LibraryScreenTest {
                             downloads = mapOf("alpha" to libraryTestDownload(path = "alpha")),
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
             }
         }
 
-        composeRule.onNodeWithContentDescription("Delete").assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Delete").assertIsDisplayed()
+    }
+
+    @Test
+    fun songInfoDialogListsFieldsAndNoneForMissingSoy() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha", songOfTheYear = null)),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Song info").performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.SONG_INFO).assertIsDisplayed()
+        composeRule.onNodeWithText("Song of the year").assertIsDisplayed()
+        composeRule.onAllNodesWithText("None").onFirst().assertIsDisplayed()
+        composeRule.onNodeWithText("Lyric type").assertIsDisplayed()
+        composeRule.onNodeWithText("lrc").assertIsDisplayed()
+        composeRule.onNodeWithText("Title").assertIsDisplayed()
+        composeRule.onNodeWithText("Stream URL").assertExists()
     }
 
     @Test
@@ -349,8 +525,7 @@ class LibraryScreenTest {
                             isOnline = false,
                         ),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )
@@ -367,8 +542,7 @@ class LibraryScreenTest {
                 LibraryScreen(
                     state = LibraryUiState(songs = emptyList(), isLoading = false),
                     onQueryChange = {},
-                    onSortSelected = {},
-                    onSortOrderToggle = {},
+                    onSortFieldChosen = {},
                     onRefresh = {},
                     onSongClick = {},
                 )

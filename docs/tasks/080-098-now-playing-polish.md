@@ -28,7 +28,7 @@ These are **this phase**, not the already-documented extras in [PLAN.md §10](..
 | 089 | `.progress` is a thin filled span. | Slim ~4.dp track, small round thumb, played vs remaining contrast in both themes. |
 | 090 | `getAverageRGB` (brightness 1.6) tints **waveform bars only** (not ported). `picture-bg` uses the cover as a full-bleed lyric backdrop. | Subtle **gradient** from the cover Palette on Now Playing chrome. Soft theme-based gradient fallback when there is no cover — **never flat grey**. |
 | 091 | CSS arrows are full opacity; `.active` is the accent. | Transport/control icons `onSurface` (not dim grey). Active state uses the accent (`primary`). |
-| 092 | Karaoke fill: light `#2199F9` + unsung `#333`; dark/picture `#FC0` + unsung `#FFF` (`BaiHatService.getKaraokeWordStyle` checks `lyric-pg-light`). Passed words stay 100% fill. Light lyric pane is `#dfdfdf`, not Material grey. | Dim already-sung text slightly so the current word stands out. Fill/unsung follow the **effective** surface (light vs dark), not only `LyricTheme.LIGHT`. Light app + `picture-bg` without a cover must not look like the screenshot’s flat grey + yellow `#FC0`. Dark keeps `#FC0`. |
+| 092 | Karaoke fill: light `#2199F9` + unsung `#333`; dark/picture `#FC0` + unsung `#FFF` (`BaiHatService.getKaraokeWordStyle` checks `lyric-pg-light`). Passed words stay 100% fill. Light lyric pane is `#dfdfdf`, not Material grey. | Fill/unsung follow the **effective** surface (light vs dark), not only `LyricTheme.LIGHT`. Light app + `picture-bg` without a cover must not look like the screenshot’s flat grey + yellow `#FC0`. Dark keeps `#FC0`. Sung (already-highlighted) words use the **full** karaoke fill, matching web — an early 55% dim was removed at the owner’s request. |
 | 093 | `title=` on CSS buttons (Back is in the table/nav, not a now-playing app bar). | Every app-bar icon (back, download, lyric card, settings) has contentDescription + long-press tooltip via `LiliIconButton` (076). |
 | 094 | Single-page app; no now-playing route to dismiss. | Swipe down closes to the previous screen / mini player. Must not steal the handle drag (083) or lyric scrolling. |
 | 095 | `.body-dark` sets `color: #eee`; Font Awesome icons inherit. | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons/buttons and fix tints. |
@@ -103,7 +103,7 @@ The screenshot’s `=====` is timed lyric text (a separator line in that song’
 | 089 | Seek tag still present and seeking still works |
 | 090 | Palette tag exists with cover override; no-cover screen still has a background tag (gradient fallback, not missing chrome) |
 | 091 | Play mode selected uses accent (tag or selected semantics); transport still clickable |
-| 092 | `LyricTheme.colors(effectiveLight=)` : light fill `#2199F9` + unsung `#333`; dark `#FC0`; passed-word brush is dimmed fill; picture-bg without cover on light app uses light lyric surface |
+| 092 | `LyricTheme.colors(effectiveLight=)` : light fill `#2199F9` + unsung `#333`; dark `#FC0`; passed-word brush is the **full** karaoke fill (not dimmed); picture-bg without cover on light app uses light lyric surface |
 | 093 | Back / Download / Create lyric card / Settings: contentDescription + long-press tooltip |
 | 094 | Swipe-down on chrome (not handle) fires `onBack`; handle drag does not |
 | 095 | Dark theme: library/player/downloads/settings/lyric-card icon buttons exist and use `onSurface` (Compose under `LiliTheme(darkTheme = true)`) |

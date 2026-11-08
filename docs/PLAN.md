@@ -325,13 +325,26 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 089 | Thinner seek bar (~4.dp track, small thumb, played vs remaining contrast) | This PR |
 | 090 | Subtle cover Palette **gradient** on Now Playing; theme-based gradient fallback; never flat grey | This PR |
 | 091 | Transport icons full `onSurface`; active state uses the accent | This PR |
-| 092 | Dim already-sung karaoke text; light effective theme uses `#2199F9` + dark-grey unsung; dark keeps `#FC0` | This PR |
+| 092 | Light effective theme uses `#2199F9` + dark-grey unsung + `#DFDFDF` pane; dark keeps `#FC0`. Sung words use full karaoke fill (dimming removed at owner request) | This PR |
 | 093 | App-bar back / download / lyric card / settings: contentDescription + long-press tooltip (`LiliIconButton`) | This PR |
 | 094 | Swipe down on Now Playing closes to the previous screen / mini player (no conflict with 083 or lyric scroll) | This PR |
 | 095 | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons | This PR |
 | 096 | `enableEdgeToEdge` + `SystemBarStyle` from **in-app** theme; light status-bar icons dark on light | This PR |
 | 097 | App bar shows cover thumbnail + title/artist; drop “Now playing” title and the duplicate block below lyrics | This PR |
 | 098 | ~16.dp corner radius on the lyric pane; clip content | This PR |
+| 099 | Karaoke fill progresses across every wrapped visual line (not only the last). See [099](tasks/099-wrapped-karaoke-fill.md) | This PR |
+| 100 | Wrapped lyric lines use ~1.4× lineHeight (`LineHeightStyle` center, trim none). See [100](tasks/100-lyric-wrap-line-height.md) | This PR |
+| 101 | Auto-scroll centers the active lyric line in the pane (web `scrollLyric`). See [101](tasks/101-center-active-lyric.md) | This PR |
+| 102 | Transport row: equal-weight left/right groups, centered Play, matching speed/play-mode targets. See [102](tasks/102-control-row-symmetry.md) | This PR |
+| 103 | Compact Now Playing download / lyric-card / settings glyphs (~20.dp) with ≥40.dp touch targets. See [103](tasks/103-compact-app-bar-actions.md) | This PR |
+| 104 | Overflowing app-bar title and artist marquee slowly; drag to scroll; fitting text stays still. See [104](tasks/104-app-bar-marquee.md) | This PR |
+| 105 | App-bar artist is muted (`onSurface` ~0.65 alpha) so the title stands out. See [105](tasks/105-deemphasize-artist.md) | This PR |
+| 106 | Compact Library search (~44–48.dp) with placeholder. See [106](tasks/106-compact-library-search.md) | This PR |
+| 107 | One sort pill + dropdown instead of chips. See [107](tasks/107-library-sort-pill.md) | This PR |
+| 108 | Library row: title, artist, listens, soy only (no type/date wrap). See [108](tasks/108-library-row-fields.md) | This PR |
+| 109 | Listens (icon) left, soy badge right on one row. See [109](tasks/109-listens-soy-row.md) | This PR |
+| 110 | Row overflow menu: song info dialog + 074 download states. See [110](tasks/110-song-more-menu.md) | This PR |
+| 111 | `LauncherActivityTest` launches `MainActivity` by class (`FLAG_ACTIVITY_NEW_TASK`); unit tests print full exception traces. See [111](tasks/111-launcher-activity-test-ci.md) | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -359,7 +372,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 
 ## 9. This-run deliverable
 
-PR #23 merged Phase 7 **075–076** on main. This PR is Phase 8 **080–098**: Now Playing polish from the owner’s compact-phone screenshots. See [080–098](tasks/080-098-now-playing-polish.md) for web diffs and the per-item approach.
+PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–111**: Now Playing wrap/center/app-bar polish, Library search/sort/rows/menu, and a CI-hardening of `LauncherActivityTest`. See [099](tasks/099-wrapped-karaoke-fill.md)–[111](tasks/111-launcher-activity-test-ci.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 

@@ -162,6 +162,40 @@ class LibraryViewModelTest {
         }
 
     @Test
+    fun choosingCurrentSortFieldTogglesOrder() =
+        runTest {
+            val repository = FakeSongRepository()
+            val preferences = FakeSortPreferences()
+            val viewModel = libraryViewModel(repository = repository, prefs = preferences)
+
+            viewModel.onSortFieldChosen(SongSort.TITLE)
+
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.sortOrder == SortOrder.DESC }
+                assertThat(state.sort).isEqualTo(SongSort.TITLE)
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertThat(repository.refreshCalls.last()).isEqualTo(SongSort.TITLE to SortOrder.DESC)
+        }
+
+    @Test
+    fun choosingAnotherSortFieldUsesDefaultOrder() =
+        runTest {
+            val repository = FakeSongRepository()
+            val preferences = FakeSortPreferences()
+            val viewModel = libraryViewModel(repository = repository, prefs = preferences)
+
+            viewModel.onSortFieldChosen(SongSort.LISTENS)
+
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.sort == SongSort.LISTENS }
+                assertThat(state.sortOrder).isEqualTo(SortOrder.DESC)
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertThat(repository.refreshCalls.last()).isEqualTo(SongSort.LISTENS to SortOrder.DESC)
+        }
+
+    @Test
     fun pullToRefreshSendsCurrentSortToRepository() =
         runTest {
             val repository = FakeSongRepository()

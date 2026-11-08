@@ -23,7 +23,8 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [11 — Play Store](11-play-store.md) | Lyric card, App Links, R8/signing, `make smoke` |
 | [12 — Lyric wrap / height](12-now-playing-lyrics.md) | Long karaoke wrap, full-height lyric slot, Previous label |
 | [13 — Phase 7 web parity](13-phase7-web-parity.md) | Compact lyrics, transport icons, fonts, cancel download, download icons, smooth TRC karaoke, icon buttons + tooltips |
-| [14 — Now Playing polish](14-now-playing-polish.md) | Phase 8: cycling play mode, lyric fade/handle, one control row, offset overlay, palette gradient, karaoke contrast, swipe-down, status bar |
+| [14 — Now Playing polish](14-now-playing-polish.md) | Phase 8: cycling play mode, lyric fade/handle, one control row, offset overlay, palette gradient, karaoke contrast, swipe-down, status bar; follow-up wrap fill, line height, centered scroll, control-row symmetry, compact app-bar actions, marquee title/artist |
+| [15 — Library redesign](15-library-redesign.md) | Compact search, sort pill, slimmer rows, listens/soy row, song-info overflow menu |
 
 ## Status of phases
 
@@ -39,7 +40,8 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 - [x] [PR #21](https://github.com/anhtuta/lili-music-android/pull/21) — Lyric card (062), App Links (063), Play packaging (064), release smoke (065), lyric wrap (066), full-height lyrics (067) (merged to main)
 - [x] [PR #22](https://github.com/anhtuta/lili-music-android/pull/22) — Phase 7 070–074: compact now-playing, transport icons, lyric-card fonts, cancel download, download action icons (merged to main)
 - [x] [PR #23](https://github.com/anhtuta/lili-music-android/pull/23) — Phase 7 075–076: smooth `.trc` karaoke fill; icon actions with long-press tooltips (merged to main)
-- [ ] This PR — Phase 8 080–098: Now Playing polish from owner screenshot review
+- [x] [PR #24](https://github.com/anhtuta/lili-music-android/pull/24) — Phase 8 080–098: Now Playing polish from owner screenshot review (merged to main)
+- [ ] This PR — Phase 8 follow-up 099–110: Now Playing wrap/center/app-bar polish plus Library search, sort pill, slimmer rows, song-info menu
 
 ## After a later phase
 

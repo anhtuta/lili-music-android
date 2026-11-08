@@ -111,6 +111,7 @@ internal fun KaraokeLine(
     var textLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
     Text(
         text = layout.annotated,
+        style = LyricLineMetrics.textStyle(fontSize),
         textAlign = style.textAlign,
         softWrap = true,
         overflow = TextOverflow.Clip,
@@ -256,12 +257,23 @@ internal fun wordBrush(
     karaokeMode: Boolean,
     fillColor: Color,
     restColor: Color,
-    sungColor: Color = fillColor.copy(alpha = 0.55f),
+    sungColor: Color = fillColor,
 ) = when {
     !karaokeMode && (word.isActive || word.isPassed) -> SolidColor(fillColor)
     !karaokeMode -> SolidColor(restColor)
     word.isPassed -> SolidColor(sungColor)
     else -> SolidColor(restColor)
+}
+
+internal data class KaraokeFillExtent(
+    val lineIndex: Int,
+    val left: Float,
+    val top: Float,
+    val right: Float,
+    val bottom: Float,
+    val filledWidth: Float,
+) {
+    val width: Float get() = right - left
 }
 
 internal fun drawActiveWordFill(
@@ -271,67 +283,94 @@ internal fun drawActiveWordFill(
     color: Color,
     drawScope: DrawScope,
 ) {
-    if (fill <= 0f || range.isEmpty()) return
-    val start = range.first
-    val endExclusive = range.last + 1
-    val startLine = layout.getLineForOffset(start)
-    val endLine = layout.getLineForOffset((endExclusive - 1).coerceAtLeast(start))
-    val segments = mutableListOf<FillSegment>()
-    var totalWidth = 0f
-    for (line in startLine..endLine) {
-        val segment = fillSegment(layout, line, start, endExclusive) ?: continue
-        segments += segment
-        totalWidth += segment.width
-    }
-    if (totalWidth <= 0f) return
-    var remaining = if (fill >= 1f) totalWidth else totalWidth * fill
-    for (segment in segments) {
-        if (remaining <= 0f) break
-        val filledWidth = min(segment.width, remaining)
+    karaokeFillExtents(layout, range, fill).forEach { extent ->
         drawScope.clipRect(
-            segment.left,
-            segment.top,
-            segment.left + filledWidth,
-            segment.bottom,
+            extent.left,
+            extent.top,
+            extent.left + extent.filledWidth,
+            extent.bottom,
         ) {
             drawRect(
                 color = color,
-                topLeft = Offset(segment.left, segment.top),
-                size = Size(width = filledWidth, height = segment.bottom - segment.top),
+                topLeft = Offset(extent.left, extent.top),
+                size = Size(width = extent.filledWidth, height = extent.bottom - extent.top),
                 blendMode = BlendMode.SrcAtop,
             )
         }
-        remaining -= filledWidth
     }
 }
 
-private fun fillSegment(
+internal fun karaokeFillExtents(
+    layout: TextLayoutResult,
+    range: IntRange,
+    fill: Float,
+): List<KaraokeFillExtent> {
+    val textLength = layout.layoutInput.text.length
+    if (fill <= 0f || range.isEmpty() || textLength == 0) return emptyList()
+    val rangeStart = range.first.coerceIn(0, textLength)
+    val rangeEndExclusive = (range.last + 1).coerceIn(rangeStart, textLength)
+    if (rangeStart >= rangeEndExclusive) return emptyList()
+    val startLine = layout.getLineForOffset(rangeStart)
+    val endLine = layout.getLineForOffset((rangeEndExclusive - 1).coerceAtLeast(rangeStart))
+    val segments = ArrayList<KaraokeFillExtent>(endLine - startLine + 1)
+    for (line in startLine..endLine) {
+        val segment = visualLineSegment(layout, line, rangeStart, rangeEndExclusive) ?: continue
+        segments += segment
+    }
+    val totalWidth = segments.sumOf { it.width.toDouble() }.toFloat()
+    if (totalWidth <= 0f) return emptyList()
+    var remaining = if (fill >= 1f) totalWidth else totalWidth * fill.coerceIn(0f, 1f)
+    return segments.mapNotNull { segment ->
+        val filled = min(segment.width, remaining)
+        remaining -= filled
+        if (filled <= 0f) null else segment.copy(filledWidth = filled)
+    }
+}
+
+private fun visualLineSegment(
     layout: TextLayoutResult,
     line: Int,
     rangeStart: Int,
     rangeEndExclusive: Int,
-): FillSegment? {
-    val from = max(rangeStart, layout.getLineStart(line))
-    val to = min(rangeEndExclusive, layout.getLineEnd(line, visibleEnd = true))
-    if (from >= to) return null
-    val a = layout.getHorizontalPosition(from, true)
-    val b = layout.getHorizontalPosition(to, true)
-    val left = min(a, b)
-    val right = max(a, b)
-    if (right - left <= 0f) return null
-    return FillSegment(
-        left = left,
+): KaraokeFillExtent? {
+    val lineStart = layout.getLineStart(line)
+    val lineEndExclusive = exclusiveVisibleLineEnd(layout, line)
+    val from = max(rangeStart, lineStart)
+    val toExclusive = min(rangeEndExclusive, lineEndExclusive)
+    if (from >= toExclusive) return null
+    val left =
+        if (from == lineStart) {
+            layout.getLineLeft(line)
+        } else {
+            layout.getHorizontalPosition(from, usePrimaryDirection = true)
+        }
+    val right =
+        if (toExclusive >= lineEndExclusive) {
+            layout.getLineRight(line)
+        } else {
+            layout.getHorizontalPosition(toExclusive, usePrimaryDirection = true)
+        }
+    val leftEdge = min(left, right)
+    val rightEdge = max(left, right)
+    if (rightEdge - leftEdge <= 0f) return null
+    return KaraokeFillExtent(
+        lineIndex = line,
+        left = leftEdge,
         top = layout.getLineTop(line),
-        right = right,
+        right = rightEdge,
         bottom = layout.getLineBottom(line),
+        filledWidth = 0f,
     )
 }
 
-private data class FillSegment(
-    val left: Float,
-    val top: Float,
-    val right: Float,
-    val bottom: Float,
-) {
-    val width: Float get() = right - left
+private fun exclusiveVisibleLineEnd(
+    layout: TextLayoutResult,
+    line: Int,
+): Int {
+    val raw = layout.getLineEnd(line, visibleEnd = true)
+    val length = layout.layoutInput.text.length
+    if (length == 0) return 0
+    val end = raw.coerceIn(0, length)
+    if (end >= length) return length
+    return if (layout.getLineForOffset(end) == line) end + 1 else end
 }

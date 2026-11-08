@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -311,10 +312,12 @@ private fun SyncedLyricList(
 ) {
     val listState = rememberLazyListState()
     val displayPosition = rememberKaraokeDisplayPositionState(clock)
+    val userDragging by listState.interactionSource.collectIsDraggedAsState()
     LaunchedEffect(frame.activeLineIndex) {
-        if (frame.activeLineIndex >= 0) {
-            listState.animateScrollToItem(frame.activeLineIndex)
+        if (frame.activeLineIndex < 0 || !LyricPaneScroll.shouldAutoScroll(userDragging)) {
+            return@LaunchedEffect
         }
+        listState.animateScrollItemToCenter(frame.activeLineIndex)
     }
     val seekDescription = stringResource(R.string.lyrics_line_cd)
     LazyColumn(

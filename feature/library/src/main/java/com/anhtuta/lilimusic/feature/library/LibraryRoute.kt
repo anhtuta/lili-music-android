@@ -17,8 +17,7 @@ fun LibraryRoute(
     LibraryScreen(
         state = state,
         onQueryChange = viewModel::onQueryChange,
-        onSortSelected = viewModel::onSortSelected,
-        onSortOrderToggle = viewModel::onSortOrderToggle,
+        onSortFieldChosen = viewModel::onSortFieldChosen,
         onRefresh = viewModel::onRefresh,
         onSongClick = { song ->
             if (viewModel.onSongClick(song)) {
