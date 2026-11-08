@@ -1,7 +1,5 @@
 package com.anhtuta.lilimusic
 
-import android.app.Activity
-import android.content.Intent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -51,13 +49,18 @@ class LauncherActivityTest {
                 LauncherManifestTest.debugMergedManifest().readText(),
             )
         assertThat(launcherNames).containsExactly(MainActivity::class.java.name)
-        val launchIntent =
-            Intent(ApplicationProvider.getApplicationContext(), Class.forName(launcherNames.single()))
-                .setAction(Intent.ACTION_MAIN)
-                .addCategory(Intent.CATEGORY_LAUNCHER)
 
-        ActivityScenario.launch<Activity>(launchIntent).use { scenario ->
-            scenario.onActivity { activity ->
+        val scenario =
+            try {
+                ActivityScenario.launch(MainActivity::class.java)
+            } catch (error: Throwable) {
+                val chain =
+                    generateSequence(error) { it.cause }
+                        .joinToString(" -> ") { "${it::class.java.name}: ${it.message}" }
+                throw AssertionError("MainActivity launch failed: $chain", error)
+            }
+        scenario.use {
+            it.onActivity { activity ->
                 assertThat(activity).isInstanceOf(MainActivity::class.java)
             }
             composeRule.waitUntil(timeoutMillis = 5_000) {

@@ -1,5 +1,8 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
@@ -52,5 +55,14 @@ subprojects {
     }
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
         configureQualityPlugins(target)
+    }
+    tasks.withType<Test>().configureEach {
+        testLogging {
+            events(TestLogEvent.FAILED)
+            exceptionFormat = TestExceptionFormat.FULL
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+        }
     }
 }
