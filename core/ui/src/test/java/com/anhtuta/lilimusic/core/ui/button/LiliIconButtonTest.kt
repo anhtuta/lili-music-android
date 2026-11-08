@@ -42,6 +42,36 @@ class LiliIconButtonTest {
         composeRule.onNodeWithText("Previous song").assertIsDisplayed()
     }
 
+    @Test
+    fun darkThemeIconButtonRemainsFindable() {
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                LiliIconButton(
+                    icon = Icons.Filled.PlayArrow,
+                    label = "Settings",
+                    onClick = {},
+                )
+            }
+        }
+        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+    }
+
+    @Test
+    fun filledPlayButtonExposesContentDescription() {
+        var clicks = 0
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                LiliFilledIconButton(
+                    icon = Icons.Filled.PlayArrow,
+                    label = "Play",
+                    onClick = { clicks++ },
+                )
+            }
+        }
+        composeRule.onNodeWithContentDescription("Play").assertIsDisplayed().performClick()
+        assertThat(clicks).isEqualTo(1)
+    }
+
     private fun setButton(onClick: () -> Unit = {}) {
         composeRule.setContent {
             LiliTheme {
