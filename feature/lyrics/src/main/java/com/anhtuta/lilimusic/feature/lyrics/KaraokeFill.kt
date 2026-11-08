@@ -256,7 +256,7 @@ internal fun wordBrush(
     karaokeMode: Boolean,
     fillColor: Color,
     restColor: Color,
-    sungColor: Color = fillColor.copy(alpha = 0.55f),
+    sungColor: Color = fillColor,
 ) = when {
     !karaokeMode && (word.isActive || word.isPassed) -> SolidColor(fillColor)
     !karaokeMode -> SolidColor(restColor)

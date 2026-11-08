@@ -16,7 +16,7 @@
 10. **Slim seek bar (089).** ~4.dp track, small round thumb, played vs remaining contrast in both themes.
 11. **Cover gradient (090).** Subtle Palette colour wash on Now Playing; theme-based fallback when there is no cover — never flat grey.
 12. **Contrast (091).** Transport icons `onSurface`. Shuffle / Repeat one use the accent (`primary`).
-13. **Karaoke colours (092).** Already-sung words use fill at 55% alpha so the current word stands out. Light pane: surface `#DFDFDF`, fill `#2199F9`, unsung `#333`. Dark: fill `#FC0`. `picture-bg` without a cover follows the **in-app** light/dark theme (fixes the screenshot’s grey pane + yellow fill).
+13. **Karaoke colours (092).** Light pane: surface `#DFDFDF`, fill `#2199F9`, unsung `#333`. Dark: fill `#FC0`. `picture-bg` without a cover follows the **in-app** light/dark theme (fixes the screenshot’s grey pane + yellow fill). Sung (already-highlighted) words use the **full** karaoke colour, like the web — an early 55% dim was removed at Tú’s request.
 14. **App-bar labels (093).** Back, download, lyric card, settings: `contentDescription` + long-press tooltip via `LiliIconButton`.
 15. **Swipe down (094).** Nested-scroll leftover downward overscroll closes Now Playing to the previous screen / mini player. Disabled while lyrics are expanded so it does not fight the handle or lyric scrolling.
 16. **Dark-mode audit (095).** Default icon tint is `onSurface`. Library / downloads / settings / lyric card / player Compose tests render in `LiliTheme(darkTheme = true)` and still find Back / Settings / transport by contentDescription.

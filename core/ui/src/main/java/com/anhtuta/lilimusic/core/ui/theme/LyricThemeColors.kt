@@ -27,24 +27,24 @@ fun LyricTheme.colors(
     hasCover: Boolean = true,
 ): LyricThemeColors {
     val effectiveLight = isEffectiveLight(appTheme, hasCover)
-    val sung = karaokeFillFor(effectiveLight).copy(alpha = 0.55f)
     return when (this) {
-        LyricTheme.DARK -> darkColors(sung)
-        LyricTheme.LIGHT -> lightColors(sung)
+        LyricTheme.DARK -> darkColors()
+        LyricTheme.LIGHT -> lightColors()
         LyricTheme.PICTURE_BG ->
             if (hasCover) {
+                val fill = karaokeFillFor(effectiveLight = false)
                 LyricThemeColors(
                     background = Color.Transparent,
                     text = DarkUnsung,
                     activeText = Color.White,
-                    karaokeFill = karaokeFillFor(effectiveLight = false),
+                    karaokeFill = fill,
                     overlay = PictureOverlay,
-                    sungText = karaokeFillFor(effectiveLight = false).copy(alpha = 0.55f),
+                    sungText = fill,
                 )
             } else if (effectiveLight) {
-                lightColors(sung)
+                lightColors()
             } else {
-                darkColors(sung)
+                darkColors()
             }
     }
 }
@@ -61,22 +61,22 @@ fun LyricTheme.isEffectiveLight(
 
 private fun karaokeFillFor(effectiveLight: Boolean): Color = if (effectiveLight) KaraokeFillLight else KaraokeFillDark
 
-private fun lightColors(sung: Color) =
+private fun lightColors() =
     LyricThemeColors(
         background = LightSurface,
         text = LightUnsung,
         activeText = LightActive,
         karaokeFill = KaraokeFillLight,
         overlay = Color.Transparent,
-        sungText = sung,
+        sungText = KaraokeFillLight,
     )
 
-private fun darkColors(sung: Color) =
+private fun darkColors() =
     LyricThemeColors(
         background = DarkSurface,
         text = DarkUnsung,
         activeText = Color.White,
         karaokeFill = KaraokeFillDark,
         overlay = Color.Transparent,
-        sungText = sung,
+        sungText = KaraokeFillDark,
     )

@@ -325,7 +325,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 089 | Thinner seek bar (~4.dp track, small thumb, played vs remaining contrast) | This PR |
 | 090 | Subtle cover Palette **gradient** on Now Playing; theme-based gradient fallback; never flat grey | This PR |
 | 091 | Transport icons full `onSurface`; active state uses the accent | This PR |
-| 092 | Dim already-sung karaoke text; light effective theme uses `#2199F9` + dark-grey unsung; dark keeps `#FC0` | This PR |
+| 092 | Light effective theme uses `#2199F9` + dark-grey unsung + `#DFDFDF` pane; dark keeps `#FC0`. Sung words use full karaoke fill (dimming removed at owner request) | This PR |
 | 093 | App-bar back / download / lyric card / settings: contentDescription + long-press tooltip (`LiliIconButton`) | This PR |
 | 094 | Swipe down on Now Playing closes to the previous screen / mini player (no conflict with 083 or lyric scroll) | This PR |
 | 095 | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons | This PR |
