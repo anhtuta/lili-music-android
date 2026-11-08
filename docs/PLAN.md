@@ -299,11 +299,11 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 070 | Hide the cover on compact width (&lt; 720dp, matching web `#div_left_wrapper { display: none }`) so lyrics fill the body immediately; pin transport / seek / speed at the bottom. Wider screens keep cover + lyrics side by side. Remove the 067 scroll-to-full-height column where it no longer applies | This PR |
-| 071 | Replace Previous / −5s / Play / +5s / Next text with icon buttons (web `ll-btn-prev` / `ll-btn-next` / play-pause) plus contentDescriptions | This PR |
-| 072 | Bundle web lyric-card Google Fonts (Lobster, Pacifico, Lavishly Yours, Borel; OFL) as `res/font` and use them in the font picker / JPEG export | This PR |
-| 073 | Cancel an in-progress download: stop Media3, remove partial audio/lyric/cover + Room row, update Downloads / library / player UI | This PR |
-| 074 | Replace the text Download action with a state icon (`Download` / progress / `DownloadDone`) plus contentDescriptions on library rows and Now playing | This PR |
+| 070 | Hide the cover on compact width (&lt; 720dp, matching web `#div_left_wrapper { display: none }`) so lyrics fill the body immediately; pin transport / seek / speed at the bottom. Wider screens keep cover + lyrics side by side. Remove the 067 scroll-to-full-height column where it no longer applies | Done in PR #22 |
+| 071 | Replace Previous / −5s / Play / +5s / Next text with icon buttons (web `ll-btn-prev` / `ll-btn-next` / play-pause) plus contentDescriptions | Done in PR #22 |
+| 072 | Bundle web lyric-card Google Fonts (Lobster, Pacifico, Lavishly Yours, Borel; OFL) as `res/font` and use them in the font picker / JPEG export | Done in PR #22 |
+| 073 | Cancel an in-progress download: stop Media3, remove partial audio/lyric/cover + Room row, update Downloads / library / player UI | Done in PR #22 |
+| 074 | Replace the text Download action with a state icon (`Download` / progress / `DownloadDone`) plus contentDescriptions on library rows and Now playing | Done in PR #22 |
 | 075 | Smooth `.trc` karaoke fill (interpolate playback position between ExoPlayer samples; draw-phase fill). `.xtrc` stays out of v1 (web: “future”) | This PR |
 
 ## 7. Workflow (mandatory)
@@ -332,14 +332,9 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 
 ## 9. This-run deliverable
 
-PR #21 (Phase 6 remainder: lyric card, App Links, Play packaging, karaoke wrap, full-height lyrics) is merged on main. This PR is **Phase 7**:
+PR #22 merged Phase 7 **070–074** on main. This PR is **075**:
 
-- **070** compact now-playing: hide cover below 720dp so lyrics fill immediately; pin controls; wide layout is cover + lyrics side by side
-- **071** icon transport buttons with contentDescriptions
-- **072** bundle OFL Google Fonts for the lyric card
-- **073** cancel in-progress Media3 downloads and clear partial files
-- **074** Download action is an icon that shows idle / in-progress / done (tap in-progress to cancel)
-- **075** `.trc` karaoke fill interpolates between ExoPlayer position samples (web `currentTime` is continuous); fill is painted in draw so TRC `AnnotatedString`s stay stable
+- **075** `.trc` karaoke fill interpolates between ExoPlayer position samples (web `currentTime` is continuous); fill is painted in draw so TRC `AnnotatedString`s stay stable. `.xtrc` stays documented-only (web: “future”; Android already parses it as TRC without translations)
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
