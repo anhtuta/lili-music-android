@@ -47,25 +47,26 @@ class SongInfoFieldsTest {
                 streamUrl = "Stream URL",
             )
         val rows = SongInfoFields.rows(song, labels)
-        assertThat(rows.map { it.label }).containsExactly(
-            "Title",
-            "Artist",
-            "Album",
-            "Type",
-            "Song of the year",
-            "Lyric type",
-            "Lyric file",
-            "Listens",
-            "Date",
-            "Created date",
-            "File name",
-            "Path",
-            "Id",
-            "Zing id",
-            "Image name",
-            "Image URL",
-            "Stream URL",
-        ).inOrder()
+        assertThat(rows.map { it.label })
+            .containsExactly(
+                "Title",
+                "Artist",
+                "Album",
+                "Type",
+                "Song of the year",
+                "Lyric type",
+                "Lyric file",
+                "Listens",
+                "Date",
+                "Created date",
+                "File name",
+                "Path",
+                "Id",
+                "Zing id",
+                "Image name",
+                "Image URL",
+                "Stream URL",
+            ).inOrder()
         assertThat(rows.single { it.label == "Song of the year" }.value).isEqualTo("None")
         assertThat(rows.single { it.label == "Zing id" }.value).isEqualTo("None")
         assertThat(rows.single { it.label == "Lyric type" }.value).isEqualTo("lrc")
