@@ -379,17 +379,17 @@ Owner follow-up screenshots: leaner app bar, edge-to-edge lyrics, control insets
 | 115 | Five lyric font sizes (default = level 2 Normal). See [115](tasks/115-lyric-font-size-levels.md) | This run |
 | 117 | Schedule listen count when playback starts even if first ExoPlayer position is slightly &gt; 0. See [117](tasks/117-fix-listen-count-schedule.md) | This run |
 
-### Phase 13 — Library chrome & overflow trigger *(this run)*
+### Phase 13 — Library chrome & overflow trigger *(done on `tuta`)*
 
-Owner screenshots: Now Playing ⋮ trigger; library sort left, scrollable chrome, scrollbar, row ⋮ alignment. Task plans: [118](tasks/118-now-playing-overflow-morevert.md)–[122](tasks/122-library-row-more-align.md).
+Owner screenshots: Now Playing ⋮ trigger; library sort left, scrollable chrome, scrollbar, row ⋮ alignment. Task plans: [118](tasks/118-now-playing-overflow-morevert.md)–[122](tasks/122-library-row-more-align.md). Learning: [17 — Library chrome](learning/17-phase13-library-chrome.md).
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 118 | Now Playing overflow trigger uses ⋮ (`MoreVert`), not gear. See [118](tasks/118-now-playing-overflow-morevert.md) | This run |
-| 119 | Library sort pill start-aligned. See [119](tasks/119-library-sort-pill-start.md) | This run |
-| 120 | Library title, search, sort scroll with the list (not pinned). See [120](tasks/120-library-scrollable-chrome.md) | This run |
-| 121 | Vertical scrollbar on library list. See [121](tasks/121-library-scrollbar.md) | This run |
-| 122 | Row ⋮ aligns with search/settings right edge. See [122](tasks/122-library-row-more-align.md) | This run |
+| 118 | Now Playing overflow trigger uses ⋮ (`MoreVert`), not gear. See [118](tasks/118-now-playing-overflow-morevert.md) | Done |
+| 119 | Library sort pill start-aligned. See [119](tasks/119-library-sort-pill-start.md) | Done |
+| 120 | Library title, search, sort scroll with the list (not pinned). See [120](tasks/120-library-scrollable-chrome.md) | Done |
+| 121 | Vertical scrollbar on library list. See [121](tasks/121-library-scrollbar.md) | Done |
+| 122 | Row ⋮ aligns with search/settings right edge. See [122](tasks/122-library-row-more-align.md) | Done |
 
 ## 7. Workflow (mandatory)
 
