@@ -1,6 +1,6 @@
 # Phase 8 — Now Playing polish (owner screenshot review)
 
-[Learning guide index](README.md) · Tasks [080–098](../tasks/080-098-now-playing-polish.md)
+[Learning guide index](README.md) · Tasks [080–098](../tasks/080-098-now-playing-polish.md) · Follow-up [099](../tasks/099-wrapped-karaoke-fill.md)–[102](../tasks/102-control-row-symmetry.md)
 
 **What was built.** Tú reviewed compact-phone screenshots of Now Playing (dark + light) and asked for a tighter player. Web player remains class `BaiHat.js` / `Player.js`. Android extras that stay: line-tap-to-seek, ±5s, speed on the bar, swipe-down to close.
 
@@ -23,8 +23,12 @@
 17. **Status bar (096).** `enableEdgeToEdge` plus `WindowCompat` `isAppearanceLightStatusBars` from **in-app** `AppTheme`, not only system night. Light theme uses dark status-bar icons; the Now Playing app bar uses `surfaceContainerHigh`.
 18. **App bar song (097).** No “Now playing” title. Small rounded cover thumbnail, then title (1 line, ellipsis) and artist (1 line). Duplicate title/artist under the lyric pane is gone.
 19. **Rounded pane (098).** 16.dp corner radius; content is clipped to it.
+20. **Wrapped karaoke fill (099).** Fill walks every *visual* line of the active `Text` (line 1 left→right, then line 2). Web paints a CSS gradient on one word `<span>`; Android concatenates the line into one `Text`, so wrap is `TextLayoutResult` lines, not extra spans.
+21. **Wrap line height (100).** Lyric `Text` uses `lineHeight = fontSize * 1.4` with `LineHeightStyle(Center, Trim.None)` so wrapped rows breathe. Padding between *sentences* is unchanged. Fill still uses `getLineTop` / `getLineBottom`, so it covers the glyphs plus that leading.
+22. **Centered active line (101).** Auto-scroll puts the active row’s vertical center on the pane’s center (web `scrollLyric` uses `offsetHeight/2 + clientHeight/2`). Uses `item.size`, so pinyin/translation rows count. Dragging the list pauses auto-scroll; the next line change recenters.
+23. **Control row symmetry (102).** Speed is a 48.dp `LiliIconButton` (`1.0×` + tooltip) matching play-mode’s 48.dp target (play-mode glyph is slightly larger). Left and right of Play are `weight(1f)` groups so Play is the screen’s horizontal center.
 
-**Status:** this PR (Phase 8). Phase 7 075–076 merged in [PR #23](https://github.com/anhtuta/lili-music-android/pull/23).
+**Status:** PR #24 merged 080–098. Follow-up 099–102 is this PR. Phase 7 075–076 merged in [PR #23](https://github.com/anhtuta/lili-music-android/pull/23).
 
 ## New terms
 
@@ -58,6 +62,13 @@
 | `onPostScroll` `available.y` | Pixels the list did **not** consume (overscroll) | `scrollTop === 0` and the finger still moves down |
 | `TextOverflow.Ellipsis` | Truncate with `…` | CSS `text-overflow: ellipsis; white-space: nowrap` |
 | `clip(RoundedCornerShape)` | Round corners and hide children that stick out | `border-radius: 16px; overflow: hidden` on `.lyric-wrapper` |
+| `TextLayoutResult` | After `Text` lays out, the positions of every glyph and visual line | `Range.getClientRects()` / a canvas `measureText` plus wrap; web karaoke does not need this because each word is its own `<span>` |
+| `getLineForOffset` / `getLineLeft` / `getLineRight` | Which visual line an index sits on, and that line’s x edges | `getClientRects()[n]` for a wrapped DOM node. Do **not** use `getHorizontalPosition(getLineEnd())` — that x can jump to the *next* line |
+| `lineHeight` | Paragraph leading as a `TextUnit` (`1.4 * fontSize`) | CSS `line-height: 1.4` |
+| `LineHeightStyle` (`alignment = Center`, `trim = None`) | Extra leading is split above and below the glyphs and is **not** clipped off the first/last line | CSS `line-height` with no `leading-trim`; Android otherwise trims like `line-height: 1` on the first/last wrap |
+| `LazyListState.animateScrollBy` | Animate a pixel delta after you know `item.offset` / `item.size` | `element.scrollBy({ top, behavior: 'smooth' })`. `animateScrollToItem(index)` is `scrollIntoView` aligned to the **top** |
+| `collectIsDraggedAsState` | True while a pointer drag is in progress on the list | `pointerdown`…`pointerup` on the scroller; skip `scrollLyric` while the user is dragging |
+| `Modifier.weight(1f)` on sibling `Row`s | Two groups share leftover width **equally** around Play | CSS `flex: 1` on `.left` and `.right` with the play button in between; not `justify-content: space-between` with unequal ends |
 
 Why line tap both seeks **and** reveals offset: line `clickable` already owns the tap. Revealing on that same tap keeps scrolling intact (an outer `clickable` on the pane fights `LazyColumn`). Empty space uses `detectTapGestures` on the list, which fires on tap but not on a drag-scroll.
 
@@ -66,17 +77,20 @@ Why swipe-down uses leftover nested scroll, not a screen-wide drag: a screen dra
 ## Code to focus on
 
 1. [PlayMode.kt](../../core/model/src/main/java/com/anhtuta/lilimusic/core/model/PlayMode.kt) — `cycle()`.
-2. [PlayerControls.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerControls.kt) — one row: speed chip, transport, play mode, slim `Slider`.
+2. [PlayerControls.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerControls.kt) — one row: equal-weight left/right groups around 64.dp Play; compact speed + play mode.
 3. [LiliFilledIconButton.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/button/LiliFilledIconButton.kt) — 64.dp Play/Pause.
 4. [PlayerScreen.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerScreen.kt) — app bar cover+title+artist, palette gradient, handle, rounded `LyricSlot`, nested-scroll dismiss.
 5. [PlayerLyricHandle.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerLyricHandle.kt) — drag + tap + tooltip.
 6. [NowPlayingDismiss.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/NowPlayingDismiss.kt) — leftover downward overscroll.
-7. [LyricsPane.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/LyricsPane.kt) — offset overlay, line tap seeks and reveals.
+7. [LyricsPane.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/LyricsPane.kt) — offset overlay, line tap seeks and reveals; auto-scroll centers the active row.
 8. [LyricEdgeFade.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/LyricEdgeFade.kt) — `DstIn` mask.
 9. [LyricThemeColors.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/theme/LyricThemeColors.kt) — `isEffectiveLight`, `sungText`.
 10. [CoverPalette.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/palette/CoverPalette.kt) — `nowPlayingGradient`.
 11. [SystemBarAppearance.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/theme/SystemBarAppearance.kt) + [LiliApp.kt](../../app/src/main/java/com/anhtuta/lilimusic/LiliApp.kt) `ApplySystemBarAppearance`.
-12. [PlayerScreenPolishTest.kt](../../feature/player/src/test/java/com/anhtuta/lilimusic/feature/player/PlayerScreenPolishTest.kt) — play mode cycle, handle, single row, tooltips, dark theme.
+12. [PlayerScreenPolishTest.kt](../../feature/player/src/test/java/com/anhtuta/lilimusic/feature/player/PlayerScreenPolishTest.kt) — play mode cycle, handle, single row, tooltips, dark theme, centered Play.
+13. [KaraokeFill.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/KaraokeFill.kt) `karaokeFillExtents` — per-visual-line fill.
+14. [LyricLineMetrics.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/LyricLineMetrics.kt) — 1.4× `lineHeight`.
+15. [LyricPaneScroll.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/LyricPaneScroll.kt) — `centerDelta` / `shouldAutoScroll`.
 
 Play mode cycle (from `PlayMode`):
 
@@ -111,6 +125,23 @@ ApplySystemBarAppearance(darkTheme = darkTheme)
 WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
 ```
 
+Wrapped karaoke fill (from `KaraokeFill`):
+
+```kotlin
+for (line in startLine..endLine) {
+    val segment = visualLineSegment(layout, line, rangeStart, rangeEndExclusive) ?: continue
+    segments += segment
+}
+var remaining = totalWidth * fill
+```
+
+Centered active line (from `LyricPaneScroll`):
+
+```kotlin
+fun centerDelta(viewportStart: Int, viewportEnd: Int, itemOffset: Int, itemSize: Int): Int =
+    (itemOffset + itemSize / 2) - (viewportStart + viewportEnd) / 2
+```
+
 ## How to test on the arm64 emulator
 
 From the repo root, with the emulator already running (`make emulator` if you use that target):
@@ -127,3 +158,5 @@ That installs the debug APK. Then:
 4. **Offset:** tap a lyric line — it seeks **and** minus/plus appear; they vanish after a few seconds. They must not survive a song change or an app restart.
 5. **Swipe down** on the pane when lyrics are at the top: Now Playing closes to the mini player. Swipe should still scroll lyrics when not at the top.
 6. Toggle **Settings → appearance** light/dark (not only the system theme): status-bar icons flip, the light lyric pane is `#DFDFDF` with blue karaoke (not grey + yellow), transport icons stay visible on dark.
+7. **Wrapped karaoke:** a long Chinese TRC line should fill the first wrapped row, then the next (`走` last). Wrapped rows should have a little gap. The active sentence sits in the **middle** of the pane, not the top.
+8. **Play button:** it should sit on the screen’s horizontal center; speed (`1.0×`) and play-mode icons look like matching 48.dp ends.
