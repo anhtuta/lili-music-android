@@ -256,7 +256,6 @@ private fun CompactPlayerBody(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
                 .animateContentSize(),
     ) {
         LyricSlot(
@@ -292,14 +291,14 @@ private fun ExpandedPlayerBody(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
                 .animateContentSize(),
     ) {
         Row(
             modifier =
                 Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(start = 24.dp),
         ) {
             if (!lyricsExpanded) {
                 Column(
@@ -344,7 +343,6 @@ private fun LyricSlot(
     Box(
         modifier =
             modifier
-                .clip(RoundedCornerShape(LyricPaneShape.CornerRadius))
                 .testTag(PlayerTestTags.LYRICS),
     ) {
         if (expanded) {
