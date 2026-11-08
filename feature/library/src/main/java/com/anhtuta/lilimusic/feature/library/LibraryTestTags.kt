@@ -28,6 +28,8 @@ object LibraryTestTags {
 
     fun cover(id: Long): String = "library-cover-$id"
 
+    fun playbackBadge(id: Long): String = "library-playback-badge-$id"
+
     fun listens(id: Long): String = "library-listens-$id"
 
     fun soy(id: Long): String = "library-soy-$id"

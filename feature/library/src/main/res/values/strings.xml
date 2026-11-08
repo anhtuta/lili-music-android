@@ -23,6 +23,8 @@
     <string name="library_error">Couldn’t refresh the catalog</string>
     <string name="library_retry">Retry</string>
     <string name="library_cover_cd">Cover art for %1$s</string>
+    <string name="library_now_playing_badge_cd">Now playing: %1$s</string>
+    <string name="library_paused_badge_cd">Paused: %1$s</string>
     <string name="library_cover_placeholder_cd">No cover art for %1$s</string>
     <string name="library_cover_preview_cd">Full-size cover art for %1$s</string>
     <string name="library_cover_preview_caption">%1$s - %2$s</string>

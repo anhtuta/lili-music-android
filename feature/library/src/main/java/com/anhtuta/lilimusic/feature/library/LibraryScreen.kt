@@ -210,6 +210,8 @@ private fun LibraryCatalog(
                     LibrarySongRow(
                         song = song,
                         soyYears = soyYears,
+                        isNowPlaying = state.nowPlayingPath == song.path,
+                        isPlaying = state.isPlaying,
                         coverUrl = state.coverUrl(song),
                         unavailableOffline = state.isUnavailableOffline(song.path),
                         downloadStatus = state.status(song.path),
