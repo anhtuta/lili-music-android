@@ -339,6 +339,11 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 103 | Compact Now Playing download / lyric-card / settings glyphs (~20.dp) with ≥40.dp touch targets. See [103](tasks/103-compact-app-bar-actions.md) | This PR |
 | 104 | Overflowing app-bar title and artist marquee slowly; drag to scroll; fitting text stays still. See [104](tasks/104-app-bar-marquee.md) | This PR |
 | 105 | App-bar artist is muted (`onSurface` ~0.65 alpha) so the title stands out. See [105](tasks/105-deemphasize-artist.md) | This PR |
+| 106 | Compact Library search (~44–48.dp) with placeholder. See [106](tasks/106-compact-library-search.md) | This PR |
+| 107 | One sort pill + dropdown instead of chips. See [107](tasks/107-library-sort-pill.md) | This PR |
+| 108 | Library row: title, artist, listens, soy only (no type/date wrap). See [108](tasks/108-library-row-fields.md) | This PR |
+| 109 | Listens (icon) left, soy badge right on one row. See [109](tasks/109-listens-soy-row.md) | This PR |
+| 110 | Row overflow menu: song info dialog + 074 download states. See [110](tasks/110-song-more-menu.md) | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -366,7 +371,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 
 ## 9. This-run deliverable
 
-PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–105**: wrapped karaoke fill, lyric line height, centered active line, symmetric control row, compact app-bar actions, marquee title/artist, and a muted artist line. See [099](tasks/099-wrapped-karaoke-fill.md)–[105](tasks/105-deemphasize-artist.md).
+PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–110**: Now Playing wrap/center/app-bar polish plus Library search, sort pill, slimmer rows, and a song-info menu. See [099](tasks/099-wrapped-karaoke-fill.md)–[110](tasks/110-song-more-menu.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
