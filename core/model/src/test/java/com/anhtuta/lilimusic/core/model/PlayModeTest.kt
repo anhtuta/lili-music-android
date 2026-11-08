@@ -19,6 +19,13 @@ class PlayModeTest {
     }
 
     @Test
+    fun cycleFollowsWebPlayTypeListOrder() {
+        assertThat(PlayMode.SEQUENCE.cycle()).isEqualTo(PlayMode.SHUFFLE)
+        assertThat(PlayMode.SHUFFLE.cycle()).isEqualTo(PlayMode.REPEAT_ONE)
+        assertThat(PlayMode.REPEAT_ONE.cycle()).isEqualTo(PlayMode.SEQUENCE)
+    }
+
+    @Test
     fun shuffleAndRepeatOneEachToggleBackToSequence() {
         assertThat(PlayMode.SEQUENCE.toggleShuffle()).isEqualTo(PlayMode.SHUFFLE)
         assertThat(PlayMode.SHUFFLE.toggleShuffle()).isEqualTo(PlayMode.SEQUENCE)
