@@ -1,6 +1,6 @@
 # Phase 8 — Now Playing polish (owner screenshot review)
 
-[Learning guide index](README.md) · Tasks [080–098](../tasks/080-098-now-playing-polish.md) · Follow-up [099](../tasks/099-wrapped-karaoke-fill.md)–[102](../tasks/102-control-row-symmetry.md)
+[Learning guide index](README.md) · Tasks [080–098](../tasks/080-098-now-playing-polish.md) · Follow-up [099](../tasks/099-wrapped-karaoke-fill.md)–[105](../tasks/105-deemphasize-artist.md)
 
 **What was built.** Tú reviewed compact-phone screenshots of Now Playing (dark + light) and asked for a tighter player. Web player remains class `BaiHat.js` / `Player.js`. Android extras that stay: line-tap-to-seek, ±5s, speed on the bar, swipe-down to close.
 
@@ -21,14 +21,17 @@
 15. **Swipe down (094).** Nested-scroll leftover downward overscroll closes Now Playing to the previous screen / mini player. Disabled while lyrics are expanded so it does not fight the handle or lyric scrolling.
 16. **Dark-mode audit (095).** Default icon tint is `onSurface`. Library / downloads / settings / lyric card / player Compose tests render in `LiliTheme(darkTheme = true)` and still find Back / Settings / transport by contentDescription.
 17. **Status bar (096).** `enableEdgeToEdge` plus `WindowCompat` `isAppearanceLightStatusBars` from **in-app** `AppTheme`, not only system night. Light theme uses dark status-bar icons; the Now Playing app bar uses `surfaceContainerHigh`.
-18. **App bar song (097).** No “Now playing” title. Small rounded cover thumbnail, then title (1 line, ellipsis) and artist (1 line). Duplicate title/artist under the lyric pane is gone.
+18. **App bar song (097).** No “Now playing” title. Small rounded cover thumbnail, then title and artist (one line each). Duplicate title/artist under the lyric pane is gone. Overflow now marquees (104) instead of ellipsis.
 19. **Rounded pane (098).** 16.dp corner radius; content is clipped to it.
 20. **Wrapped karaoke fill (099).** Fill walks every *visual* line of the active `Text` (line 1 left→right, then line 2). Web paints a CSS gradient on one word `<span>`; Android concatenates the line into one `Text`, so wrap is `TextLayoutResult` lines, not extra spans.
 21. **Wrap line height (100).** Lyric `Text` uses `lineHeight = fontSize * 1.4` with `LineHeightStyle(Center, Trim.None)` so wrapped rows breathe. Padding between *sentences* is unchanged. Fill still uses `getLineTop` / `getLineBottom`, so it covers the glyphs plus that leading.
 22. **Centered active line (101).** Auto-scroll puts the active row’s vertical center on the pane’s center (web `scrollLyric` uses `offsetHeight/2 + clientHeight/2`). Uses `item.size`, so pinyin/translation rows count. Dragging the list pauses auto-scroll; the next line change recenters.
 23. **Control row symmetry (102).** Speed is a 48.dp `LiliIconButton` (`1.0×` + tooltip) matching play-mode’s 48.dp target (play-mode glyph is slightly larger). Left and right of Play are `weight(1f)` groups so Play is the screen’s horizontal center.
+24. **Compact app-bar actions (103).** Download / lyric card / settings glyphs are 20.dp in 40.dp buttons; `minimumInteractiveComponentSize()` keeps a 48.dp tap target. Tooltips and 074 download states stay. Back stays the default size.
+25. **Marquee title/artist (104).** Overflowing lines `horizontalScroll` slowly (~35 dp/s), pause ~1.75s at the end, jump back, repeat. Fitting text does not move. Drag to scroll; auto-scroll resumes after a short pause. Web `#song_title` / `#song_artist` in `Player.js` do not marquee.
+26. **Muted artist (105).** App-bar artist is `onSurface` at 0.65 alpha, regular `bodySmall`, so the title stands out in light and dark.
 
-**Status:** PR #24 merged 080–098. Follow-up 099–102 is this PR. Phase 7 075–076 merged in [PR #23](https://github.com/anhtuta/lili-music-android/pull/23).
+**Status:** PR #24 merged 080–098. Follow-up 099–105 is this PR. Phase 7 075–076 merged in [PR #23](https://github.com/anhtuta/lili-music-android/pull/23).
 
 ## New terms
 
@@ -69,6 +72,11 @@
 | `LazyListState.animateScrollBy` | Animate a pixel delta after you know `item.offset` / `item.size` | `element.scrollBy({ top, behavior: 'smooth' })`. `animateScrollToItem(index)` is `scrollIntoView` aligned to the **top** |
 | `collectIsDraggedAsState` | True while a pointer drag is in progress on the list | `pointerdown`…`pointerup` on the scroller; skip `scrollLyric` while the user is dragging |
 | `Modifier.weight(1f)` on sibling `Row`s | Two groups share leftover width **equally** around Play | CSS `flex: 1` on `.left` and `.right` with the play button in between; not `justify-content: space-between` with unequal ends |
+| `minimumInteractiveComponentSize()` | Expand a smaller visual button so the tap target is still ~48.dp | CSS `min-width/min-height: 48px` (or padding) around a 20px icon; Apple/Google “minimum touch target” |
+| `ScrollState` | Pixel offset + max of a scrollable | `element.scrollLeft` / `scrollWidth - clientWidth` |
+| `horizontalScroll(ScrollState)` | Make a child wider than the viewport and let the user drag it | CSS `overflow-x: auto` on a nowrap line |
+| `ScrollState.animateScrollTo` | Animate `scrollLeft` to a value with a duration/easing | `element.scrollTo({ left, behavior: 'smooth' })` but we pass a **linear** `tween` so speed is constant (~35 dp/s) |
+| `LaunchedEffect` loop | Coroutine that restarts when keys change (`text`, overflow, dragging) | `setInterval` / a `while (true) { await delay; scroll }` that is cleared when the song changes |
 
 Why line tap both seeks **and** reveals offset: line `clickable` already owns the tap. Revealing on that same tap keeps scrolling intact (an outer `clickable` on the pane fights `LazyColumn`). Empty space uses `detectTapGestures` on the list, which fires on tap but not on a drag-scroll.
 
@@ -91,6 +99,7 @@ Why swipe-down uses leftover nested scroll, not a screen-wide drag: a screen dra
 13. [KaraokeFill.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/KaraokeFill.kt) `karaokeFillExtents` — per-visual-line fill.
 14. [LyricLineMetrics.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/LyricLineMetrics.kt) — 1.4× `lineHeight`.
 15. [LyricPaneScroll.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/LyricPaneScroll.kt) — `centerDelta` / `shouldAutoScroll`.
+16. [MarqueeText.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/text/MarqueeText.kt) — slow `horizontalScroll` loop; skip when `maxValue == 0` or the user is dragging.
 
 Play mode cycle (from `PlayMode`):
 
@@ -160,3 +169,5 @@ That installs the debug APK. Then:
 6. Toggle **Settings → appearance** light/dark (not only the system theme): status-bar icons flip, the light lyric pane is `#DFDFDF` with blue karaoke (not grey + yellow), transport icons stay visible on dark.
 7. **Wrapped karaoke:** a long Chinese TRC line should fill the first wrapped row, then the next (`走` last). Wrapped rows should have a little gap. The active sentence sits in the **middle** of the pane, not the top.
 8. **Play button:** it should sit on the screen’s horizontal center; speed (`1.0×`) and play-mode icons look like matching 48.dp ends.
+9. **App-bar actions:** download / lyric card / settings glyphs are smaller than Back; long-press still shows a tooltip; download progress still cancels.
+10. **App-bar text:** a long title/artist scrolls slowly, then jumps back; a short one stays still. You can drag it. The artist is paler than the title in both themes.
