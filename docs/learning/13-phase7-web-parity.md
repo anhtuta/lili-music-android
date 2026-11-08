@@ -1,6 +1,6 @@
-# Phase 7 — compact now-playing, transport icons, lyric-card fonts, cancel download
+# Phase 7 — compact now-playing, transport icons, lyric-card fonts, cancel download, smooth TRC karaoke
 
-[Learning guide index](README.md) · Tasks [070](../tasks/070-compact-lyrics.md), [071](../tasks/071-transport-icons.md), [072](../tasks/072-lyric-card-fonts.md), [073](../tasks/073-cancel-download.md), [074](../tasks/074-download-action-icon.md)
+[Learning guide index](README.md) · Tasks [070](../tasks/070-compact-lyrics.md), [071](../tasks/071-transport-icons.md), [072](../tasks/072-lyric-card-fonts.md), [073](../tasks/073-cancel-download.md), [074](../tasks/074-download-action-icon.md), [075](../tasks/075-smooth-trc-karaoke.md)
 
 **What was built.** Owner-picked follow-ups after PR #21:
 
@@ -9,8 +9,9 @@
 3. **Lyric-card fonts (072).** The web card loads Google Fonts `Lavishly Yours`, `Lobster`, `Pacifico`, `Borel` (OFL). Those Regular TTFs are now `res/font` in `:feature:lyrics`. The picker and JPEG export use them. Open Sans / Verdana / Georgia stay system sans/serif so we do not ship extra families.
 4. **Cancel download (073).** Queued or downloading songs get **Cancel**. That stops Media3 (`engine.remove` → `DownloadService.sendRemoveDownload`), deletes the partial cover and lyric cache, and deletes the Room `downloads` row so the UI returns to not-downloaded. Completed/failed still use Delete (which keeps the lyric cache for online play).
 5. **Download action icons (074).** Library rows and Now playing no longer show a text **Download** button. Idle is `Icons.Filled.Download` (contentDescription **Download**), queued/downloading is a `CircularProgressIndicator` (**Cancel**, tap still runs 073), completed is `DownloadDone` (**Delete**), failed is `Refresh` (**Retry**). The Downloads screen still uses text Cancel / Delete / Retry.
+6. **Smooth `.trc` karaoke (075).** Web `BaiHatService.runKaraokeEffect` writes a CSS `linear-gradient` on the **current word span** from `HTMLAudioElement.currentTime` (a continuous clock, sampled every 30ms). Android copied ExoPlayer `currentPosition` every 30ms and rebuilt the whole line’s `AnnotatedString` + per-word brush. LRC lines last seconds, so a coarse clock still looks smooth; TRC words are often 150–400ms, so the same tick jumped ~15%+ of a word. The 066 brush was already fractional (`word.fill` as a hard-stop, like CSS `process%`). Fix: interpolate `position + elapsedRealtimeDelta * speed` on vsync (`withFrameNanos`), paint fill in **draw** (`drawWithContent` + `SrcAtop`) so the remembered `AnnotatedString` does not include fill. `.xtrc` is still TRC without translations (web comment: “future”; the `else` branch already builds TRC spans with `hasTranslation = false`).
 
-**Status:** This PR.
+**Status:** 070–074 merged in [PR #22](https://github.com/anhtuta/lili-music-android/pull/22). 075 is this PR.
 
 ## New terms
 
@@ -33,6 +34,13 @@
 | `item.isActive` | `QUEUED` or `DOWNLOADING` | A row still in the download queue |
 | `CircularProgressIndicator` | Material spinner; determinate takes `progress = { 0f..1f }` | A CSS spinner / `<progress>`; tap target is still the `IconButton` |
 | `DownloadDone` | Check-on-download Material icon | A “downloaded” badge, not a separate “Delete” text label |
+| `Player.currentPosition` | ExoPlayer’s last known media time, millisecond, often **held** between renderer updates | `HTMLAudioElement.currentTime` is a float that keeps moving; web karaoke can sample it every 30ms and still look continuous |
+| `SystemClock.elapsedRealtime()` | Monotonic ms since boot (not wall clock) | `performance.now()`; used to interpolate between coarse player samples |
+| `withFrameNanos` | Compose suspends until the next vsync, then runs the lambda | `requestAnimationFrame`; one loop for karaoke, not N per line |
+| `drawWithContent` | Draw the composable, then extra drawing in the **draw** phase | Setting `style` on a DOM span without React re-render (`runKaraokeEffect`) |
+| `CompositingStrategy.Offscreen` | Render this node to its own layer so blend modes see glyph alpha | An offscreen canvas; without it `SrcAtop` can tint the backdrop, not the letters |
+| `BlendMode.SrcAtop` | Paint fill only where text already has alpha | CSS `background-clip: text` + `linear-gradient` on the current word |
+| `MutableLongState` read in draw | Snapshot invalidates **draw**, not composition, if composition never reads the value | Mutating a CSS variable; the span’s text node stays the same |
 
 Why 720.dp and not Compact 600.dp? Web CSS is `max-width: 720px`. Material Compact would hide the cover on a 7″ tablet in portrait (~600–700.dp) while the web still showed it. `BoxWithConstraints.maxWidth` is the Now playing pane, which matches “how wide is this player” better than the activity’s window class.
 
@@ -49,6 +57,9 @@ Why cancel also deletes lyrics, but delete-completed does not? Online play still
 7. [DownloadsScreen.kt](../../feature/downloads/src/main/java/com/anhtuta/lilimusic/feature/downloads/DownloadsScreen.kt) — Cancel on `isActive`, Delete otherwise.
 8. [LibraryViewModel.kt](../../feature/library/src/main/java/com/anhtuta/lilimusic/feature/library/LibraryViewModel.kt) / [PlayerViewModel.kt](../../feature/player/src/main/java/com/anhtuta/lilimusic/feature/player/PlayerViewModel.kt) — download action on QUEUED/DOWNLOADING calls `cancel`.
 9. [DownloadActionButton.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/download/DownloadActionButton.kt) — shared icon; tests use `onNodeWithContentDescription("Download")`.
+10. [PlaybackPositionInterpolator.kt](../../core/lyrics/src/main/java/com/anhtuta/lilimusic/core/lyrics/PlaybackPositionInterpolator.kt) — fake-clock tests; pause / missing stamp return the sampled position.
+11. [KaraokeFill.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/KaraokeFill.kt) — remembered line structure, vsync display time, draw-phase fill of the active word only.
+12. [Media3PlayerController.kt](../../core/playback/src/main/java/com/anhtuta/lilimusic/core/playback/Media3PlayerController.kt) — `positionSampledAtElapsedMs` stamped only when `currentPosition` or play-state changes.
 
 Compact vs expanded (from `PlayerBody`):
 
@@ -100,3 +111,17 @@ IconButton(
     }
 }
 ```
+
+Interpolator (from `PlaybackPositionInterpolator`; tests use a fake clock):
+
+```kotlin
+fun interpolate(snapshot: Snapshot, nowElapsedMs: Long): Long {
+    if (!snapshot.isPlaying || snapshot.capturedAtElapsedMs <= 0L) {
+        return snapshot.positionMs
+    }
+    val elapsedMs = (nowElapsedMs - snapshot.capturedAtElapsedMs).coerceAtLeast(0L)
+    return snapshot.positionMs + (elapsedMs * snapshot.speed).toLong()
+}
+```
+
+Why LRC looked fine: one span per line, often several seconds, so a 30ms ExoPlayer hold is ~1% of the fill. Why TRC jumped: many short word spans; the same hold is a visible chunk of the word, and rebuilding `AnnotatedString` on every tick dropped frames. Web never re-rendered React for the gradient — it set `style` on the current `<span>`.
