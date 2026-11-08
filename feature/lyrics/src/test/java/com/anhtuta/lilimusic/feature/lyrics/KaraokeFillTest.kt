@@ -55,6 +55,21 @@ class KaraokeFillTest {
         assertThat(brush).isEqualTo(SolidColor(Color.Gray))
     }
 
+    @Test
+    fun passedKaraokeBrushUsesDimmedSungColor() {
+        val word = testWord(fill = 1f, isActive = false, isPassed = true)
+        val sung = Color.Red.copy(alpha = 0.55f)
+        val brush =
+            wordBrush(
+                word = word,
+                karaokeMode = true,
+                fillColor = Color.Red,
+                restColor = Color.Gray,
+                sungColor = sung,
+            )
+        assertThat(brush).isEqualTo(SolidColor(sung))
+    }
+
     private fun lineOf(word: LyricWordFrame): LyricLineFrame =
         LyricLineFrame(
             words = listOf(word),

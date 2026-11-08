@@ -1,6 +1,7 @@
 package com.anhtuta.lilimusic.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -16,6 +17,7 @@ class LyricThemeColorsTest {
         assertThat(colors.text).isEqualTo(Color(0xFFDFDFDF))
         assertThat(colors.activeText).isEqualTo(Color.White)
         assertThat(colors.karaokeFill).isEqualTo(Color(0xFFFFCC00))
+        assertThat(colors.sungText.alpha).isWithin(0.01f).of(0.55f)
         assertThat(colors.overlay).isEqualTo(Color.Transparent)
     }
 
@@ -26,15 +28,24 @@ class LyricThemeColorsTest {
         assertThat(colors.text).isEqualTo(Color(0xFF333333))
         assertThat(colors.activeText).isEqualTo(Color(0xFF575757))
         assertThat(colors.karaokeFill).isEqualTo(Color(0xFF2199F9))
+        assertThat(colors.sungText.alpha).isWithin(0.01f).of(0.55f)
     }
 
     @Test
-    fun pictureBgIsTransparentWithDarkOverlay() {
-        val colors = LyricTheme.PICTURE_BG.colors()
+    fun pictureBgWithCoverIsTransparentWithDarkOverlayAndYellowFill() {
+        val colors = LyricTheme.PICTURE_BG.colors(hasCover = true)
         assertThat(colors.background).isEqualTo(Color.Transparent)
         assertThat(colors.text).isEqualTo(Color(0xFFDFDFDF))
         assertThat(colors.activeText).isEqualTo(Color.White)
         assertThat(colors.karaokeFill).isEqualTo(Color(0xFFFFCC00))
         assertThat(colors.overlay.alpha).isWithin(0.01f).of(0.4f)
+    }
+
+    @Test
+    fun pictureBgWithoutCoverOnLightAppUsesLightLyricSurface() {
+        val colors = LyricTheme.PICTURE_BG.colors(appTheme = AppTheme.LIGHT, hasCover = false)
+        assertThat(colors.background).isEqualTo(Color(0xFFDFDFDF))
+        assertThat(colors.text).isEqualTo(Color(0xFF333333))
+        assertThat(colors.karaokeFill).isEqualTo(Color(0xFF2199F9))
     }
 }
