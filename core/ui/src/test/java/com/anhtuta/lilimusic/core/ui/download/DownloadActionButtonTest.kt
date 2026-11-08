@@ -81,7 +81,7 @@ class DownloadActionButtonTest {
         }
         val glyph =
             composeRule
-                .onNodeWithTag(DownloadActionTags.GLYPH, useUnmergedTree = true)
+                .onNodeWithTag(DownloadActionGlyphTag, useUnmergedTree = true)
                 .getUnclippedBoundsInRoot()
         assertThat(glyph.bottom.value - glyph.top.value).isWithin(1.5f).of(20f)
         val button = composeRule.onNodeWithTag("compact-download").getUnclippedBoundsInRoot()

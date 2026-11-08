@@ -76,7 +76,7 @@ class MarqueeTextTest {
                 holder.state = scroll
                 Box(modifier = Modifier.width(12.dp)) {
                     MarqueeText(
-                        text = LONG_TITLE,
+                        text = LongTitle,
                         style = MaterialTheme.typography.titleMedium.copy(fontSize = 48.sp),
                         scrollState = scroll,
                     )
@@ -104,7 +104,7 @@ class MarqueeTextTest {
                             .height(56.dp),
                 ) {
                     MarqueeText(
-                        text = LONG_TITLE,
+                        text = LongTitle,
                         style = MaterialTheme.typography.titleMedium.copy(fontSize = 48.sp),
                         scrollState = scroll,
                         modifier = Modifier.testTag("marquee"),
@@ -129,5 +129,5 @@ private class ScrollHolder {
     var state: ScrollState? = null
 }
 
-private const val LONG_TITLE =
+private const val LongTitle =
     "All Falls Down by Alan Walker, Noah Cyrus, Digital Farm Animals and still more words"
