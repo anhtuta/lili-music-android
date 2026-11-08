@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
@@ -77,75 +78,107 @@ internal fun LibrarySortPill(
                 tooltip = { PlainTooltip { Text(text = tooltip) } },
                 state = rememberTooltipState(),
             ) {
-                Surface(
+                SortPillButton(
+                    fieldLabel = fieldLabel,
+                    orderLabel = orderLabel,
+                    tooltip = tooltip,
+                    arrow = arrow,
                     onClick = { expanded = true },
-                    shape = RoundedCornerShape(50),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier =
-                        Modifier
-                            .testTag(LibraryTestTags.SORT_PILL)
-                            .semantics { contentDescription = tooltip },
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = fieldLabel.uppercase(Locale.US),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                        Icon(
-                            imageVector = arrow,
-                            contentDescription = orderLabel,
-                            modifier =
-                                Modifier
-                                    .padding(start = 8.dp)
-                                    .size(16.dp)
-                                    .testTag(LibraryTestTags.SORT_ORDER),
-                        )
-                    }
-                }
+                )
             }
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.testTag(LibraryTestTags.SORT_MENU),
             ) {
-                SongSort.entries.forEach { sort ->
-                    val label = stringResource(sort.labelRes())
-                    DropdownMenuItem(
-                        text = { Text(text = label) },
-                        onClick = {
-                            onSortFieldChosen(sort)
-                            expanded = false
-                        },
-                        leadingIcon =
-                            if (sort == selected) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = stringResource(R.string.library_sort_current),
-                                    )
-                                }
-                            } else {
-                                null
-                            },
-                        trailingIcon =
-                            if (sort == selected) {
-                                {
-                                    Icon(
-                                        imageVector = arrow,
-                                        contentDescription = orderLabel,
-                                    )
-                                }
-                            } else {
-                                null
-                            },
-                        modifier = Modifier.testTag(LibraryTestTags.sort(sort)),
-                    )
-                }
+                LibrarySortMenuItems(
+                    selected = selected,
+                    orderLabel = orderLabel,
+                    arrow = arrow,
+                    onSortFieldChosen = { sort ->
+                        onSortFieldChosen(sort)
+                        expanded = false
+                    },
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun LibrarySortMenuItems(
+    selected: SongSort,
+    orderLabel: String,
+    arrow: ImageVector,
+    onSortFieldChosen: (SongSort) -> Unit,
+) {
+    SongSort.entries.forEach { sort ->
+        val label = stringResource(sort.labelRes())
+        DropdownMenuItem(
+            text = { Text(text = label) },
+            onClick = { onSortFieldChosen(sort) },
+            leadingIcon =
+                if (sort == selected) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = stringResource(R.string.library_sort_current),
+                        )
+                    }
+                } else {
+                    null
+                },
+            trailingIcon =
+                if (sort == selected) {
+                    {
+                        Icon(
+                            imageVector = arrow,
+                            contentDescription = orderLabel,
+                        )
+                    }
+                } else {
+                    null
+                },
+            modifier = Modifier.testTag(LibraryTestTags.sort(sort)),
+        )
+    }
+}
+
+@Composable
+private fun SortPillButton(
+    fieldLabel: String,
+    orderLabel: String,
+    tooltip: String,
+    arrow: ImageVector,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier =
+            Modifier
+                .testTag(LibraryTestTags.SORT_PILL)
+                .semantics { contentDescription = tooltip },
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = fieldLabel.uppercase(Locale.US),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Icon(
+                imageVector = arrow,
+                contentDescription = orderLabel,
+                modifier =
+                    Modifier
+                        .padding(start = 8.dp)
+                        .size(16.dp)
+                        .testTag(LibraryTestTags.SORT_ORDER),
+            )
         }
     }
 }
