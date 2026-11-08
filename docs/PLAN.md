@@ -332,6 +332,10 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 096 | `enableEdgeToEdge` + `SystemBarStyle` from **in-app** theme; light status-bar icons dark on light | This PR |
 | 097 | App bar shows cover thumbnail + title/artist; drop “Now playing” title and the duplicate block below lyrics | This PR |
 | 098 | ~16.dp corner radius on the lyric pane; clip content | This PR |
+| 099 | Karaoke fill progresses across every wrapped visual line (not only the last). See [099](tasks/099-wrapped-karaoke-fill.md) | This PR |
+| 100 | Wrapped lyric lines use ~1.4× lineHeight (`LineHeightStyle` center, trim none). See [100](tasks/100-lyric-wrap-line-height.md) | This PR |
+| 101 | Auto-scroll centers the active lyric line in the pane (web `scrollLyric`). See [101](tasks/101-center-active-lyric.md) | This PR |
+| 102 | Transport row: equal-weight left/right groups, centered Play, matching speed/play-mode targets. See [102](tasks/102-control-row-symmetry.md) | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -359,7 +363,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 
 ## 9. This-run deliverable
 
-PR #23 merged Phase 7 **075–076** on main. This PR is Phase 8 **080–098**: Now Playing polish from the owner’s compact-phone screenshots. See [080–098](tasks/080-098-now-playing-polish.md) for web diffs and the per-item approach.
+PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–102**: wrapped karaoke fill, lyric line height, centered active line, and a symmetric control row. See [099](tasks/099-wrapped-karaoke-fill.md), [100](tasks/100-lyric-wrap-line-height.md), [101](tasks/101-center-active-lyric.md), [102](tasks/102-control-row-symmetry.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
