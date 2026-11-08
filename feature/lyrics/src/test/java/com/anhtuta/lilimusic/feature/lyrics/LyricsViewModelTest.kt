@@ -90,7 +90,8 @@ class LyricsViewModelTest {
         runTest {
             val controller = FakePlayerController()
             val repository = FakeLyricRepository(LyricLoadResult.Ready(sampleParsedLyric()))
-            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
+            val settings = FakeSettingsRepository()
+            val viewModel = LyricsViewModel(controller, repository, settings)
             controller.play(listOf(song, other), "alpha")
 
             viewModel.nudgeOffset(LyricSynchronizer.USER_OFFSET_STEP_MS)
@@ -99,6 +100,7 @@ class LyricsViewModelTest {
                 assertThat(offset.frame?.userOffsetMs).isEqualTo(100L)
                 cancelAndIgnoreRemainingEvents()
             }
+            assertThat(settings.writeCount).isEqualTo(0)
 
             controller.play(listOf(song, other), "beta")
             viewModel.uiState.test {
@@ -106,6 +108,7 @@ class LyricsViewModelTest {
                 assertThat(reset.userOffsetMs).isEqualTo(0L)
                 cancelAndIgnoreRemainingEvents()
             }
+            assertThat(settings.writeCount).isEqualTo(0)
         }
 
     @Test

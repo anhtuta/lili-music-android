@@ -8,8 +8,8 @@
     <string name="lyrics_missing_fb_uri" translatable="false">https://fb.com/anhtuta95</string>
     <string name="lyrics_error">Could not load lyrics.</string>
     <string name="lyrics_offset_value">Offset: %1$dms</string>
-    <string name="lyrics_offset_earlier">Lyric earlier (−100ms)</string>
-    <string name="lyrics_offset_later">Lyric later (+100ms)</string>
+    <string name="lyrics_offset_earlier">Lyric 100ms earlier</string>
+    <string name="lyrics_offset_later">Lyric 100ms later</string>
     <string name="lyrics_line_cd">Seek to this lyric line</string>
     <string name="lyrics_countdown_cd">Instrumental countdown, %1$d beats</string>
     <string name="lyrics_meta_separator">-----------</string>

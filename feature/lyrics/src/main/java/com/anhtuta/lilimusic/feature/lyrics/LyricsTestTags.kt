@@ -25,6 +25,8 @@ object LyricsTestTags {
     const val LINE_APPEAR = "lyrics-line-appear"
     const val TRANSLATE = "lyrics-translate"
     const val META_FOOTER = "lyrics-meta-footer"
+    const val EDGE_FADE = "lyrics-edge-fade"
+    const val OFFSET_ROW = "lyrics-offset-row"
 
     fun align(align: LyricAlign): String = "lyrics-align-${align.storageValue}"
 
