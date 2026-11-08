@@ -95,6 +95,29 @@ class LibraryScreenTest {
     }
 
     @Test
+    fun missingSoyHidesTheBadge() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha", songOfTheYear = null)),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.soy(1)).assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("Listens").assertIsDisplayed()
+    }
+
+    @Test
     fun soyBadgeAndCoverPreviewOpenWhenImageExists() {
         var clickedId: Long? = null
         composeRule.setContent {
@@ -124,6 +147,10 @@ class LibraryScreenTest {
 
         composeRule.onNodeWithTag(LibraryTestTags.soy(1), useUnmergedTree = true).assertIsDisplayed()
         composeRule.onNodeWithText("2024").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Listens").assertIsDisplayed()
+        val listens = composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val soy = composeRule.onNodeWithTag(LibraryTestTags.soy(1), useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertThat(listens.left.value).isLessThan(soy.left.value)
         composeRule.onNodeWithTag(LibraryTestTags.cover(1), useUnmergedTree = true).performClick()
         composeRule.onNodeWithTag(LibraryTestTags.COVER_PREVIEW).assertIsDisplayed()
         composeRule.onNodeWithText("Ann - Alpha").assertIsDisplayed()

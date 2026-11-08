@@ -27,4 +27,5 @@
     <string name="library_cover_preview_cd">Full-size cover art for %1$s</string>
     <string name="library_cover_preview_caption">%1$s - %2$s</string>
     <string name="library_soy_cd">Song of the Year: %1$d</string>
+    <string name="library_listens">Listens</string>
 </resources>

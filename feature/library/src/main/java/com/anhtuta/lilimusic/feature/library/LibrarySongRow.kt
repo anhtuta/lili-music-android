@@ -11,8 +11,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -152,21 +160,43 @@ private fun SongCover(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SongMetaRow(
     song: Song,
     soyYears: List<Int>,
 ) {
+    val listensLabel = stringResource(R.string.library_listens)
     Row(
-        modifier = Modifier.padding(top = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = song.listens.toString(),
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.testTag(LibraryTestTags.listens(song.id)),
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                tooltip = { PlainTooltip { Text(text = listensLabel) } },
+                state = rememberTooltipState(),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Headphones,
+                    contentDescription = listensLabel,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                text = song.listens.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.testTag(LibraryTestTags.listens(song.id)),
+            )
+        }
         song.songOfTheYear?.let { year ->
             val soyDescription = stringResource(R.string.library_soy_cd, year)
             Text(
