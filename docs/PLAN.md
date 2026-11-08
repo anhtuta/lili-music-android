@@ -344,6 +344,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 108 | Library row: title, artist, listens, soy only (no type/date wrap). See [108](tasks/108-library-row-fields.md) | This PR |
 | 109 | Listens (icon) left, soy badge right on one row. See [109](tasks/109-listens-soy-row.md) | This PR |
 | 110 | Row overflow menu: song info dialog + 074 download states. See [110](tasks/110-song-more-menu.md) | This PR |
+| 111 | `LauncherActivityTest` launches `MainActivity` by class (`FLAG_ACTIVITY_NEW_TASK`); unit tests print full exception traces. See [111](tasks/111-launcher-activity-test-ci.md) | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -371,7 +372,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 
 ## 9. This-run deliverable
 
-PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–110**: Now Playing wrap/center/app-bar polish plus Library search, sort pill, slimmer rows, and a song-info menu. See [099](tasks/099-wrapped-karaoke-fill.md)–[110](tasks/110-song-more-menu.md).
+PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–111**: Now Playing wrap/center/app-bar polish, Library search/sort/rows/menu, and a CI-hardening of `LauncherActivityTest`. See [099](tasks/099-wrapped-karaoke-fill.md)–[111](tasks/111-launcher-activity-test-ci.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
