@@ -8,4 +8,7 @@ internal object LibraryChromeInsets {
 
     /** Trailing inset for header icons and row ⋮ to share the same right edge. */
     val TrailingAction = 4.dp
+
+    /** Space reserved for the catalog scrollbar track at the list's trailing edge. */
+    val ScrollbarTrack = 12.dp
 }

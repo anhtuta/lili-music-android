@@ -165,7 +165,11 @@ private fun LibraryCatalog(
                 Modifier
                     .fillMaxSize()
                     .testTag(LibraryTestTags.LIST),
-            contentPadding = PaddingValues(bottom = 8.dp),
+            contentPadding =
+                PaddingValues(
+                    bottom = 8.dp,
+                    end = LibraryChromeInsets.ScrollbarTrack,
+                ),
         ) {
             if (state.isOfflineError) {
                 item(key = "offline-banner") {
