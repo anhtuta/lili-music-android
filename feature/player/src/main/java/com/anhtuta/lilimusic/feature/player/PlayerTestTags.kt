@@ -29,6 +29,8 @@ object PlayerTestTags {
     const val MINI_TITLE = "mini-player-title"
     const val MINI_PLAY_PAUSE = "mini-player-play-pause"
     const val SETTINGS = "player-settings"
+    const val OVERFLOW_MENU = "player-overflow-menu"
+    const val SETTINGS_SCREEN = "player-settings-screen"
     const val PALETTE = "player-palette"
     const val DOWNLOAD = "player-download"
     const val LYRIC_CARD = "player-lyric-card"

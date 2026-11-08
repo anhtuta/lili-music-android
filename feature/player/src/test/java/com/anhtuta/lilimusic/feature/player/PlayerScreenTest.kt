@@ -216,7 +216,8 @@ class PlayerScreenTest {
 
         composeRule.onNodeWithTag(PlayerTestTags.PALETTE).assertExists()
         composeRule.onNodeWithTag(PlayerTestTags.BACKGROUND).assertExists()
-        composeRule.onNodeWithTag(PlayerTestTags.SETTINGS).performClick()
+        composeRule.onNodeWithContentDescription("More options").performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.SETTINGS_SCREEN).performClick()
         assertThat(settings).isEqualTo(1)
     }
 
@@ -237,8 +238,8 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Download").performClick()
+        composeRule.onNodeWithContentDescription("More options").performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.DOWNLOAD).performClick()
         assertThat(downloads).isEqualTo(1)
     }
 
@@ -260,7 +261,8 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithContentDescription("Cancel").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("More options").performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.DOWNLOAD).assertIsDisplayed()
     }
 
     @Test
@@ -280,7 +282,8 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithContentDescription("Delete").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("More options").performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.DOWNLOAD).assertIsDisplayed()
     }
 
     @Test
@@ -300,6 +303,7 @@ class PlayerScreenTest {
             }
         }
 
+        composeRule.onNodeWithContentDescription("More options").performClick()
         composeRule.onNodeWithTag(PlayerTestTags.LYRIC_CARD).performClick()
         assertThat(cards).isEqualTo(1)
     }

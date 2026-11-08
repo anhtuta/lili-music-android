@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -44,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
-import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
 import com.anhtuta.lilimusic.core.ui.palette.CoverPalette
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import com.anhtuta.lilimusic.core.ui.text.MarqueeText
@@ -109,11 +106,6 @@ fun PlayerScreen(
     }
 }
 
-internal object AppBarActionMetrics {
-    val IconSize = 20.dp
-    val ContainerSize = 40.dp
-}
-
 internal object NowPlayingAppBarStyle {
     const val ARTIST_ALPHA = 0.65f
 
@@ -138,31 +130,11 @@ private fun NowPlayingTopBar(
             )
         },
         actions = {
-            if (state.song != null) {
-                DownloadActionButton(
-                    status = state.downloadStatus,
-                    progressPercent = state.downloadProgress,
-                    onClick = callbacks.onDownload,
-                    modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
-                    iconSize = AppBarActionMetrics.IconSize,
-                    containerSize = AppBarActionMetrics.ContainerSize,
-                )
-                LiliIconButton(
-                    icon = Icons.Filled.Image,
-                    label = stringResource(R.string.player_lyric_card),
-                    onClick = callbacks.onLyricCard,
-                    modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
-                    iconSize = AppBarActionMetrics.IconSize,
-                    containerSize = AppBarActionMetrics.ContainerSize,
-                )
-            }
-            LiliIconButton(
-                icon = Icons.Filled.Settings,
-                label = stringResource(R.string.player_settings),
-                onClick = callbacks.onSettings,
-                modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
-                iconSize = AppBarActionMetrics.IconSize,
-                containerSize = AppBarActionMetrics.ContainerSize,
+            NowPlayingOverflowMenu(
+                song = state.song,
+                downloadStatus = state.downloadStatus,
+                downloadProgress = state.downloadProgress,
+                callbacks = callbacks,
             )
         },
         colors =
