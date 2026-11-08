@@ -391,6 +391,18 @@ Owner screenshots: Now Playing ⋮ trigger; library sort left, scrollable chrome
 | 121 | Vertical scrollbar on library list. See [121](tasks/121-library-scrollbar.md) | Done |
 | 122 | Row ⋮ aligns with search/settings right edge. See [122](tasks/122-library-row-more-align.md) | Done |
 
+### Phase 14 — Library playback chrome *(this run)*
+
+Now Playing: no pull-dismiss. Library: search inset, thicker scrollbar, playing/pause cover badges, auto-scroll to current track. Task plans: [123](tasks/123-remove-now-playing-pull-dismiss.md)–[127](tasks/127-library-scroll-to-now-playing.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 123 | Remove Now Playing pull-down back gesture. See [123](tasks/123-remove-now-playing-pull-dismiss.md) | This run |
+| 124 | Search right edge clears scrollbar; align with settings. See [124](tasks/124-library-search-scrollbar-inset.md) | This run |
+| 125 | Thicker library scrollbar thumb. See [125](tasks/125-library-scrollbar-thumb-width.md) | This run |
+| 126 | Playing/pause GIF overlay on current song cover. See [126](tasks/126-library-now-playing-cover-badge.md) | This run |
+| 127 | Scroll library to now-playing song on show. See [127](tasks/127-library-scroll-to-now-playing.md) | This run |
+
 ## 7. Workflow (mandatory)
 
 1. Write/update the overall plan in `docs/` when scope changes.
