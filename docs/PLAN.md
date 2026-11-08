@@ -336,6 +336,9 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 100 | Wrapped lyric lines use ~1.4× lineHeight (`LineHeightStyle` center, trim none). See [100](tasks/100-lyric-wrap-line-height.md) | This PR |
 | 101 | Auto-scroll centers the active lyric line in the pane (web `scrollLyric`). See [101](tasks/101-center-active-lyric.md) | This PR |
 | 102 | Transport row: equal-weight left/right groups, centered Play, matching speed/play-mode targets. See [102](tasks/102-control-row-symmetry.md) | This PR |
+| 103 | Compact Now Playing download / lyric-card / settings glyphs (~20.dp) with ≥40.dp touch targets. See [103](tasks/103-compact-app-bar-actions.md) | This PR |
+| 104 | Overflowing app-bar title and artist marquee slowly; drag to scroll; fitting text stays still. See [104](tasks/104-app-bar-marquee.md) | This PR |
+| 105 | App-bar artist is muted (`onSurface` ~0.65 alpha) so the title stands out. See [105](tasks/105-deemphasize-artist.md) | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -363,7 +366,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 
 ## 9. This-run deliverable
 
-PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–102**: wrapped karaoke fill, lyric line height, centered active line, and a symmetric control row. See [099](tasks/099-wrapped-karaoke-fill.md), [100](tasks/100-lyric-wrap-line-height.md), [101](tasks/101-center-active-lyric.md), [102](tasks/102-control-row-symmetry.md).
+PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–105**: wrapped karaoke fill, lyric line height, centered active line, symmetric control row, compact app-bar actions, marquee title/artist, and a muted artist line. See [099](tasks/099-wrapped-karaoke-fill.md)–[105](tasks/105-deemphasize-artist.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
