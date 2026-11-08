@@ -16,6 +16,8 @@
 | `ui-test-manifest` | Debug dependency that registers that empty Activity | A test-only route that must not be `/` |
 | `createComposeRule()` | Starts `ComponentActivity` with `MAIN`/`LAUNCHER` | Mounts a test host that needs a matching route |
 | `createAndroidComposeRule<T>()` | Starts `T` by class name, no launcher filter | `new T()` instead of hitting `/` |
+| `ActivityScenario.launch(Class)` | Starts that Activity with `FLAG_ACTIVITY_NEW_TASK` | `new MainActivity()` in the test JVM, not resolving `/` through the unit-test manifest |
+| `TestExceptionFormat.FULL` | Gradle prints the exception **message** and cause chain | JUnit’s short log is only `RuntimeException at File.kt:59` — the missing method name is in `e.getMessage()` |
 | `processDebugMainManifest` | Writes the **APK** merged manifest | The production nginx config, not the test one |
 | `VRI[ComponentActivity]` | Logcat name of the drawn window | The document title of whatever `/` resolved to |
 
@@ -30,7 +32,7 @@ Android 16 starts the **first** matching `LAUNCHER` activity. Merge order put Co
 3. [LiliApp.kt](../../app/src/main/java/com/anhtuta/lilimusic/LiliApp.kt) — full-size Material `Surface` so the first frame is not an empty window.
 4. [LibraryScreen.kt](../../feature/library/src/main/java/com/anhtuta/lilimusic/feature/library/LibraryScreen.kt) — `isLoading` → spinner; offline empty → retry.
 5. [LauncherManifestTest.kt](../../app/src/test/java/com/anhtuta/lilimusic/LauncherManifestTest.kt) — parses `processDebugMainManifest`, not the unit-test merge.
-6. [LauncherActivityTest.kt](../../app/src/test/java/com/anhtuta/lilimusic/LauncherActivityTest.kt) — launches that launcher class and asserts library or loading.
+6. [LauncherActivityTest.kt](../../app/src/test/java/com/anhtuta/lilimusic/LauncherActivityTest.kt) — asserts the APK launcher name, then `ActivityScenario.launch(MainActivity::class.java)` (adds `FLAG_ACTIVITY_NEW_TASK`; uses the Hilt-transformed class). Do **not** build a `MAIN`/`LAUNCHER` Intent via `Class.forName` — that path threw `NoSuchMethodException` on CI.
 
 Merged debug APK (only `MainActivity` has `LAUNCHER`; `ComponentActivity` is test-host only):
 
