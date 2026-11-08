@@ -21,8 +21,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-internal const val LiliIconGlyphTag = "lili-icon-glyph"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiliIconButton(
@@ -48,7 +46,7 @@ fun LiliIconButton(
             modifier =
                 Modifier
                     .size(iconSize)
-                    .testTag(LiliIconGlyphTag),
+                    .testTag(LiliIconButtonTags.GLYPH),
             tint =
                 if (tint == Color.Unspecified) {
                     MaterialTheme.colorScheme.onSurface

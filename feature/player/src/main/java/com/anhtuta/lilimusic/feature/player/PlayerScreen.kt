@@ -45,9 +45,9 @@ import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
-import com.anhtuta.lilimusic.core.ui.text.MarqueeText
 import com.anhtuta.lilimusic.core.ui.palette.CoverPalette
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
+import com.anhtuta.lilimusic.core.ui.text.MarqueeText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

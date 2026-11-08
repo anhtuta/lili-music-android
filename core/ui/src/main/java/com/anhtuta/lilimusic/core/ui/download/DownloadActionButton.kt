@@ -17,8 +17,6 @@ import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.ui.R
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
-const val DownloadActionGlyphTag = "download-action-glyph"
-
 @Composable
 fun DownloadActionButton(
     status: DownloadStatus,
@@ -60,7 +58,7 @@ private fun DownloadActionVisual(
     val glyphModifier =
         Modifier
             .size(iconSize)
-            .testTag(DownloadActionGlyphTag)
+            .testTag(DownloadActionTags.GLYPH)
     when (status) {
         DownloadStatus.QUEUED ->
             CircularProgressIndicator(

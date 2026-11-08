@@ -76,7 +76,7 @@ class MarqueeTextTest {
                 holder.state = scroll
                 Box(modifier = Modifier.width(12.dp)) {
                     MarqueeText(
-                        text = LongTitle,
+                        text = LONG_TITLE,
                         style = MaterialTheme.typography.titleMedium.copy(fontSize = 48.sp),
                         scrollState = scroll,
                     )
@@ -104,7 +104,7 @@ class MarqueeTextTest {
                             .height(56.dp),
                 ) {
                     MarqueeText(
-                        text = LongTitle,
+                        text = LONG_TITLE,
                         style = MaterialTheme.typography.titleMedium.copy(fontSize = 48.sp),
                         scrollState = scroll,
                         modifier = Modifier.testTag("marquee"),
@@ -123,11 +123,13 @@ class MarqueeTextTest {
         composeRule.waitForIdle()
         assertThat(scroll.value).isGreaterThan(0)
     }
+
+    private companion object {
+        const val LONG_TITLE =
+            "All Falls Down by Alan Walker, Noah Cyrus, Digital Farm Animals and still more words"
+    }
 }
 
 private class ScrollHolder {
     var state: ScrollState? = null
 }
-
-private const val LongTitle =
-    "All Falls Down by Alan Walker, Noah Cyrus, Digital Farm Animals and still more words"
