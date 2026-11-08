@@ -14,5 +14,15 @@ object PlaybackSpeed {
 
     fun decrease(current: Float): Float = coerce(current - STEP)
 
+    fun steps(): List<Float> {
+        val values = mutableListOf<Float>()
+        var value = MIN
+        while (value <= MAX + 0.001f) {
+            values += coerce(value)
+            value += STEP
+        }
+        return values
+    }
+
     private fun roundToStep(value: Float): Float = ((value * 10f).roundToInt() / 10f).coerceIn(MIN, MAX)
 }

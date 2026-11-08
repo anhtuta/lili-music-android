@@ -13,6 +13,17 @@ class PlaybackSpeedTest {
     }
 
     @Test
+    fun stepsCoverClampRangeInTenths() {
+        val steps = PlaybackSpeed.steps()
+        assertThat(steps.first()).isEqualTo(PlaybackSpeed.MIN)
+        assertThat(steps.last()).isEqualTo(PlaybackSpeed.MAX)
+        assertThat(steps).contains(1.0f)
+        assertThat(steps).contains(1.1f)
+        assertThat(steps).contains(2.0f)
+        assertThat(steps).containsNoneOf(0.4f, 2.1f)
+    }
+
+    @Test
     fun coerceRoundsToStep() {
         assertThat(PlaybackSpeed.coerce(1.14f)).isEqualTo(1.1f)
         assertThat(PlaybackSpeed.coerce(0.4f)).isEqualTo(PlaybackSpeed.MIN)
