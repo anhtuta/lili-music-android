@@ -4,7 +4,8 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -420,8 +421,11 @@ class LibraryScreenTest {
             }
         }
 
-        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Download").performClick()
+        composeRule.onNodeWithContentDescription("More options").assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Song info").assertIsDisplayed()
+        composeRule.onNodeWithText("Download").assertIsDisplayed()
+        composeRule.onNodeWithText("Download").performClick()
         assertThat(downloadedId).isEqualTo(1L)
     }
 
@@ -452,8 +456,9 @@ class LibraryScreenTest {
             }
         }
 
-        composeRule.onNodeWithContentDescription("Cancel").assertIsDisplayed()
-        composeRule.onAllNodesWithContentDescription("Download").assertCountEquals(0)
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Cancel").assertIsDisplayed()
+        composeRule.onAllNodesWithText("Download").assertCountEquals(0)
     }
 
     @Test
@@ -475,7 +480,37 @@ class LibraryScreenTest {
             }
         }
 
-        composeRule.onNodeWithContentDescription("Delete").assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Delete").assertIsDisplayed()
+    }
+
+    @Test
+    fun songInfoDialogListsFieldsAndNoneForMissingSoy() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs = listOf(libraryTestSong(id = 1, title = "Alpha", songOfTheYear = null)),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LibraryTestTags.more(1)).performClick()
+        composeRule.onNodeWithText("Song info").performClick()
+        composeRule.onNodeWithTag(LibraryTestTags.SONG_INFO).assertIsDisplayed()
+        composeRule.onNodeWithText("Song of the year").assertIsDisplayed()
+        composeRule.onAllNodesWithText("None").onFirst().assertIsDisplayed()
+        composeRule.onNodeWithText("Lyric type").assertIsDisplayed()
+        composeRule.onNodeWithText("lrc").assertIsDisplayed()
+        composeRule.onNodeWithText("Title").assertIsDisplayed()
+        composeRule.onNodeWithText("Stream URL").assertExists()
     }
 
     @Test

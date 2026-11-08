@@ -19,6 +19,8 @@ object LibraryTestTags {
     const val CLEAR_SEARCH = "library-clear-search"
 
     const val COVER_PREVIEW = "library-cover-preview"
+    const val SONG_INFO = "library-song-info"
+    const val MORE_MENU = "library-more-menu"
 
     fun song(id: Long): String = "library-song-$id"
 
@@ -33,6 +35,8 @@ object LibraryTestTags {
     fun date(id: Long): String = "library-date-$id"
 
     fun download(id: Long): String = "library-download-$id"
+
+    fun more(id: Long): String = "library-more-$id"
 
     fun unavailable(id: Long): String = "library-unavailable-$id"
 

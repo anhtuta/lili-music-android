@@ -28,4 +28,24 @@
     <string name="library_cover_preview_caption">%1$s - %2$s</string>
     <string name="library_soy_cd">Song of the Year: %1$d</string>
     <string name="library_listens">Listens</string>
+    <string name="library_more_options">More options</string>
+    <string name="library_song_info">Song info</string>
+    <string name="library_info_none">None</string>
+    <string name="library_info_close">Close</string>
+    <string name="library_info_title">Title</string>
+    <string name="library_info_artist">Artist</string>
+    <string name="library_info_album">Album</string>
+    <string name="library_info_type">Type</string>
+    <string name="library_info_soy">Song of the year</string>
+    <string name="library_info_lyric_type">Lyric type</string>
+    <string name="library_info_lyric_file">Lyric file</string>
+    <string name="library_info_date">Date</string>
+    <string name="library_info_created_date">Created date</string>
+    <string name="library_info_file_name">File name</string>
+    <string name="library_info_path">Path</string>
+    <string name="library_info_id">Id</string>
+    <string name="library_info_zing_id">Zing id</string>
+    <string name="library_info_image_name">Image name</string>
+    <string name="library_info_image_url">Image URL</string>
+    <string name="library_info_stream_url">Stream URL</string>
 </resources>
