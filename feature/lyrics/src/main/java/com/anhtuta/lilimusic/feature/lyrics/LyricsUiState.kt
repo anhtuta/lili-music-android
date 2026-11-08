@@ -12,4 +12,8 @@ data class LyricsUiState(
     val userOffsetMs: Long = 0L,
     val settings: PlayerSettings = PlayerSettings(),
     val coverUrl: String? = null,
+    val positionMs: Long = 0L,
+    val isPlaying: Boolean = false,
+    val speed: Float = 1f,
+    val positionSampledAtElapsedMs: Long = 0L,
 )

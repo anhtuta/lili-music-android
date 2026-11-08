@@ -68,6 +68,24 @@ class LyricsViewModelTest {
         }
 
     @Test
+    fun copiesPlaybackClockForKaraokeInterpolation() =
+        runTest {
+            val controller = FakePlayerController()
+            val repository = FakeLyricRepository(LyricLoadResult.Ready(sampleParsedLyric()))
+            val viewModel = LyricsViewModel(controller, repository, FakeSettingsRepository())
+            controller.play(listOf(song), "alpha")
+            controller.advancePosition(1_200L)
+
+            viewModel.uiState.test {
+                val state = awaitItemUntil { it.positionMs == 1_200L && it.frame != null }
+                assertThat(state.isPlaying).isTrue()
+                assertThat(state.positionSampledAtElapsedMs)
+                    .isEqualTo(controller.state.value.positionSampledAtElapsedMs)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun nudgeOffsetIsSessionOnlyAndResetsOnSongChange() =
         runTest {
             val controller = FakePlayerController()

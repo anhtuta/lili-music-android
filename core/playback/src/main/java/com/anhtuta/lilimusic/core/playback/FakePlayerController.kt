@@ -1,5 +1,6 @@
 package com.anhtuta.lilimusic.core.playback
 
+import android.os.SystemClock
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.PlayQueue
 import com.anhtuta.lilimusic.core.model.PlaybackQueueState
@@ -117,6 +118,7 @@ class FakePlayerController(
                 queue = queueState.playableQueue,
                 isPlaying = playing && queueState.currentSong != null && !reachedEnd,
                 positionMs = positionMs,
+                positionSampledAtElapsedMs = SystemClock.elapsedRealtime(),
                 durationMs = if (queueState.currentSong == null) 0L else fakeDurationMs,
                 playMode = queueState.playMode,
                 speed = previous.speed,

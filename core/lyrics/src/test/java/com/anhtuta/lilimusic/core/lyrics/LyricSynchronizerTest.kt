@@ -17,6 +17,7 @@ class LyricSynchronizerTest {
         assertThat(mid.activeWordIndex).isEqualTo(0)
         assertThat(mid.lines[0].isActive).isTrue()
         assertThat(mid.lines[0].words[0].fill).isWithin(0.001f).of(0.5f)
+        assertThat(mid.lines[0].words[0].startMs).isEqualTo(0L)
         assertThat(mid.lines[0].words[1].fill).isEqualTo(0f)
 
         val passed = LyricSynchronizer.sync(lyric, positionMs = 450L, durationMs = 10_000L)
@@ -24,6 +25,18 @@ class LyricSynchronizerTest {
         assertThat(passed.lines[0].words[0].isPassed).isTrue()
         assertThat(passed.lines[0].words[0].fill).isEqualTo(1f)
         assertThat(passed.lines[0].words[1].fill).isWithin(0.001f).of(0.5f)
+    }
+
+    @Test
+    fun karaokeFillIsFractionalInsideTheWord() {
+        assertThat(
+            LyricSynchronizer.karaokeFill(
+                startMs = 0L,
+                endMs = 1_000L,
+                positionMs = 370L,
+                offsetMs = 0L,
+            ),
+        ).isWithin(0.001f).of(0.37f)
     }
 
     @Test

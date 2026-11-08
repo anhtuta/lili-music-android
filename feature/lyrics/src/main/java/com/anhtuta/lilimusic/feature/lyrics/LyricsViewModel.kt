@@ -88,6 +88,10 @@ class LyricsViewModel
                     userOffsetMs = offset,
                     settings = settings,
                     coverUrl = coverUrl,
+                    positionMs = playback.positionMs,
+                    isPlaying = playback.isPlaying,
+                    speed = playback.speed,
+                    positionSampledAtElapsedMs = playback.positionSampledAtElapsedMs,
                 )
             return when (load) {
                 null -> base.copy(isLoading = true)

@@ -9,6 +9,7 @@ data class PlaybackState(
     val queue: List<Song> = emptyList(),
     val isPlaying: Boolean = false,
     val positionMs: Long = 0L,
+    val positionSampledAtElapsedMs: Long = 0L,
     val durationMs: Long = 0L,
     val playMode: PlayMode = PlayMode.SEQUENCE,
     val speed: Float = PlaybackSpeed.DEFAULT,
