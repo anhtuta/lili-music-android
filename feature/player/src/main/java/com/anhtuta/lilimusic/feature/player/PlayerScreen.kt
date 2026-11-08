@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -62,15 +61,11 @@ fun PlayerScreen(
     val loadedPalette = rememberCoverPalette(state.song?.imageUrl)
     val palette = coverPaletteOverride ?: loadedPalette
     var lyricsExpanded by remember { mutableStateOf(false) }
-    val dismissScroll = rememberNowPlayingDismissScroll(enabled = !lyricsExpanded, onDismiss = callbacks.onBack)
     BackHandler(enabled = lyricsExpanded) { lyricsExpanded = false }
     val isDark = !CoverPalette.isLight(MaterialTheme.colorScheme.background)
     val gradient = CoverPalette.nowPlayingGradient(palette?.background, isDark)
     Scaffold(
-        modifier =
-            modifier
-                .testTag(PlayerTestTags.SCREEN)
-                .nestedScroll(dismissScroll),
+        modifier = modifier.testTag(PlayerTestTags.SCREEN),
         containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f),
         contentColor = palette?.onBackground ?: MaterialTheme.colorScheme.onSurface,
         topBar = {
