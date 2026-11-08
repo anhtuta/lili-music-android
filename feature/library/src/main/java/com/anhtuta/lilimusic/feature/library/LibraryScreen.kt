@@ -167,59 +167,59 @@ private fun LibraryCatalog(
                     .testTag(LibraryTestTags.LIST),
             contentPadding = PaddingValues(bottom = 8.dp),
         ) {
-        if (state.isOfflineError) {
-            item(key = "offline-banner") {
-                Text(
-                    text = stringResource(R.string.library_error),
-                    color = MaterialTheme.colorScheme.error,
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .testTag(LibraryTestTags.ERROR_BANNER)
-                            .padding(horizontal = LibraryChromeInsets.Horizontal, vertical = 8.dp),
+            if (state.isOfflineError) {
+                item(key = "offline-banner") {
+                    Text(
+                        text = stringResource(R.string.library_error),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .testTag(LibraryTestTags.ERROR_BANNER)
+                                .padding(horizontal = LibraryChromeInsets.Horizontal, vertical = 8.dp),
+                    )
+                }
+            }
+            item(key = "header") {
+                LibraryScrollableHeader(
+                    onRefresh = onRefresh,
+                    onDownloadsClick = onDownloadsClick,
+                    onSettingsClick = onSettingsClick,
                 )
             }
-        }
-        item(key = "header") {
-            LibraryScrollableHeader(
-                onRefresh = onRefresh,
-                onDownloadsClick = onDownloadsClick,
-                onSettingsClick = onSettingsClick,
-            )
-        }
-        item(key = "search") {
-            LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
-        }
-        item(key = "sort") {
-            LibrarySortPill(
-                selected = state.sort,
-                sortOrder = state.sortOrder,
-                onSortFieldChosen = onSortFieldChosen,
-            )
-        }
-        if (state.songs.isEmpty()) {
-            item(key = "empty") {
-                LibraryEmpty(query = state.query)
+            item(key = "search") {
+                LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
             }
-        } else {
-            items(state.songs, key = { it.id }) { song ->
-                LibrarySongRow(
-                    song = song,
-                    soyYears = soyYears,
-                    coverUrl = state.coverUrl(song),
-                    unavailableOffline = state.isUnavailableOffline(song.path),
-                    downloadStatus = state.status(song.path),
-                    downloadProgress = state.progress(song.path),
-                    onClick = { onSongClick(song) },
-                    onCoverClick = {
-                        if (state.coverUrl(song) != null) {
-                            previewSong = song
-                        }
-                    },
-                    onDownloadAction = { onDownloadAction(song) },
+            item(key = "sort") {
+                LibrarySortPill(
+                    selected = state.sort,
+                    sortOrder = state.sortOrder,
+                    onSortFieldChosen = onSortFieldChosen,
                 )
             }
-        }
+            if (state.songs.isEmpty()) {
+                item(key = "empty") {
+                    LibraryEmpty(query = state.query)
+                }
+            } else {
+                items(state.songs, key = { it.id }) { song ->
+                    LibrarySongRow(
+                        song = song,
+                        soyYears = soyYears,
+                        coverUrl = state.coverUrl(song),
+                        unavailableOffline = state.isUnavailableOffline(song.path),
+                        downloadStatus = state.status(song.path),
+                        downloadProgress = state.progress(song.path),
+                        onClick = { onSongClick(song) },
+                        onCoverClick = {
+                            if (state.coverUrl(song) != null) {
+                                previewSong = song
+                            }
+                        },
+                        onDownloadAction = { onDownloadAction(song) },
+                    )
+                }
+            }
         }
         LibraryLazyScrollbar(
             listState = listState,

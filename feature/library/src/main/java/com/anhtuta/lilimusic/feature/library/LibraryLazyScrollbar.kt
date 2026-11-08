@@ -63,8 +63,7 @@ internal fun LibraryLazyScrollbar(
                     .background(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f),
                         shape = RoundedCornerShape(3.dp),
-                    )
-                    .pointerInput(listState, layoutInfo.totalItemsCount) {
+                    ).pointerInput(listState, layoutInfo.totalItemsCount) {
                         detectDragGestures { change, dragAmount ->
                             change.consume()
                             val deltaIndex =

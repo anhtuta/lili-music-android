@@ -73,7 +73,12 @@ fun LibrarySongRow(
                 .fillMaxWidth()
                 .testTag(LibraryTestTags.song(song.id))
                 .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(
+                    start = LibraryChromeInsets.Horizontal,
+                    end = LibraryChromeInsets.TrailingAction,
+                    top = 8.dp,
+                    bottom = 8.dp,
+                ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

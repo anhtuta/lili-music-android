@@ -34,8 +34,7 @@ internal fun LibraryScrollableHeader(
                     end = LibraryChromeInsets.TrailingAction,
                     top = 8.dp,
                     bottom = 4.dp,
-                )
-                .testTag(LibraryTestTags.HEADER),
+                ).testTag(LibraryTestTags.HEADER),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
