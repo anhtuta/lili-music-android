@@ -367,6 +367,18 @@ Library search/sort/rows/overflow menu plus launcher unit-test hardening. Task p
 | 110 | Row overflow menu: song info dialog + 074 download states. See [110](tasks/110-song-more-menu.md) | This PR |
 | 111 | `LauncherActivityTest` launches `MainActivity` by class (`FLAG_ACTIVITY_NEW_TASK`); unit tests print full exception traces. See [111](tasks/111-launcher-activity-test-ci.md) | This PR |
 
+### Phase 12 — Now Playing refinement *(this run)*
+
+Owner follow-up screenshots: leaner app bar, edge-to-edge lyrics, control insets, lyric text size presets, listen-count fix. Task plans: [112](tasks/112-now-playing-overflow-menu.md)–[117](tasks/117-fix-listen-count-schedule.md) (no 116).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 112 | Download + Lyric card in gear overflow menu; smaller settings icon. See [112](tasks/112-now-playing-overflow-menu.md) | This run |
+| 113 | Full-width lyric area; drop outer rounded box; keep text padding aligned with chrome. See [113](tasks/113-full-width-lyric-pane.md) | This run |
+| 114 | Bottom inset / navigation padding on transport + seek. See [114](tasks/114-player-controls-bottom-inset.md) | This run |
+| 115 | Five lyric font sizes (default = level 2 Normal). See [115](tasks/115-lyric-font-size-levels.md) | This run |
+| 117 | Schedule listen count when playback starts even if first ExoPlayer position is slightly &gt; 0. See [117](tasks/117-fix-listen-count-schedule.md) | This run |
+
 ## 7. Workflow (mandatory)
 
 1. Write/update the overall plan in `docs/` when scope changes.
@@ -393,7 +405,7 @@ Library search/sort/rows/overflow menu plus launcher unit-test hardening. Task p
 
 ## 9. This-run deliverable
 
-PR #24 merged Phases **8–9** (**080–098**) on main. This follow-up is Phases **10–11** (**099–111**): Now Playing wrap/center/app-bar polish, Library search/sort/rows/menu, and a CI-hardening of `LauncherActivityTest`. See [099](tasks/099-wrapped-karaoke-fill.md)–[111](tasks/111-launcher-activity-test-ci.md).
+PR #24 merged Phases **8–9** (**080–098**) on main. Phases **10–11** (**099–111**) cover wrap/center/app-bar polish, Library compact UI, and launcher test CI. Phase **12** (**112–117**) is the current run: overflow app bar, full-width lyrics, control insets, lyric font levels, listen-count fix. See [112](tasks/112-now-playing-overflow-menu.md)–[117](tasks/117-fix-listen-count-schedule.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
