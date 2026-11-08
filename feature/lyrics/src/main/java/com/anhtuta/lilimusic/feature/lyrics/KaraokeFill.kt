@@ -111,6 +111,7 @@ internal fun KaraokeLine(
     var textLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
     Text(
         text = layout.annotated,
+        style = LyricLineMetrics.textStyle(fontSize),
         textAlign = style.textAlign,
         softWrap = true,
         overflow = TextOverflow.Clip,
