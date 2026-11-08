@@ -26,6 +26,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [14 — Now Playing polish](14-now-playing-polish.md) | Phase 8: cycling play mode, lyric fade/handle, one control row, offset overlay, palette gradient, karaoke contrast, swipe-down, status bar; follow-up wrap fill, line height, centered scroll, control-row symmetry, compact app-bar actions, marquee title/artist |
 | [15 — Library redesign](15-library-redesign.md) | Compact search, sort pill, slimmer rows, listens/soy row, song-info overflow menu |
 | [16 — Now Playing refinement](16-phase12-now-playing-refinement.md) | Overflow app bar, full-width lyrics, control insets, lyric font presets, listen-count tolerance |
+| [17 — Library chrome (Phase 13)](17-phase13-library-chrome.md) | MoreVert overflow, scrollable library header, scrollbar, shared chrome insets |
 
 ## Status of phases
 
