@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
@@ -156,13 +157,16 @@ private fun LibraryCatalog(
             SongOfTheYearPalette.uniqueYearsDescending(state.songs.map { it.songOfTheYear })
         }
     var previewSong by remember { mutableStateOf<Song?>(null) }
-    LazyColumn(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .testTag(LibraryTestTags.LIST),
-        contentPadding = PaddingValues(bottom = 8.dp),
-    ) {
+    val listState = rememberLazyListState()
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .testTag(LibraryTestTags.LIST),
+            contentPadding = PaddingValues(bottom = 8.dp),
+        ) {
         if (state.isOfflineError) {
             item(key = "offline-banner") {
                 Text(
@@ -216,6 +220,11 @@ private fun LibraryCatalog(
                 )
             }
         }
+        }
+        LibraryLazyScrollbar(
+            listState = listState,
+            modifier = Modifier.align(Alignment.CenterEnd),
+        )
     }
     previewSong?.let { preview ->
         CoverPreviewDialog(
