@@ -37,6 +37,8 @@ object PlayerTestTags {
     const val LYRIC_HANDLE = "player-lyric-handle"
     const val LYRICS_EXPANDED = "player-lyrics-expanded"
     const val SPEED_MENU = "player-speed-menu"
+    const val TRANSPORT_LEFT = "player-transport-left"
+    const val TRANSPORT_RIGHT = "player-transport-right"
     const val APP_BAR_COVER = "player-app-bar-cover"
     const val APP_BAR_TITLE = "player-app-bar-title"
     const val APP_BAR_ARTIST = "player-app-bar-artist"

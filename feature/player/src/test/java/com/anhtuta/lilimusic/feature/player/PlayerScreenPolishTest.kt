@@ -246,4 +246,37 @@ class PlayerScreenPolishTest {
         composeRule.onNodeWithContentDescription("Back").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
     }
+
+    @Test
+    fun transportGroupsMatchWidthAndPlayIsCentered() {
+        composeRule.setContent {
+            LiliTheme {
+                SizedPlayer(
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            speed = 1.0f,
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                )
+            }
+        }
+
+        val left = composeRule.onNodeWithTag(PlayerTestTags.TRANSPORT_LEFT).getUnclippedBoundsInRoot()
+        val right = composeRule.onNodeWithTag(PlayerTestTags.TRANSPORT_RIGHT).getUnclippedBoundsInRoot()
+        val play = composeRule.onNodeWithTag(PlayerTestTags.PLAY_PAUSE).getUnclippedBoundsInRoot()
+        val controls = composeRule.onNodeWithTag(PlayerTestTags.CONTROLS).getUnclippedBoundsInRoot()
+        val leftWidth = left.right.value - left.left.value
+        val rightWidth = right.right.value - right.left.value
+        assertThat(kotlin.math.abs(leftWidth - rightWidth)).isLessThan(1f)
+        val playCenter = (play.left.value + play.right.value) / 2f
+        val rowCenter = (controls.left.value + controls.right.value) / 2f
+        assertThat(kotlin.math.abs(playCenter - rowCenter)).isLessThan(2f)
+        composeRule.onNodeWithContentDescription("Playback speed").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Play mode: Sequence").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Playback speed").performTouchInput { longClick() }
+        composeRule.onNodeWithText("Playback speed").assertIsDisplayed()
+    }
 }

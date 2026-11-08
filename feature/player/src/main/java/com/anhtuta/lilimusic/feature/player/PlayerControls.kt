@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Forward5
 import androidx.compose.material.icons.filled.Pause
@@ -24,7 +23,7 @@ import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -194,26 +193,34 @@ internal fun PlayerTransport(
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        PlayerSpeedChip(
-            speed = speed,
-            onSetSpeed = callbacks.onSetSpeed,
-        )
-        LiliIconButton(
-            icon = Icons.Filled.SkipPrevious,
-            label = stringResource(R.string.player_previous_cd),
-            onClick = callbacks.onSkipPrevious,
-            modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
-            tint = onSurface,
-        )
-        LiliIconButton(
-            icon = Icons.Filled.Replay5,
-            label = stringResource(R.string.player_rewind_cd),
-            onClick = callbacks.onSeekBack,
-            modifier = Modifier.testTag(PlayerTestTags.REWIND),
-            tint = onSurface,
-        )
+        Row(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .testTag(PlayerTestTags.TRANSPORT_LEFT),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            PlayerSpeedChip(
+                speed = speed,
+                onSetSpeed = callbacks.onSetSpeed,
+            )
+            LiliIconButton(
+                icon = Icons.Filled.SkipPrevious,
+                label = stringResource(R.string.player_previous_cd),
+                onClick = callbacks.onSkipPrevious,
+                modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
+                tint = onSurface,
+            )
+            LiliIconButton(
+                icon = Icons.Filled.Replay5,
+                label = stringResource(R.string.player_rewind_cd),
+                onClick = callbacks.onSeekBack,
+                modifier = Modifier.testTag(PlayerTestTags.REWIND),
+                tint = onSurface,
+            )
+        }
         LiliFilledIconButton(
             icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
             label =
@@ -223,25 +230,34 @@ internal fun PlayerTransport(
             onClick = callbacks.onPlayPause,
             modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
         )
-        LiliIconButton(
-            icon = Icons.Filled.Forward5,
-            label = stringResource(R.string.player_forward_cd),
-            onClick = callbacks.onSeekForward,
-            modifier = Modifier.testTag(PlayerTestTags.FORWARD),
-            tint = onSurface,
-        )
-        LiliIconButton(
-            icon = Icons.Filled.SkipNext,
-            label = stringResource(R.string.player_next_cd),
-            onClick = callbacks.onSkipNext,
-            modifier = Modifier.testTag(PlayerTestTags.NEXT),
-            tint = onSurface,
-        )
-        PlayModeButton(
-            playMode = playMode,
-            onClick = callbacks.onCyclePlayMode,
-            tint = if (playMode == PlayMode.SEQUENCE) onSurface else accent,
-        )
+        Row(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .testTag(PlayerTestTags.TRANSPORT_RIGHT),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            LiliIconButton(
+                icon = Icons.Filled.Forward5,
+                label = stringResource(R.string.player_forward_cd),
+                onClick = callbacks.onSeekForward,
+                modifier = Modifier.testTag(PlayerTestTags.FORWARD),
+                tint = onSurface,
+            )
+            LiliIconButton(
+                icon = Icons.Filled.SkipNext,
+                label = stringResource(R.string.player_next_cd),
+                onClick = callbacks.onSkipNext,
+                modifier = Modifier.testTag(PlayerTestTags.NEXT),
+                tint = onSurface,
+            )
+            PlayModeButton(
+                playMode = playMode,
+                onClick = callbacks.onCyclePlayMode,
+                tint = if (playMode == PlayMode.SEQUENCE) onSurface else accent,
+            )
+        }
     }
 }
 
@@ -261,17 +277,22 @@ internal fun PlayModeButton(
             },
         )
     LiliIconButton(
-        icon =
-            when (playMode) {
-                PlayMode.SEQUENCE -> Icons.Filled.Repeat
-                PlayMode.SHUFFLE -> Icons.Filled.Shuffle
-                PlayMode.REPEAT_ONE -> Icons.Filled.RepeatOne
-            },
         label = stringResource(R.string.player_play_mode, modeName),
         onClick = onClick,
         modifier = modifier.testTag(PlayerTestTags.PLAY_MODE),
-        tint = tint,
-    )
+    ) {
+        Icon(
+            imageVector =
+                when (playMode) {
+                    PlayMode.SEQUENCE -> Icons.Filled.Repeat
+                    PlayMode.SHUFFLE -> Icons.Filled.Shuffle
+                    PlayMode.REPEAT_ONE -> Icons.Filled.RepeatOne
+                },
+            contentDescription = null,
+            modifier = Modifier.size(28.dp),
+            tint = tint,
+        )
+    }
 }
 
 @Composable
@@ -286,20 +307,18 @@ internal fun PlayerSpeedChip(
             String.format(Locale.US, "%.1f", speed),
         )
     Box {
-        FilterChip(
-            selected = false,
+        LiliIconButton(
+            label = stringResource(R.string.player_speed),
             onClick = { expanded = true },
-            label = {
-                Text(
-                    text = label,
-                    modifier = Modifier.testTag(PlayerTestTags.SPEED_VALUE),
-                )
-            },
-            modifier =
-                Modifier
-                    .widthIn(min = 52.dp)
-                    .testTag(PlayerTestTags.SPEED_CHIP),
-        )
+            modifier = Modifier.testTag(PlayerTestTags.SPEED_CHIP),
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
+                modifier = Modifier.testTag(PlayerTestTags.SPEED_VALUE),
+            )
+        }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
