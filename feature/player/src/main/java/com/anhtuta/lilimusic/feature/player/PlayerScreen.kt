@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
@@ -243,6 +247,43 @@ private fun PlayerBody(
     }
 }
 
+internal object PlayerControlsInsets {
+    val Horizontal = 16.dp
+    val ExtraBottom = 12.dp
+}
+
+@Composable
+private fun PlayerChromeFooter(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    lyricsExpanded: Boolean,
+    onLyricsExpandedChange: (Boolean) -> Unit,
+    horizontalPadding: Dp = PlayerControlsInsets.Horizontal,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding)
+                .padding(WindowInsets.navigationBars.asPaddingValues())
+                .padding(bottom = PlayerControlsInsets.ExtraBottom),
+    ) {
+        PlayerLyricHandle(
+            expanded = lyricsExpanded,
+            onExpandedChange = onLyricsExpandedChange,
+        )
+        if (!lyricsExpanded) {
+            PlayerControlsBar(
+                song = song,
+                state = state,
+                callbacks = callbacks,
+                showHeadings = false,
+            )
+        }
+    }
+}
+
 @Composable
 private fun CompactPlayerBody(
     song: Song,
@@ -263,18 +304,13 @@ private fun CompactPlayerBody(
             expanded = lyricsExpanded,
             modifier = Modifier.weight(1f).fillMaxWidth(),
         )
-        PlayerLyricHandle(
-            expanded = lyricsExpanded,
-            onExpandedChange = onLyricsExpandedChange,
+        PlayerChromeFooter(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            lyricsExpanded = lyricsExpanded,
+            onLyricsExpandedChange = onLyricsExpandedChange,
         )
-        if (!lyricsExpanded) {
-            PlayerControlsBar(
-                song = song,
-                state = state,
-                callbacks = callbacks,
-                showHeadings = false,
-            )
-        }
     }
 }
 
@@ -319,18 +355,14 @@ private fun ExpandedPlayerBody(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
-        PlayerLyricHandle(
-            expanded = lyricsExpanded,
-            onExpandedChange = onLyricsExpandedChange,
+        PlayerChromeFooter(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            lyricsExpanded = lyricsExpanded,
+            onLyricsExpandedChange = onLyricsExpandedChange,
+            horizontalPadding = 24.dp,
         )
-        if (!lyricsExpanded) {
-            PlayerControlsBar(
-                song = song,
-                state = state,
-                callbacks = callbacks,
-                showHeadings = false,
-            )
-        }
     }
 }
 
