@@ -69,4 +69,31 @@ class SettingsScreenTest {
         composeRule.onNodeWithTag(SettingsTestTags.BACK).performClick()
         assertThat(back).isEqualTo(1)
     }
+
+    @Test
+    fun darkThemeBackIconStaysFindable() {
+        composeRule.setContent {
+            LiliTheme(darkTheme = true) {
+                SettingsScreen(
+                    state = SettingsUiState(settings = PlayerSettings(), speed = 1.0f),
+                    callbacks =
+                        SettingsCallbacks(
+                            onBack = {},
+                            onLyricAlign = {},
+                            onLyricTheme = {},
+                            onKaraokeMode = {},
+                            onBlurMode = {},
+                            onWordAppear = {},
+                            onLineAppear = {},
+                            onGiganticLine = {},
+                            onTranslate = {},
+                            onAppTheme = {},
+                            onIncreaseSpeed = {},
+                            onDecreaseSpeed = {},
+                        ),
+                )
+            }
+        }
+        composeRule.onNodeWithTag(SettingsTestTags.BACK).assertIsDisplayed()
+    }
 }
