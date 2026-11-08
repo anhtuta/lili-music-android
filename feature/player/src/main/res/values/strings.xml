@@ -12,6 +12,8 @@
     <string name="player_next_cd">Next song</string>
     <string name="player_shuffle">Shuffle</string>
     <string name="player_repeat_one">Repeat one</string>
+    <string name="player_play_mode_sequence">Sequence</string>
+    <string name="player_play_mode">Play mode: %1$s</string>
     <string name="player_speed_up">Increase speed by 0.1x</string>
     <string name="player_speed_down">Decrease speed by 0.1x</string>
     <string name="player_speed_value">%1$s×</string>
@@ -23,4 +25,7 @@
     <string name="player_no_album">No Album</string>
     <string name="player_album">(%1$s)</string>
     <string name="mini_player_cd">Now playing %1$s</string>
+    <string name="player_lyrics_handle_expand">Expand lyrics</string>
+    <string name="player_lyrics_handle_restore">Restore lyrics</string>
+    <string name="player_speed">Playback speed</string>
 </resources>
