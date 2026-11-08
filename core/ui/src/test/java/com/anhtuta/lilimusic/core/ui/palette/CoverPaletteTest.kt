@@ -26,6 +26,15 @@ class CoverPaletteTest {
     }
 
     @Test
+    fun nowPlayingGradientNeverUsesTransparentOnlyFallback() {
+        val dark = CoverPalette.nowPlayingGradient(coverColor = null, darkTheme = true)
+        val light = CoverPalette.nowPlayingGradient(coverColor = null, darkTheme = false)
+        val tinted = CoverPalette.nowPlayingGradient(coverColor = Color(0xFF112233), darkTheme = true)
+        assertThat(dark).isNotEqualTo(light)
+        assertThat(tinted).isNotEqualTo(light)
+    }
+
+    @Test
     fun solidBitmapYieldsMatchingPaletteBackground() {
         val bitmap = Bitmap.createBitmap(16, 16, Bitmap.Config.ARGB_8888)
         bitmap.eraseColor(AndroidColor.rgb(17, 34, 51))
