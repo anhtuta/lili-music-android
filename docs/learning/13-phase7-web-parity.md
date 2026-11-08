@@ -1,6 +1,6 @@
-# Phase 7 — compact now-playing, transport icons, lyric-card fonts, cancel download, smooth TRC karaoke
+# Phase 7 — compact now-playing, transport icons, lyric-card fonts, cancel download, smooth TRC karaoke, icon tooltips
 
-[Learning guide index](README.md) · Tasks [070](../tasks/070-compact-lyrics.md), [071](../tasks/071-transport-icons.md), [072](../tasks/072-lyric-card-fonts.md), [073](../tasks/073-cancel-download.md), [074](../tasks/074-download-action-icon.md), [075](../tasks/075-smooth-trc-karaoke.md)
+[Learning guide index](README.md) · Tasks [070](../tasks/070-compact-lyrics.md), [071](../tasks/071-transport-icons.md), [072](../tasks/072-lyric-card-fonts.md), [073](../tasks/073-cancel-download.md), [074](../tasks/074-download-action-icon.md), [075](../tasks/075-smooth-trc-karaoke.md), [076](../tasks/076-icon-buttons-tooltips.md)
 
 **What was built.** Owner-picked follow-ups after PR #21:
 
@@ -10,8 +10,9 @@
 4. **Cancel download (073).** Queued or downloading songs get **Cancel**. That stops Media3 (`engine.remove` → `DownloadService.sendRemoveDownload`), deletes the partial cover and lyric cache, and deletes the Room `downloads` row so the UI returns to not-downloaded. Completed/failed still use Delete (which keeps the lyric cache for online play).
 5. **Download action icons (074).** Library rows and Now playing no longer show a text **Download** button. Idle is `Icons.Filled.Download` (contentDescription **Download**), queued/downloading is a `CircularProgressIndicator` (**Cancel**, tap still runs 073), completed is `DownloadDone` (**Delete**), failed is `Refresh` (**Retry**). The Downloads screen still uses text Cancel / Delete / Retry.
 6. **Smooth `.trc` karaoke (075).** Web `BaiHatService.runKaraokeEffect` writes a CSS `linear-gradient` on the **current word span** from `HTMLAudioElement.currentTime` (a continuous clock, sampled every 30ms). Android copied ExoPlayer `currentPosition` every 30ms and rebuilt the whole line’s `AnnotatedString` + per-word brush. LRC lines last seconds, so a coarse clock still looks smooth; TRC words are often 150–400ms, so the same tick jumped ~15%+ of a word. The 066 brush was already fractional (`word.fill` as a hard-stop, like CSS `process%`). Fix: interpolate `position + elapsedRealtimeDelta * speed` on vsync (`withFrameNanos`), paint fill in **draw** (`drawWithContent` + `SrcAtop`) so the remembered `AnnotatedString` does not include fill. `.xtrc` is still TRC without translations (web comment: “future”; the `else` branch already builds TRC spans with `hasTranslation = false`).
+7. **Icon actions + long-press tooltips (076).** Remaining `TextButton`s (app bars, speed ±, lyric offset ±, lyric card, downloads, mini-player) are `LiliIconButton`: Material Icon, `contentDescription` = tooltip text (`TooltipBox` + `PlainTooltip` + `rememberTooltipState`). FilterChips, switches, search field, and values (`1.0×`) stay text.
 
-**Status:** 070–074 merged in [PR #22](https://github.com/anhtuta/lili-music-android/pull/22). 075 is this PR.
+**Status:** 070–074 merged in [PR #22](https://github.com/anhtuta/lili-music-android/pull/22). 075–076 are this PR.
 
 ## New terms
 
@@ -41,6 +42,9 @@
 | `CompositingStrategy.Offscreen` | Render this node to its own layer so blend modes see glyph alpha | An offscreen canvas; without it `SrcAtop` can tint the backdrop, not the letters |
 | `BlendMode.SrcAtop` | Paint fill only where text already has alpha | CSS `background-clip: text` + `linear-gradient` on the current word |
 | `MutableLongState` read in draw | Snapshot invalidates **draw**, not composition, if composition never reads the value | Mutating a CSS variable; the span’s text node stays the same |
+| `TooltipBox` + `PlainTooltip` | Long-press popup naming an icon | `title` / `aria-label` on an icon button; hover tooltip on desktop |
+| `rememberTooltipState` | Holds shown/hidden for that tooltip | Local React state for a popover |
+| `contentDescription` | TalkBack name of the control | `aria-label`; we reuse the same string as the tooltip |
 
 Why 720.dp and not Compact 600.dp? Web CSS is `max-width: 720px`. Material Compact would hide the cover on a 7″ tablet in portrait (~600–700.dp) while the web still showed it. `BoxWithConstraints.maxWidth` is the Now playing pane, which matches “how wide is this player” better than the activity’s window class.
 
@@ -60,6 +64,7 @@ Why cancel also deletes lyrics, but delete-completed does not? Online play still
 10. [PlaybackPositionInterpolator.kt](../../core/lyrics/src/main/java/com/anhtuta/lilimusic/core/lyrics/PlaybackPositionInterpolator.kt) — fake-clock tests; pause / missing stamp return the sampled position.
 11. [KaraokeFill.kt](../../feature/lyrics/src/main/java/com/anhtuta/lilimusic/feature/lyrics/KaraokeFill.kt) — remembered line structure, vsync display time, draw-phase fill of the active word only.
 12. [Media3PlayerController.kt](../../core/playback/src/main/java/com/anhtuta/lilimusic/core/playback/Media3PlayerController.kt) — `positionSampledAtElapsedMs` stamped only when `currentPosition` or play-state changes.
+13. [LiliIconButton.kt](../../core/ui/src/main/java/com/anhtuta/lilimusic/core/ui/button/LiliIconButton.kt) — shared icon + tooltip; tests long-press with `performTouchInput { longClick() }`.
 
 Compact vs expanded (from `PlayerBody`):
 
@@ -125,3 +130,17 @@ fun interpolate(snapshot: Snapshot, nowElapsedMs: Long): Long {
 ```
 
 Why LRC looked fine: one span per line, often several seconds, so a 30ms ExoPlayer hold is ~1% of the fill. Why TRC jumped: many short word spans; the same hold is a visible chunk of the word, and rebuilding `AnnotatedString` on every tick dropped frames. Web never re-rendered React for the gradient — it set `style` on the current `<span>`.
+
+`LiliIconButton` (tooltip text = `contentDescription`):
+
+```kotlin
+TooltipBox(
+    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+    tooltip = { PlainTooltip { Text(text = label) } },
+    state = rememberTooltipState(),
+) {
+    IconButton(onClick = onClick, modifier = Modifier.semantics { contentDescription = label }) {
+        Icon(imageVector = icon, contentDescription = null)
+    }
+}
+```
