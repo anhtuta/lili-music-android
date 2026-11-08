@@ -51,10 +51,47 @@ class LibraryScreenTest {
         composeRule.onNodeWithText("Alpha").assertIsDisplayed()
         composeRule.onNodeWithText("Bob").assertIsDisplayed()
         composeRule.onNodeWithTag(LibraryTestTags.listens(1), useUnmergedTree = true).assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.type(1), useUnmergedTree = true).assertIsDisplayed()
-        composeRule.onNodeWithTag(LibraryTestTags.date(1), useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.type(1), useUnmergedTree = true).assertDoesNotExist()
+        composeRule.onNodeWithTag(LibraryTestTags.date(1), useUnmergedTree = true).assertDoesNotExist()
+        composeRule.onNodeWithText("Vietnam").assertDoesNotExist()
+        composeRule.onNodeWithText("2021/06/09").assertDoesNotExist()
         composeRule.onNodeWithTag(LibraryTestTags.song(1)).performClick()
         assertThat(clickedId).isEqualTo(1L)
+    }
+
+    @Test
+    fun songRowHidesTypeAndDateEvenWhenPresent() {
+        composeRule.setContent {
+            LiliTheme {
+                LibraryScreen(
+                    state =
+                        LibraryUiState(
+                            songs =
+                                listOf(
+                                    libraryTestSong(
+                                        id = 1,
+                                        title = "Alpha",
+                                        artist = "Ann",
+                                        type = "Electronic Dance",
+                                        formatCreatedDate = "2021/06/09",
+                                    ),
+                                ),
+                            isLoading = false,
+                        ),
+                    onQueryChange = {},
+                    onSortFieldChosen = {},
+                    onRefresh = {},
+                    onSongClick = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Alpha").assertIsDisplayed()
+        composeRule.onNodeWithText("Ann").assertIsDisplayed()
+        composeRule.onNodeWithText("Electronic Dance").assertDoesNotExist()
+        composeRule.onNodeWithText("2021/06/09").assertDoesNotExist()
+        composeRule.onNodeWithTag(LibraryTestTags.type(1)).assertDoesNotExist()
+        composeRule.onNodeWithTag(LibraryTestTags.date(1)).assertDoesNotExist()
     }
 
     @Test

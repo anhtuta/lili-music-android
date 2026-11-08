@@ -182,19 +182,5 @@ private fun SongMetaRow(
                         .semantics { contentDescription = soyDescription },
             )
         }
-        song.type?.let { type ->
-            Text(
-                text = type,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.testTag(LibraryTestTags.type(song.id)),
-            )
-        }
-        song.formatCreatedDate?.let { date ->
-            Text(
-                text = date,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.testTag(LibraryTestTags.date(song.id)),
-            )
-        }
     }
 }
