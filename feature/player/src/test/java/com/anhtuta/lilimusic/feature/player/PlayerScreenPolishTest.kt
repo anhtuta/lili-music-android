@@ -14,7 +14,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
+import com.anhtuta.lilimusic.core.ui.download.DownloadActionTags
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -278,5 +280,38 @@ class PlayerScreenPolishTest {
         composeRule.onNodeWithContentDescription("Play mode: Sequence").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Playback speed").performTouchInput { longClick() }
         composeRule.onNodeWithText("Playback speed").assertIsDisplayed()
+    }
+
+    @Test
+    fun appBarActionIconsAreCompactWithAccessibleTargets() {
+        composeRule.setContent {
+            LiliTheme {
+                SizedPlayer(
+                    width = PlayerScreenCompactWidth,
+                    height = PlayerScreenPhoneHeight,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            downloadStatus = DownloadStatus.NONE,
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                )
+            }
+        }
+
+        assertThat(AppBarActionMetrics.IconSize.value).isEqualTo(20f)
+        assertThat(AppBarActionMetrics.ContainerSize.value).isEqualTo(40f)
+        val downloadGlyph =
+            composeRule
+                .onNodeWithTag(DownloadActionTags.GLYPH, useUnmergedTree = true)
+                .getUnclippedBoundsInRoot()
+        assertThat(downloadGlyph.bottom.value - downloadGlyph.top.value).isWithin(1.5f).of(20f)
+        listOf(PlayerTestTags.DOWNLOAD, PlayerTestTags.LYRIC_CARD, PlayerTestTags.SETTINGS).forEach { tag ->
+            val bounds = composeRule.onNodeWithTag(tag).getUnclippedBoundsInRoot()
+            assertThat(bounds.bottom.value - bounds.top.value).isAtLeast(40f)
+        }
+        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Create lyric card").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
     }
 }

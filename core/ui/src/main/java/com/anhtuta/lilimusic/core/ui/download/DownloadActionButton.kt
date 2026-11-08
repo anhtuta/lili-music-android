@@ -9,11 +9,17 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.ui.R
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
+
+object DownloadActionTags {
+    const val GLYPH = "download-action-glyph"
+}
 
 @Composable
 fun DownloadActionButton(
@@ -21,14 +27,21 @@ fun DownloadActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     progressPercent: Int = 0,
+    iconSize: Dp = 24.dp,
+    containerSize: Dp? = null,
 ) {
     val description = stringResource(descriptionRes(status))
     LiliIconButton(
         label = description,
         onClick = onClick,
         modifier = modifier,
+        containerSize = containerSize,
     ) {
-        DownloadActionVisual(status = status, progressPercent = progressPercent)
+        DownloadActionVisual(
+            status = status,
+            progressPercent = progressPercent,
+            iconSize = iconSize,
+        )
     }
 }
 
@@ -44,25 +57,41 @@ private fun descriptionRes(status: DownloadStatus): Int =
 private fun DownloadActionVisual(
     status: DownloadStatus,
     progressPercent: Int,
+    iconSize: Dp,
 ) {
-    val indicatorModifier = Modifier.size(24.dp)
+    val glyphModifier =
+        Modifier
+            .size(iconSize)
+            .testTag(DownloadActionTags.GLYPH)
     when (status) {
         DownloadStatus.QUEUED ->
             CircularProgressIndicator(
-                modifier = indicatorModifier,
+                modifier = glyphModifier,
                 strokeWidth = 2.dp,
             )
         DownloadStatus.DOWNLOADING ->
             CircularProgressIndicator(
                 progress = { progressPercent.coerceIn(0, 100) / 100f },
-                modifier = indicatorModifier,
+                modifier = glyphModifier,
                 strokeWidth = 2.dp,
             )
         DownloadStatus.COMPLETED ->
-            Icon(imageVector = Icons.Filled.DownloadDone, contentDescription = null)
+            Icon(
+                imageVector = Icons.Filled.DownloadDone,
+                contentDescription = null,
+                modifier = glyphModifier,
+            )
         DownloadStatus.FAILED ->
-            Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+            Icon(
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = null,
+                modifier = glyphModifier,
+            )
         DownloadStatus.NONE ->
-            Icon(imageVector = Icons.Filled.Download, contentDescription = null)
+            Icon(
+                imageVector = Icons.Filled.Download,
+                contentDescription = null,
+                modifier = glyphModifier,
+            )
     }
 }

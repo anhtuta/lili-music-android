@@ -107,6 +107,11 @@ fun PlayerScreen(
     }
 }
 
+internal object AppBarActionMetrics {
+    val IconSize = 20.dp
+    val ContainerSize = 40.dp
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NowPlayingTopBar(
@@ -131,12 +136,16 @@ private fun NowPlayingTopBar(
                     progressPercent = state.downloadProgress,
                     onClick = callbacks.onDownload,
                     modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
+                    iconSize = AppBarActionMetrics.IconSize,
+                    containerSize = AppBarActionMetrics.ContainerSize,
                 )
                 LiliIconButton(
                     icon = Icons.Filled.Image,
                     label = stringResource(R.string.player_lyric_card),
                     onClick = callbacks.onLyricCard,
                     modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
+                    iconSize = AppBarActionMetrics.IconSize,
+                    containerSize = AppBarActionMetrics.ContainerSize,
                 )
             }
             LiliIconButton(
@@ -144,6 +153,8 @@ private fun NowPlayingTopBar(
                 label = stringResource(R.string.player_settings),
                 onClick = callbacks.onSettings,
                 modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
+                iconSize = AppBarActionMetrics.IconSize,
+                containerSize = AppBarActionMetrics.ContainerSize,
             )
         },
         colors =
