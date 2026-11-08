@@ -38,12 +38,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
+import com.anhtuta.lilimusic.core.ui.text.MarqueeText
 import com.anhtuta.lilimusic.core.ui.palette.CoverPalette
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 
@@ -178,18 +178,14 @@ private fun NowPlayingAppBarTitle(song: Song?) {
     ) {
         NowPlayingAppBarCover(song = song)
         Column(modifier = Modifier.weight(1f)) {
-            Text(
+            MarqueeText(
                 text = song.title,
                 style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.testTag(PlayerTestTags.APP_BAR_TITLE),
             )
-            Text(
+            MarqueeText(
                 text = song.artist,
                 style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.testTag(PlayerTestTags.APP_BAR_ARTIST),
             )
         }
