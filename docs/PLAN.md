@@ -307,31 +307,45 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 | 075 | Smooth `.trc` karaoke fill (interpolate playback position between ExoPlayer samples; draw-phase fill). `.xtrc` stays out of v1 (web: “future”) | Done in PR #23 |
 | 076 | Replace remaining text action buttons with Material Icons + long-press `PlainTooltip` via a shared `LiliIconButton`. Keep non-button text (labels, `1.0×`, sort chips, switches) | Done in PR #23 |
 
-### Phase 8 — Now Playing polish *(this PR)*
+### Phase 8 — Now Playing polish (transport & pane)
 
-Owner review of compact Now Playing screenshots (dark + light phone). Task plan: [080–098](tasks/080-098-now-playing-polish.md). Web player remains `BaiHat.js` / `Player.js`.
+Owner review of compact Now Playing screenshots (dark + light phone). Tasks **080–089** are the first slice of [080–098](tasks/080-098-now-playing-polish.md). Web player remains `BaiHat.js` / `Player.js`.
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 080 | One cycling play-mode icon after Next: Sequence (`Repeat`) → Shuffle (`Shuffle`) → Repeat one (`RepeatOne`). Tooltip `Play mode: {current}`. Keep shuffle-current-first | This PR |
-| 081 | Keep `=====` lyric lines as plain lyric text (no chrome change) | This PR |
-| 082 | Fade top and bottom edges of the lyric pane (gradient mask) | This PR |
-| 083 | Drag handle between lyrics and controls: drag down expands lyrics fullscreen; drag up / Back / tap restores | This PR |
-| 084 | Single control row: speed chip, previous, −5s, play, +5s, next, play mode. Speed ±0.1 in 0.5–2.0 | This PR |
-| 085 | Large filled circular Play/Pause (~64.dp, primary container) | This PR |
-| 086 | Lyric offset hidden until pane tap; auto-hide; minus/plus icons only; session/per-song, never persisted | This PR |
-| 087 | Remove the in-pane lyric-card button; keep the app-bar one | This PR |
-| 088 | Hide album text everywhere on Now Playing | This PR |
-| 089 | Thinner seek bar (~4.dp track, small thumb, played vs remaining contrast) | This PR |
-| 090 | Subtle cover Palette **gradient** on Now Playing; theme-based gradient fallback; never flat grey | This PR |
-| 091 | Transport icons full `onSurface`; active state uses the accent | This PR |
-| 092 | Light effective theme uses `#2199F9` + dark-grey unsung + `#DFDFDF` pane; dark keeps `#FC0`. Sung words use full karaoke fill (dimming removed at owner request) | This PR |
-| 093 | App-bar back / download / lyric card / settings: contentDescription + long-press tooltip (`LiliIconButton`) | This PR |
-| 094 | Swipe down on Now Playing closes to the previous screen / mini player (no conflict with 083 or lyric scroll) | This PR |
-| 095 | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons | This PR |
-| 096 | `enableEdgeToEdge` + `SystemBarStyle` from **in-app** theme; light status-bar icons dark on light | This PR |
-| 097 | App bar shows cover thumbnail + title/artist; drop “Now playing” title and the duplicate block below lyrics | This PR |
-| 098 | ~16.dp corner radius on the lyric pane; clip content | This PR |
+| 080 | One cycling play-mode icon after Next: Sequence (`Repeat`) → Shuffle (`Shuffle`) → Repeat one (`RepeatOne`). Tooltip `Play mode: {current}`. Keep shuffle-current-first | Done in PR #24 |
+| 081 | Keep `=====` lyric lines as plain lyric text (no chrome change) | Done in PR #24 |
+| 082 | Fade top and bottom edges of the lyric pane (gradient mask) | Done in PR #24 |
+| 083 | Drag handle between lyrics and controls: drag down expands lyrics fullscreen; drag up / Back / tap restores | Done in PR #24 |
+| 084 | Single control row: speed chip, previous, −5s, play, +5s, next, play mode. Speed ±0.1 in 0.5–2.0 | Done in PR #24 |
+| 085 | Large filled circular Play/Pause (~64.dp, primary container) | Done in PR #24 |
+| 086 | Lyric offset hidden until pane tap; auto-hide; minus/plus icons only; session/per-song, never persisted | Done in PR #24 |
+| 087 | Remove the in-pane lyric-card button; keep the app-bar one | Done in PR #24 |
+| 088 | Hide album text everywhere on Now Playing | Done in PR #24 |
+| 089 | Thinner seek bar (~4.dp track, small thumb, played vs remaining contrast) | Done in PR #24 |
+
+### Phase 9 — Now Playing polish (chrome & app bar)
+
+Tasks **090–098** complete [080–098](tasks/080-098-now-playing-polish.md) (gradient, contrast, edge-to-edge, app-bar song info, rounded pane).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 090 | Subtle cover Palette **gradient** on Now Playing; theme-based gradient fallback; never flat grey | Done in PR #24 |
+| 091 | Transport icons full `onSurface`; active state uses the accent | Done in PR #24 |
+| 092 | Light effective theme uses `#2199F9` + dark-grey unsung + `#DFDFDF` pane; dark keeps `#FC0`. Sung words use full karaoke fill (dimming removed at owner request) | Done in PR #24 |
+| 093 | App-bar back / download / lyric card / settings: contentDescription + long-press tooltip (`LiliIconButton`) | Done in PR #24 |
+| 094 | Swipe down on Now Playing closes to the previous screen / mini player (no conflict with 083 or lyric scroll) | Done in PR #24 |
+| 095 | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons | Done in PR #24 |
+| 096 | `enableEdgeToEdge` + `SystemBarStyle` from **in-app** theme; light status-bar icons dark on light | Done in PR #24 |
+| 097 | App bar shows cover thumbnail + title/artist; drop “Now playing” title and the duplicate block below lyrics | Done in PR #24 |
+| 098 | ~16.dp corner radius on the lyric pane; clip content | Done in PR #24 |
+
+### Phase 10 — Now Playing lyrics & controls *(this PR)*
+
+Wrap/center/marquee lyric UI and symmetric transport row. Task plans: [099](tasks/099-wrapped-karaoke-fill.md)–[105](tasks/105-deemphasize-artist.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
 | 099 | Karaoke fill progresses across every wrapped visual line (not only the last). See [099](tasks/099-wrapped-karaoke-fill.md) | This PR |
 | 100 | Wrapped lyric lines use ~1.4× lineHeight (`LineHeightStyle` center, trim none). See [100](tasks/100-lyric-wrap-line-height.md) | This PR |
 | 101 | Auto-scroll centers the active lyric line in the pane (web `scrollLyric`). See [101](tasks/101-center-active-lyric.md) | This PR |
@@ -339,6 +353,13 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 103 | Compact Now Playing download / lyric-card / settings glyphs (~20.dp) with ≥40.dp touch targets. See [103](tasks/103-compact-app-bar-actions.md) | This PR |
 | 104 | Overflowing app-bar title and artist marquee slowly; drag to scroll; fitting text stays still. See [104](tasks/104-app-bar-marquee.md) | This PR |
 | 105 | App-bar artist is muted (`onSurface` ~0.65 alpha) so the title stands out. See [105](tasks/105-deemphasize-artist.md) | This PR |
+
+### Phase 11 — Library compact UI & test CI *(this PR)*
+
+Library search/sort/rows/overflow menu plus launcher unit-test hardening. Task plans: [106](tasks/106-compact-library-search.md)–[111](tasks/111-launcher-activity-test-ci.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
 | 106 | Compact Library search (~44–48.dp) with placeholder. See [106](tasks/106-compact-library-search.md) | This PR |
 | 107 | One sort pill + dropdown instead of chips. See [107](tasks/107-library-sort-pill.md) | This PR |
 | 108 | Library row: title, artist, listens, soy only (no type/date wrap). See [108](tasks/108-library-row-fields.md) | This PR |
@@ -372,7 +393,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 
 ## 9. This-run deliverable
 
-PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–111**: Now Playing wrap/center/app-bar polish, Library search/sort/rows/menu, and a CI-hardening of `LauncherActivityTest`. See [099](tasks/099-wrapped-karaoke-fill.md)–[111](tasks/111-launcher-activity-test-ci.md).
+PR #24 merged Phases **8–9** (**080–098**) on main. This follow-up is Phases **10–11** (**099–111**): Now Playing wrap/center/app-bar polish, Library search/sort/rows/menu, and a CI-hardening of `LauncherActivityTest`. See [099](tasks/099-wrapped-karaoke-fill.md)–[111](tasks/111-launcher-activity-test-ci.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
