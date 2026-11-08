@@ -4,6 +4,7 @@ package com.anhtuta.lilimusic.core.playback
 
 import android.content.ComponentName
 import android.content.Context
+import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -49,6 +50,9 @@ class Media3PlayerController
         private var queueState = PlaybackQueueState()
         private var positionJob: Job? = null
         private val random = Random.Default
+        private var lastReportedPositionMs = Long.MIN_VALUE
+        private var lastReportedPlaying = false
+        private var positionSampledAtElapsedMs = 0L
 
         private val listener =
             object : Player.Listener {
@@ -245,12 +249,14 @@ class Media3PlayerController
             atStartOfQueue: Boolean = false,
         ) {
             val previous = _state.value
+            val sampled = samplePlayerPosition(player)
             val next =
                 PlaybackState(
                     currentSong = queueState.currentSong,
                     queue = queueState.playableQueue,
                     isPlaying = player.isPlaying,
-                    positionMs = player.currentPosition.coerceAtLeast(0L),
+                    positionMs = sampled.positionMs,
+                    positionSampledAtElapsedMs = sampled.sampledAtElapsedMs,
                     durationMs = PlaybackDuration.fromMedia3(player.duration),
                     playMode = queueState.playMode,
                     speed = player.playbackParameters.speed,
@@ -282,14 +288,28 @@ class Media3PlayerController
                         delay(POSITION_TICK_MS)
                         val mediaController = controller
                         if (mediaController != null && mediaController.isPlaying) {
+                            val sampled = samplePlayerPosition(mediaController)
                             _state.value =
                                 _state.value.copy(
-                                    positionMs = mediaController.currentPosition.coerceAtLeast(0L),
+                                    positionMs = sampled.positionMs,
+                                    positionSampledAtElapsedMs = sampled.sampledAtElapsedMs,
                                     durationMs = PlaybackDuration.fromMedia3(mediaController.duration),
                                 )
                         }
                     }
                 }
+        }
+
+        private fun samplePlayerPosition(player: Player): SampledPosition {
+            val pos = player.currentPosition.coerceAtLeast(0L)
+            val now = SystemClock.elapsedRealtime()
+            val playing = player.isPlaying
+            if (!playing || !lastReportedPlaying || pos != lastReportedPositionMs) {
+                lastReportedPositionMs = pos
+                positionSampledAtElapsedMs = now
+            }
+            lastReportedPlaying = playing
+            return SampledPosition(positionMs = pos, sampledAtElapsedMs = positionSampledAtElapsedMs)
         }
 
         private fun withController(block: (MediaController) -> Unit) {
@@ -316,3 +336,8 @@ class Media3PlayerController
             const val POSITION_TICK_MS = 30L
         }
     }
+
+private data class SampledPosition(
+    val positionMs: Long,
+    val sampledAtElapsedMs: Long,
+)

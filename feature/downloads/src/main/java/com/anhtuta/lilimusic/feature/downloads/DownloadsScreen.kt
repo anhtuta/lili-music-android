@@ -10,13 +10,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.SongDownload
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,21 +48,21 @@ fun DownloadsScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.downloads_title)) },
                 navigationIcon = {
-                    TextButton(
+                    LiliIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        label = stringResource(R.string.downloads_back),
                         onClick = callbacks.onBack,
                         modifier = Modifier.testTag(DownloadsTestTags.BACK),
-                    ) {
-                        Text(stringResource(R.string.downloads_back))
-                    }
+                    )
                 },
                 actions = {
                     if (state.items.isNotEmpty()) {
-                        TextButton(
+                        LiliIconButton(
+                            icon = Icons.Filled.DeleteSweep,
+                            label = stringResource(R.string.downloads_delete_all),
                             onClick = callbacks.onDeleteAllClick,
                             modifier = Modifier.testTag(DownloadsTestTags.DELETE_ALL),
-                        ) {
-                            Text(stringResource(R.string.downloads_delete_all))
-                        }
+                        )
                     }
                 },
             )
@@ -104,20 +112,20 @@ private fun DeleteAllConfirmation(callbacks: DownloadsCallbacks) {
         title = { Text(stringResource(R.string.downloads_delete_all)) },
         text = { Text(stringResource(R.string.downloads_delete_all_confirm)) },
         confirmButton = {
-            TextButton(
+            LiliIconButton(
+                icon = Icons.Filled.Delete,
+                label = stringResource(R.string.downloads_confirm),
                 onClick = callbacks.onConfirmDeleteAll,
                 modifier = Modifier.testTag(DownloadsTestTags.CONFIRM_DELETE_ALL),
-            ) {
-                Text(stringResource(R.string.downloads_confirm))
-            }
+            )
         },
         dismissButton = {
-            TextButton(
+            LiliIconButton(
+                icon = Icons.Filled.Close,
+                label = stringResource(R.string.downloads_cancel),
                 onClick = callbacks.onCancelDeleteAll,
                 modifier = Modifier.testTag(DownloadsTestTags.CANCEL_DELETE_ALL),
-            ) {
-                Text(stringResource(R.string.downloads_cancel))
-            }
+            )
         },
     )
 }
@@ -152,35 +160,35 @@ private fun DownloadRow(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             if (item.isComplete) {
-                TextButton(
+                LiliIconButton(
+                    icon = Icons.Filled.PlayArrow,
+                    label = stringResource(R.string.downloads_play),
                     onClick = onPlay,
                     modifier = Modifier.testTag(DownloadsTestTags.play(item.songPath)),
-                ) {
-                    Text(stringResource(R.string.downloads_play))
-                }
+                )
             }
             if (item.status == DownloadStatus.FAILED) {
-                TextButton(
+                LiliIconButton(
+                    icon = Icons.Filled.Refresh,
+                    label = stringResource(R.string.downloads_retry),
                     onClick = onRetry,
                     modifier = Modifier.testTag(DownloadsTestTags.retry(item.songPath)),
-                ) {
-                    Text(stringResource(R.string.downloads_retry))
-                }
+                )
             }
             if (item.isActive) {
-                TextButton(
+                LiliIconButton(
+                    icon = Icons.Filled.Cancel,
+                    label = stringResource(R.string.downloads_cancel_item),
                     onClick = onCancel,
                     modifier = Modifier.testTag(DownloadsTestTags.cancel(item.songPath)),
-                ) {
-                    Text(stringResource(R.string.downloads_cancel_item))
-                }
+                )
             } else {
-                TextButton(
+                LiliIconButton(
+                    icon = Icons.Filled.Delete,
+                    label = stringResource(R.string.downloads_delete),
                     onClick = onDelete,
                     modifier = Modifier.testTag(DownloadsTestTags.delete(item.songPath)),
-                ) {
-                    Text(stringResource(R.string.downloads_delete))
-                }
+                )
             }
         }
     }

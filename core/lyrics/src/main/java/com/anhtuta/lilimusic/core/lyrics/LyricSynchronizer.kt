@@ -14,6 +14,8 @@ data class LyricWordFrame(
     val isActive: Boolean,
     val isPassed: Boolean,
     val seekPositionMs: Long,
+    val startMs: Long,
+    val endMs: Long,
 )
 
 data class LyricLineFrame(
@@ -71,6 +73,8 @@ object LyricSynchronizer {
                             isActive = isActive,
                             isPassed = isPassed,
                             seekPositionMs = seekPositionMs,
+                            startMs = word.startMs,
+                            endMs = endMs,
                         )
                     }
                 val isActive = frames.any { it.isActive }
@@ -150,7 +154,7 @@ object LyricSynchronizer {
         return ceil(timeLeftMs / 1000.0).toInt().coerceIn(0, 5)
     }
 
-    internal fun karaokeFill(
+    fun karaokeFill(
         startMs: Long,
         endMs: Long,
         positionMs: Long,

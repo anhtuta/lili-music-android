@@ -16,7 +16,7 @@
     <string name="lyrics_meta_creator">Lyric creator: %1$s</string>
     <string name="lyrics_meta_source">Source: %1$s</string>
     <string name="lyrics_meta_date">Date: %1$s</string>
-    <string name="lyric_card_open">Card</string>
+    <string name="lyric_card_open">Create lyric card</string>
     <string name="lyric_card_no_lyric">No lyric available to create a card</string>
     <string name="lyric_card_select_title">Select Lyric Text</string>
     <string name="lyric_card_select_instruction">Select the lines you want to include in your lyric card:</string>

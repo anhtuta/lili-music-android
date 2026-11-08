@@ -11,15 +11,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DownloadForOffline
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -37,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,18 +66,24 @@ fun LibraryScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.library_title)) },
                 actions = {
-                    TextButton(
+                    LiliIconButton(
+                        icon = Icons.Filled.Refresh,
+                        label = stringResource(R.string.library_refresh),
+                        onClick = onRefresh,
+                        modifier = Modifier.testTag(LibraryTestTags.REFRESH),
+                    )
+                    LiliIconButton(
+                        icon = Icons.Filled.DownloadForOffline,
+                        label = stringResource(R.string.library_downloads),
                         onClick = onDownloadsClick,
                         modifier = Modifier.testTag(LibraryTestTags.DOWNLOADS),
-                    ) {
-                        Text(stringResource(R.string.library_downloads))
-                    }
-                    TextButton(
+                    )
+                    LiliIconButton(
+                        icon = Icons.Filled.Settings,
+                        label = stringResource(R.string.library_settings),
                         onClick = onSettingsClick,
                         modifier = Modifier.testTag(LibraryTestTags.SETTINGS),
-                    ) {
-                        Text(stringResource(R.string.library_settings))
-                    }
+                    )
                 },
             )
         },
@@ -149,15 +163,15 @@ private fun LibraryError(onRetry: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = stringResource(R.string.library_error))
-        Button(
+        LiliIconButton(
+            icon = Icons.Filled.Refresh,
+            label = stringResource(R.string.library_retry),
             onClick = onRetry,
             modifier =
                 Modifier
                     .padding(top = 12.dp)
                     .testTag(LibraryTestTags.RETRY),
-        ) {
-            Text(stringResource(R.string.library_retry))
-        }
+        )
     }
 }
 
@@ -182,17 +196,7 @@ private fun LibraryCatalog(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
             )
         }
-        OutlinedTextField(
-            value = state.query,
-            onValueChange = onQueryChange,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .testTag(LibraryTestTags.SEARCH),
-            singleLine = true,
-            label = { Text(stringResource(R.string.library_search_hint)) },
-        )
+        LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
         SortRow(
             selected = state.sort,
             sortOrder = state.sortOrder,
@@ -242,6 +246,43 @@ private fun LibraryCatalog(
             }
         }
     }
+}
+
+@Composable
+private fun LibrarySearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .testTag(LibraryTestTags.SEARCH),
+        singleLine = true,
+        label = { Text(stringResource(R.string.library_search_hint)) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = null,
+            )
+        },
+        trailingIcon =
+            if (query.isNotEmpty()) {
+                {
+                    LiliIconButton(
+                        icon = Icons.Filled.Close,
+                        label = stringResource(R.string.library_clear_search),
+                        onClick = { onQueryChange("") },
+                        modifier = Modifier.testTag(LibraryTestTags.CLEAR_SEARCH),
+                    )
+                }
+            } else {
+                null
+            },
+    )
 }
 
 @Composable
@@ -295,21 +336,24 @@ private fun SortRow(
                 )
             }
         }
-        TextButton(
+        LiliIconButton(
+            icon =
+                if (sortOrder == SortOrder.ASC) {
+                    Icons.Filled.ArrowUpward
+                } else {
+                    Icons.Filled.ArrowDownward
+                },
+            label =
+                stringResource(
+                    if (sortOrder == SortOrder.ASC) {
+                        R.string.library_sort_order_asc
+                    } else {
+                        R.string.library_sort_order_desc
+                    },
+                ),
             onClick = onSortOrderToggle,
             modifier = Modifier.testTag(LibraryTestTags.SORT_ORDER),
-        ) {
-            Text(
-                text =
-                    stringResource(
-                        if (sortOrder == SortOrder.ASC) {
-                            R.string.library_sort_order_asc
-                        } else {
-                            R.string.library_sort_order_desc
-                        },
-                    ),
-            )
-        }
+        )
     }
 }
 

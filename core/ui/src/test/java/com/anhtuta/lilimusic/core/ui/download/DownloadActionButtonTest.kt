@@ -3,10 +3,13 @@ package com.anhtuta.lilimusic.core.ui.download
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.google.common.truth.Truth.assertThat
@@ -55,6 +58,13 @@ class DownloadActionButtonTest {
     fun failedUsesRetry() {
         setButton(DownloadStatus.FAILED)
         composeRule.onNodeWithContentDescription("Retry").assertIsDisplayed()
+    }
+
+    @Test
+    fun longPressShowsTooltipMatchingContentDescription() {
+        setButton(DownloadStatus.NONE)
+        composeRule.onNodeWithContentDescription("Download").performTouchInput { longClick() }
+        composeRule.onNodeWithText("Download").assertIsDisplayed()
     }
 
     private fun setButton(

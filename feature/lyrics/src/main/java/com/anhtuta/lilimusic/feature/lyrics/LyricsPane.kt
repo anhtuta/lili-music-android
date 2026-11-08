@@ -13,19 +13,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableLongState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
@@ -33,22 +33,18 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.lyrics.LyricLineFrame
 import com.anhtuta.lilimusic.core.lyrics.LyricMetaFooter
 import com.anhtuta.lilimusic.core.lyrics.LyricSyncFrame
 import com.anhtuta.lilimusic.core.lyrics.LyricSynchronizer
-import com.anhtuta.lilimusic.core.lyrics.LyricWordFrame
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @Composable
 fun LyricsPane(
@@ -188,6 +184,14 @@ private fun LyricsBody(
                 frame = state.frame,
                 style = style,
                 onSeekToLine = onSeekToLine,
+                clock =
+                    KaraokeClock(
+                        sampledPositionMs = state.positionMs,
+                        sampledAtElapsedMs = state.positionSampledAtElapsedMs,
+                        speed = state.speed,
+                        isPlaying = state.isPlaying,
+                        offsetMs = state.frame.combinedOffsetMs,
+                    ),
             )
         }
     }
@@ -251,12 +255,13 @@ private fun LyricCardOpenRow(
                 .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Image,
+            label = stringResource(R.string.lyric_card_open),
             onClick = onLyricCardClick,
             modifier = Modifier.testTag(LyricCardTestTags.OPEN),
-        ) {
-            Text(text = stringResource(R.string.lyric_card_open), color = textColor)
-        }
+            tint = textColor,
+        )
     }
 }
 
@@ -274,31 +279,25 @@ private fun OffsetRow(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val earlier = stringResource(R.string.lyrics_offset_earlier)
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Remove,
+            label = stringResource(R.string.lyrics_offset_earlier),
             onClick = { onNudgeOffset(-LyricSynchronizer.USER_OFFSET_STEP_MS) },
-            modifier =
-                Modifier
-                    .testTag(LyricsTestTags.OFFSET_EARLIER)
-                    .semantics { contentDescription = earlier },
-        ) {
-            Text("−100ms", color = textColor)
-        }
+            modifier = Modifier.testTag(LyricsTestTags.OFFSET_EARLIER),
+            tint = textColor,
+        )
         Text(
             text = stringResource(R.string.lyrics_offset_value, offsetMs),
             color = textColor,
             modifier = Modifier.testTag(LyricsTestTags.OFFSET_VALUE),
         )
-        val later = stringResource(R.string.lyrics_offset_later)
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Add,
+            label = stringResource(R.string.lyrics_offset_later),
             onClick = { onNudgeOffset(LyricSynchronizer.USER_OFFSET_STEP_MS) },
-            modifier =
-                Modifier
-                    .testTag(LyricsTestTags.OFFSET_LATER)
-                    .semantics { contentDescription = later },
-        ) {
-            Text("+100ms", color = textColor)
-        }
+            modifier = Modifier.testTag(LyricsTestTags.OFFSET_LATER),
+            tint = textColor,
+        )
     }
 }
 
@@ -307,8 +306,10 @@ private fun SyncedLyricList(
     frame: LyricSyncFrame,
     style: LyricVisualStyle,
     onSeekToLine: (Long) -> Unit,
+    clock: KaraokeClock,
 ) {
     val listState = rememberLazyListState()
+    val displayPosition = rememberKaraokeDisplayPositionState(clock)
     LaunchedEffect(frame.activeLineIndex) {
         if (frame.activeLineIndex >= 0) {
             listState.animateScrollToItem(frame.activeLineIndex)
@@ -320,11 +321,16 @@ private fun SyncedLyricList(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = style.horizontal,
     ) {
-        itemsIndexed(frame.lines) { index, line ->
+        itemsIndexed(
+            items = frame.lines,
+            key = { index, _ -> index },
+        ) { index, line ->
             LyricLineRow(
                 line = line,
                 isActive = index == frame.activeLineIndex,
                 style = style,
+                displayPosition = displayPosition,
+                clock = clock,
                 onSeek = { onSeekToLine(line.seekPositionMs) },
                 seekDescription = seekDescription,
                 modifier = Modifier.fillParentMaxWidth(),
@@ -400,6 +406,8 @@ private fun LyricLineRow(
     line: LyricLineFrame,
     isActive: Boolean,
     style: LyricVisualStyle,
+    displayPosition: MutableLongState,
+    clock: KaraokeClock,
     onSeek: () -> Unit,
     seekDescription: String,
     modifier: Modifier = Modifier,
@@ -420,6 +428,9 @@ private fun LyricLineRow(
             line = line,
             isActive = isActive,
             style = style,
+            displayPosition = displayPosition,
+            offsetMs = clock.offsetMs,
+            isPlaying = clock.isPlaying,
         )
         if (style.settings.translate) {
             line.translations.forEach { translation ->
@@ -433,102 +444,5 @@ private fun LyricLineRow(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun KaraokeLine(
-    line: LyricLineFrame,
-    isActive: Boolean,
-    style: LyricVisualStyle,
-) {
-    val fontSize =
-        MaterialTheme.typography.bodyLarge.fontSize *
-            if (style.settings.giganticLine && isActive) 1.8f else 1f
-    val fillColor = style.colors.karaokeFill
-    val restColor = if (isActive) style.colors.activeText else style.colors.text
-    val shadow =
-        if (style.settings.blurMode) {
-            Shadow(color = Color.White, offset = Offset.Zero, blurRadius = 8f)
-        } else {
-            null
-        }
-    val annotated =
-        buildAnnotatedString {
-            line.words.forEach { word ->
-                val displayText = karaokeDisplayText(word, style)
-                if (displayText.isEmpty()) {
-                    return@forEach
-                }
-                withStyle(
-                    SpanStyle(
-                        brush = wordBrush(word, style.settings.karaokeMode, fillColor, restColor),
-                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = fontSize,
-                        shadow = shadow,
-                    ),
-                ) {
-                    append(displayText)
-                }
-            }
-        }
-    val countdownDescription =
-        line.words.firstOrNull { it.countdownDots > 0 }?.let { word ->
-            stringResource(R.string.lyrics_countdown_cd, word.countdownDots)
-        }
-    Text(
-        text = annotated,
-        textAlign = style.textAlign,
-        softWrap = true,
-        overflow = TextOverflow.Clip,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .testTag(LyricsTestTags.LINE_WORDS)
-                .then(
-                    if (countdownDescription != null) {
-                        Modifier.semantics { contentDescription = countdownDescription }
-                    } else {
-                        Modifier
-                    },
-                ),
-    )
-}
-
-private fun karaokeDisplayText(
-    word: LyricWordFrame,
-    style: LyricVisualStyle,
-): String {
-    val hideWord =
-        (style.settings.wordAppear || style.settings.lineAppear) &&
-            !word.isPassed &&
-            !word.isActive
-    return when {
-        hideWord -> ""
-        word.isEmpty && word.countdownDots > 0 -> "•".repeat(word.countdownDots)
-        word.isEmpty -> " "
-        else -> word.text
-    }
-}
-
-private fun wordBrush(
-    word: LyricWordFrame,
-    karaokeMode: Boolean,
-    fillColor: Color,
-    restColor: Color,
-): Brush {
-    if (!karaokeMode) {
-        return SolidColor(if (word.isActive || word.isPassed) fillColor else restColor)
-    }
-    return when {
-        word.fill <= 0f -> SolidColor(restColor)
-        word.fill >= 1f -> SolidColor(fillColor)
-        else ->
-            Brush.horizontalGradient(
-                0f to fillColor,
-                word.fill to fillColor,
-                word.fill to restColor,
-                1f to restColor,
-            )
     }
 }

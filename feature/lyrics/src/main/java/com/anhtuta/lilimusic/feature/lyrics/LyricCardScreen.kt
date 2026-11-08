@@ -10,6 +10,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -17,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.LyricAlign
 import com.anhtuta.lilimusic.core.model.LyricCardFont
 import com.anhtuta.lilimusic.core.model.LyricCardSettings
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,12 +66,12 @@ private fun LyricCardSelectionScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.lyric_card_select_title)) },
                 navigationIcon = {
-                    TextButton(
+                    LiliIconButton(
+                        icon = Icons.Filled.Close,
+                        label = stringResource(R.string.lyric_card_close),
                         onClick = callbacks.onClose,
                         modifier = Modifier.testTag(LyricCardTestTags.CLOSE),
-                    ) {
-                        Text(stringResource(R.string.lyric_card_close))
-                    }
+                    )
                 },
             )
         },
@@ -79,12 +86,12 @@ private fun LyricCardSelectionScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(text = stringResource(R.string.lyric_card_select_instruction))
-            TextButton(
+            LiliIconButton(
+                icon = Icons.Filled.SelectAll,
+                label = stringResource(R.string.lyric_card_select_all),
                 onClick = callbacks.onSelectAll,
                 modifier = Modifier.testTag(LyricCardTestTags.SELECT_ALL),
-            ) {
-                Text(stringResource(R.string.lyric_card_select_all))
-            }
+            )
             state.lines.forEach { line ->
                 Text(
                     text = line.text,
@@ -109,12 +116,12 @@ private fun LyricCardSelectionScreen(
                     text = state.selectedText,
                     modifier = Modifier.testTag(LyricCardTestTags.SELECTED_PREVIEW),
                 )
-                TextButton(
+                LiliIconButton(
+                    icon = Icons.Filled.AutoAwesome,
+                    label = stringResource(R.string.lyric_card_generate),
                     onClick = callbacks.onGenerate,
                     modifier = Modifier.testTag(LyricCardTestTags.GENERATE),
-                ) {
-                    Text(stringResource(R.string.lyric_card_generate))
-                }
+                )
             }
         }
     }
@@ -134,12 +141,12 @@ private fun LyricCardConfigureScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.lyric_card_configure_title)) },
                 navigationIcon = {
-                    TextButton(
+                    LiliIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        label = stringResource(R.string.lyric_card_back),
                         onClick = callbacks.onBackToSelection,
                         modifier = Modifier.testTag(LyricCardTestTags.BACK),
-                    ) {
-                        Text(stringResource(R.string.lyric_card_back))
-                    }
+                    )
                 },
             )
         },
@@ -226,18 +233,18 @@ private fun ConfigurePreviewAndShare(
     Text(text = state.songTitle, style = MaterialTheme.typography.titleMedium)
     Text(text = state.songArtist, style = MaterialTheme.typography.bodyMedium)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        TextButton(
+        LiliIconButton(
+            icon = Icons.Filled.Share,
+            label = stringResource(R.string.lyric_card_share),
             onClick = callbacks.onShare,
             modifier = Modifier.testTag(LyricCardTestTags.SHARE),
-        ) {
-            Text(stringResource(R.string.lyric_card_share))
-        }
-        TextButton(
+        )
+        LiliIconButton(
+            icon = Icons.Filled.ContentCopy,
+            label = stringResource(R.string.lyric_card_copy),
             onClick = callbacks.onCopy,
             modifier = Modifier.testTag(LyricCardTestTags.COPY),
-        ) {
-            Text(stringResource(R.string.lyric_card_copy))
-        }
+        )
     }
 }
 

@@ -295,15 +295,17 @@ Owner-approved mismatches vs class `BaiHat.js` / `Player.js` after PR #18. See [
 
 ### Phase 7 — Compact now-playing, transport icons, lyric-card fonts, download cancel
 
-Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-compact-lyrics.md), [071](tasks/071-transport-icons.md), [072](tasks/072-lyric-card-fonts.md), [073](tasks/073-cancel-download.md), [074](tasks/074-download-action-icon.md).
+Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-compact-lyrics.md), [071](tasks/071-transport-icons.md), [072](tasks/072-lyric-card-fonts.md), [073](tasks/073-cancel-download.md), [074](tasks/074-download-action-icon.md), [075](tasks/075-smooth-trc-karaoke.md), [076](tasks/076-icon-buttons-tooltips.md).
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 070 | Hide the cover on compact width (&lt; 720dp, matching web `#div_left_wrapper { display: none }`) so lyrics fill the body immediately; pin transport / seek / speed at the bottom. Wider screens keep cover + lyrics side by side. Remove the 067 scroll-to-full-height column where it no longer applies | This PR |
-| 071 | Replace Previous / −5s / Play / +5s / Next text with icon buttons (web `ll-btn-prev` / `ll-btn-next` / play-pause) plus contentDescriptions | This PR |
-| 072 | Bundle web lyric-card Google Fonts (Lobster, Pacifico, Lavishly Yours, Borel; OFL) as `res/font` and use them in the font picker / JPEG export | This PR |
-| 073 | Cancel an in-progress download: stop Media3, remove partial audio/lyric/cover + Room row, update Downloads / library / player UI | This PR |
-| 074 | Replace the text Download action with a state icon (`Download` / progress / `DownloadDone`) plus contentDescriptions on library rows and Now playing | This PR |
+| 070 | Hide the cover on compact width (&lt; 720dp, matching web `#div_left_wrapper { display: none }`) so lyrics fill the body immediately; pin transport / seek / speed at the bottom. Wider screens keep cover + lyrics side by side. Remove the 067 scroll-to-full-height column where it no longer applies | Done in PR #22 |
+| 071 | Replace Previous / −5s / Play / +5s / Next text with icon buttons (web `ll-btn-prev` / `ll-btn-next` / play-pause) plus contentDescriptions | Done in PR #22 |
+| 072 | Bundle web lyric-card Google Fonts (Lobster, Pacifico, Lavishly Yours, Borel; OFL) as `res/font` and use them in the font picker / JPEG export | Done in PR #22 |
+| 073 | Cancel an in-progress download: stop Media3, remove partial audio/lyric/cover + Room row, update Downloads / library / player UI | Done in PR #22 |
+| 074 | Replace the text Download action with a state icon (`Download` / progress / `DownloadDone`) plus contentDescriptions on library rows and Now playing | Done in PR #22 |
+| 075 | Smooth `.trc` karaoke fill (interpolate playback position between ExoPlayer samples; draw-phase fill). `.xtrc` stays out of v1 (web: “future”) | This PR |
+| 076 | Replace remaining text action buttons with Material Icons + long-press `PlainTooltip` via a shared `LiliIconButton`. Keep non-button text (labels, `1.0×`, sort chips, switches) | This PR |
 
 ## 7. Workflow (mandatory)
 
@@ -331,13 +333,10 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 
 ## 9. This-run deliverable
 
-PR #21 (Phase 6 remainder: lyric card, App Links, Play packaging, karaoke wrap, full-height lyrics) is merged on main. This PR is **Phase 7**:
+PR #22 merged Phase 7 **070–074** on main. This PR is **075–076**:
 
-- **070** compact now-playing: hide cover below 720dp so lyrics fill immediately; pin controls; wide layout is cover + lyrics side by side
-- **071** icon transport buttons with contentDescriptions
-- **072** bundle OFL Google Fonts for the lyric card
-- **073** cancel in-progress Media3 downloads and clear partial files
-- **074** Download action is an icon that shows idle / in-progress / done (tap in-progress to cancel)
+- **075** `.trc` karaoke fill interpolates between ExoPlayer position samples (web `currentTime` is continuous); fill is painted in draw so TRC `AnnotatedString`s stay stable. `.xtrc` stays documented-only (web: “future”; Android already parses it as TRC without translations)
+- **076** every action is a Material icon with a long-press tooltip (same string as `contentDescription`); FilterChips / switches / values stay text
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 
@@ -354,10 +353,12 @@ These Android extras / choices are **kept as-is** (not bugs):
 | **13** | Tap a lyric line to seek | Lyric taps do not seek |
 | **20** | Cover Palette tints now-playing chrome | `getAverageRGB` only tinted waveform bars (not ported) |
 | **22** | Custom scheme `lilimusic://bai-hat/{path}` always; HTTPS path-style App Links after the owner hosts `assetlinks.json`. Hash URLs rewrite only when the fragment is in the Intent. | Hash route `#/bai-hat/{path}` |
-| **Downloads** | Media3 downloads + offline playback from cache (060/061). Per-song action is an icon (`Download` / spinner / `DownloadDone`) with contentDescriptions, not a “Download” text button (074). The Downloads screen still uses text Cancel / Delete / Retry | No download / offline library |
+| **Downloads** | Media3 downloads + offline playback from cache (060/061). Per-song and Downloads-screen actions are icons with long-press tooltips (074/076), not “Download” / Cancel / Delete text | No download / offline library |
 | **Lyric card** | Tap-to-toggle whole lines; share sheet JPEG instead of a file download. Decorative Google Fonts are bundled (072); Open Sans / Verdana / Georgia still use the system sans/serif | Desktop `getSelection()` + Google Fonts (including Open Sans from `index.html`) + `html-to-image` download |
 | **App Links hosts** | Path-style `https://blog.nenmongvietnam.com/bai-hat/{path}` and `https://anhtuta.github.io/lili-player/bai-hat/{path}` (Android-first until the web host rewrites those paths) | Only `#/bai-hat/{path}` on the HashRouter origin |
-| **Transport icons** | Material Icons (`SkipPrevious`, `Replay5`, `PlayArrow`/`Pause`, `Forward5`, `SkipNext`) with contentDescriptions | CSS triangle arrows (`ll-btn-prev` / `ll-btn-next` / `.ll-play-pause .arrow`) |
+| **Transport icons** | Material Icons (`SkipPrevious`, `Replay5`, `PlayArrow`/`Pause`, `Forward5`, `SkipNext`) via `LiliIconButton` (contentDescription + long-press tooltip) | CSS triangle arrows (`ll-btn-prev` / `ll-btn-next` / `.ll-play-pause .arrow`) |
+| **Icon-only chrome** | App bar, speed ±, lyric offset ±, lyric-card / downloads / mini-player actions are icons with tooltips. Sort **field** chips, settings chips, and switches stay labeled | Web mix of text (`Back`, `Settings`) and CSS arrows; no Material tooltips |
 | **Now-playing chrome** | Separate Now playing screen with a Material top app bar; compact controls are a Compose bottom bar | Cover/lyrics live in `#lyric_playground`; the player bar (`.ll_player`) sits under it on the same page |
+| **`.xtrc`** | `LyricFormat.fromFileName` maps `.xtrc` to the `.trc` parser (no `[tranN]` translations). Not a translation format in v1 | Comment in `BaiHat.js`: “Will support `.xtrc` in the future”. Unknown extensions also take the TRC DOM path with `hasTranslation = false` |
 
 The extra sort-order toggle (**11**) still talks to the API (`sortOrder`); it does not locally re-sort an unfiltered catalog. Online play uses the **full playable catalog** in API order (`catalogIndex`); search only filters the view. Offline play uses that same catalog filtered to completed downloads.

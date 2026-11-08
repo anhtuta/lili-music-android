@@ -11,10 +11,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.DownloadStatus
@@ -397,17 +399,38 @@ class PlayerScreenTest {
             }
         }
 
-        composeRule.onNodeWithText("Previous").assertDoesNotExist()
-        composeRule.onNodeWithContentDescription("Previous").assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("Previous song").assertDoesNotExist()
+        composeRule.onNodeWithContentDescription("Previous song").assertIsDisplayed().performClick()
         composeRule.onNodeWithContentDescription("Seek back 5 seconds").assertIsDisplayed().performClick()
         composeRule.onNodeWithContentDescription("Play").assertIsDisplayed().performClick()
         composeRule.onNodeWithContentDescription("Seek forward 5 seconds").assertIsDisplayed().performClick()
-        composeRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
+        composeRule.onNodeWithContentDescription("Next song").assertIsDisplayed().performClick()
         assertThat(previous).isEqualTo(1)
         assertThat(rewind).isEqualTo(1)
         assertThat(playPause).isEqualTo(1)
         assertThat(forward).isEqualTo(1)
         assertThat(next).isEqualTo(1)
+    }
+
+    @Test
+    fun longPressPreviousShowsTooltip() {
+        composeRule.setContent {
+            LiliTheme {
+                SizedPlayer(
+                    width = COMPACT_WIDTH,
+                    height = PHONE_HEIGHT,
+                    state =
+                        PlayerUiState(
+                            song = playerTestSong(id = 1, title = "Alpha", path = "alpha", imageUrl = null),
+                            isPlaying = false,
+                        ),
+                    callbacks = idlePlayerCallbacks(),
+                )
+            }
+        }
+
+        composeRule.onNodeWithContentDescription("Previous song").performTouchInput { longClick() }
+        composeRule.onNodeWithText("Previous song").assertIsDisplayed()
     }
 
     @Test
