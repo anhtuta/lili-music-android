@@ -32,12 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
@@ -110,6 +112,12 @@ fun PlayerScreen(
 internal object AppBarActionMetrics {
     val IconSize = 20.dp
     val ContainerSize = 40.dp
+}
+
+internal object NowPlayingAppBarStyle {
+    const val ARTIST_ALPHA = 0.65f
+
+    fun artistColor(onSurface: Color): Color = onSurface.copy(alpha = ARTIST_ALPHA)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -185,7 +193,8 @@ private fun NowPlayingAppBarTitle(song: Song?) {
             )
             MarqueeText(
                 text = song.artist,
-                style = MaterialTheme.typography.bodySmall,
+                color = NowPlayingAppBarStyle.artistColor(MaterialTheme.colorScheme.onSurface),
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Normal),
                 modifier = Modifier.testTag(PlayerTestTags.APP_BAR_ARTIST),
             )
         }
