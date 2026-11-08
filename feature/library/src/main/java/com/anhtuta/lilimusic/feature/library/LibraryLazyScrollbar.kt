@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,15 +14,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
-private val ScrollbarWidth = 6.dp
-private val ScrollbarMargin = 4.dp
+private val ScrollbarThumbWidth = 10.dp
 
 @Composable
 internal fun LibraryLazyScrollbar(
@@ -40,7 +37,6 @@ internal fun LibraryLazyScrollbar(
     if (!metrics.visible) {
         return
     }
-    val density = LocalDensity.current
     val viewportPx = layoutInfo.viewportSize.height.toFloat()
     val thumbHeightPx = metrics.heightFraction * viewportPx
     val thumbTopPx = metrics.topFraction * viewportPx
@@ -49,8 +45,7 @@ internal fun LibraryLazyScrollbar(
         modifier =
             modifier
                 .fillMaxHeight()
-                .width(ScrollbarWidth + ScrollbarMargin)
-                .padding(end = ScrollbarMargin)
+                .width(LibraryChromeInsets.ScrollbarTrack)
                 .testTag(LibraryTestTags.SCROLLBAR),
         contentAlignment = Alignment.TopEnd,
     ) {
@@ -58,12 +53,9 @@ internal fun LibraryLazyScrollbar(
             modifier =
                 Modifier
                     .offset { IntOffset(0, thumbTopPx.roundToInt()) }
-                    .width(ScrollbarWidth)
+                    .width(LibraryChromeInsets.ScrollbarTrack)
                     .fillMaxHeight(metrics.heightFraction)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f),
-                        shape = RoundedCornerShape(3.dp),
-                    ).pointerInput(listState, layoutInfo.totalItemsCount) {
+                    .pointerInput(listState, layoutInfo.totalItemsCount) {
                         detectDragGestures { change, dragAmount ->
                             change.consume()
                             val deltaIndex =
@@ -78,6 +70,18 @@ internal fun LibraryLazyScrollbar(
                             }
                         }
                     },
-        )
+            contentAlignment = Alignment.CenterEnd,
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .width(ScrollbarThumbWidth)
+                        .fillMaxHeight()
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
+                            shape = RoundedCornerShape(5.dp),
+                        ),
+            )
+        }
     }
 }
