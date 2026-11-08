@@ -7,15 +7,13 @@ import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.ui.R
+import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 
 @Composable
 fun DownloadActionButton(
@@ -25,9 +23,10 @@ fun DownloadActionButton(
     progressPercent: Int = 0,
 ) {
     val description = stringResource(descriptionRes(status))
-    IconButton(
+    LiliIconButton(
+        label = description,
         onClick = onClick,
-        modifier = modifier.semantics { contentDescription = description },
+        modifier = modifier,
     ) {
         DownloadActionVisual(status = status, progressPercent = progressPercent)
     }
