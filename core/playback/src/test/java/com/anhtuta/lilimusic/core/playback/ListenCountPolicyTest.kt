@@ -20,10 +20,40 @@ class ListenCountPolicyTest {
     }
 
     @Test
-    fun playFromNonZeroPositionDoesNotSchedule() {
+    fun firstPlayWithinToleranceAfterPathChangeSchedules() {
         val decision =
             ListenCountPolicy.decide(
                 previousPath = null,
+                previousPlaying = false,
+                currentPath = "hello",
+                currentPlaying = true,
+                positionMs = 50L,
+            )
+
+        assertThat(decision.cancelPending).isFalse()
+        assertThat(decision.schedulePath).isEqualTo("hello")
+    }
+
+    @Test
+    fun newSongWithinToleranceSchedulesAndCancelsPrevious() {
+        val decision =
+            ListenCountPolicy.decide(
+                previousPath = "old",
+                previousPlaying = true,
+                currentPath = "hello",
+                currentPlaying = true,
+                positionMs = 80L,
+            )
+
+        assertThat(decision.cancelPending).isTrue()
+        assertThat(decision.schedulePath).isEqualTo("hello")
+    }
+
+    @Test
+    fun resumeFromMiddleDoesNotScheduleEvenWhenPathMatches() {
+        val decision =
+            ListenCountPolicy.decide(
+                previousPath = "hello",
                 previousPlaying = false,
                 currentPath = "hello",
                 currentPlaying = true,
