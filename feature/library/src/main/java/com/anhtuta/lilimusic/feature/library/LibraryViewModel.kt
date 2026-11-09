@@ -13,6 +13,7 @@ import com.anhtuta.lilimusic.core.model.SongCatalog
 import com.anhtuta.lilimusic.core.model.SongDownload
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
+import com.anhtuta.lilimusic.core.playback.PlaybackState
 import com.anhtuta.lilimusic.core.playback.PlayerController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -51,8 +52,10 @@ class LibraryViewModel
                 combine(isRefreshing, loadFailed, initialLoadFinished, ::RefreshSnapshot),
                 downloadRepository.observeDownloads(),
                 networkMonitor.isOnline,
-                ::toUiState,
-            ).stateIn(
+                playerController.state,
+            ) { catalog, refresh, downloads, isOnline, playback ->
+                toUiState(catalog, refresh, downloads, isOnline, playback)
+            }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = LibraryUiState(),
@@ -157,6 +160,7 @@ class LibraryViewModel
             refresh: RefreshSnapshot,
             downloads: List<SongDownload>,
             isOnline: Boolean,
+            playback: PlaybackState,
         ): LibraryUiState {
             val waiting = !refresh.finished && catalog.songs.isEmpty()
             val playableCatalog = catalog.songs
@@ -171,6 +175,8 @@ class LibraryViewModel
                 isOfflineError = refresh.failed,
                 downloads = downloads.associateBy { it.songPath },
                 isOnline = isOnline,
+                nowPlayingPath = playback.currentSong?.path,
+                isPlaying = playback.isPlaying,
             )
         }
     }

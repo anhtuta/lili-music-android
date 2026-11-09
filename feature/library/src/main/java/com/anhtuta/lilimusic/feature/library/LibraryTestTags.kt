@@ -3,7 +3,10 @@ package com.anhtuta.lilimusic.feature.library
 import com.anhtuta.lilimusic.core.model.SongSort
 
 object LibraryTestTags {
+    const val HEADER = "library-header"
     const val LIST = "library-list"
+    const val SCROLLBAR = "library-scrollbar"
+    const val SCROLLBAR_THUMB = "library-scrollbar-thumb"
     const val SEARCH = "library-search"
     const val LOADING = "library-loading"
     const val ERROR = "library-error"
@@ -25,6 +28,10 @@ object LibraryTestTags {
     fun song(id: Long): String = "library-song-$id"
 
     fun cover(id: Long): String = "library-cover-$id"
+
+    fun playbackBadge(id: Long): String = "library-playback-badge-$id"
+
+    fun nowPlayingRow(id: Long): String = "library-now-playing-row-$id"
 
     fun listens(id: Long): String = "library-listens-$id"
 

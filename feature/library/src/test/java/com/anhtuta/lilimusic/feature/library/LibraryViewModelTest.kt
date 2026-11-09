@@ -18,6 +18,29 @@ class LibraryViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
+    fun uiStateReflectsPlaybackFromController() =
+        runTest {
+            val controller = FakePlayerController()
+            val song = libraryTestSong(id = 1, title = "Alpha", path = "alpha")
+            val repository = FakeSongRepository()
+            val viewModel = libraryViewModel(repository = repository, controller = controller)
+            repository.emit(listOf(song))
+
+            viewModel.uiState.test {
+                awaitItemUntil { !it.isLoading && it.songs.isNotEmpty() }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            controller.play(listOf(song), "alpha")
+            assertThat(viewModel.uiState.value.nowPlayingPath).isEqualTo("alpha")
+            assertThat(viewModel.uiState.value.isPlaying).isTrue()
+
+            controller.playPause()
+            assertThat(viewModel.uiState.value.isPlaying).isFalse()
+            assertThat(viewModel.uiState.value.nowPlayingPath).isEqualTo("alpha")
+        }
+
+    @Test
     fun showsLoadingUntilFirstRefreshFinishes() =
         runTest {
             val repository =

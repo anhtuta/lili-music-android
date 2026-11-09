@@ -1,5 +1,7 @@
 package com.anhtuta.lilimusic.feature.settings
 
+import com.anhtuta.lilimusic.core.model.LyricFontSize
+
 object SettingsTestTags {
     const val SCREEN = "settings-screen"
     const val BACK = "settings-back"
@@ -20,4 +22,6 @@ object SettingsTestTags {
     const val SPEED_UP = "settings-speed-up"
     const val SPEED_DOWN = "settings-speed-down"
     const val SPEED_VALUE = "settings-speed-value"
+
+    fun fontSize(size: LyricFontSize): String = "settings-font-${size.storageValue}"
 }

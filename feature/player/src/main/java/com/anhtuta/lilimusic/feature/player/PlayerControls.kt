@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.PlaybackSpeed
@@ -54,6 +55,7 @@ internal fun PlayerControlsBar(
     state: PlayerUiState,
     callbacks: PlayerCallbacks,
     showHeadings: Boolean,
+    controlsContentColor: Color = NowPlayingChromeColors.controlsOnSurface(),
 ) {
     Column(
         modifier =
@@ -70,6 +72,7 @@ internal fun PlayerControlsBar(
             positionMs = state.positionMs,
             durationMs = state.durationMs,
             onSeek = callbacks.onSeek,
+            labelColor = controlsContentColor,
         )
         PlayerQueueMessages(state = state)
         Spacer(modifier = Modifier.height(8.dp))
@@ -78,6 +81,7 @@ internal fun PlayerControlsBar(
             playMode = state.playMode,
             speed = state.speed,
             callbacks = callbacks,
+            contentColor = controlsContentColor,
         )
     }
 }
@@ -129,6 +133,7 @@ internal fun PlayerSeekBar(
     positionMs: Long,
     durationMs: Long,
     onSeek: (Long) -> Unit,
+    labelColor: Color,
 ) {
     var sliderValue by remember(positionMs, durationMs) {
         mutableFloatStateOf(if (durationMs > 0L) positionMs.toFloat() / durationMs.toFloat() else 0f)
@@ -137,7 +142,7 @@ internal fun PlayerSeekBar(
         SliderDefaults.colors(
             thumbColor = MaterialTheme.colorScheme.primary,
             activeTrackColor = MaterialTheme.colorScheme.primary,
-            inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.22f),
+            inactiveTrackColor = labelColor.copy(alpha = 0.22f),
         )
     Slider(
         value = sliderValue.coerceIn(0f, 1f),
@@ -172,13 +177,20 @@ internal fun PlayerSeekBar(
     ) {
         Text(
             text = PlayerTimeFormatter.format(positionMs),
+            color = labelColor,
             modifier = Modifier.testTag(PlayerTestTags.POSITION),
         )
         Text(
             text = PlayerTimeFormatter.format(durationMs),
+            color = labelColor,
             modifier = Modifier.testTag(PlayerTestTags.DURATION),
         )
     }
+}
+
+internal object PlayerTransportLayout {
+    val PlayButtonSize = 64.dp
+    val PlayModeIconSize = 22.dp
 }
 
 @Composable
@@ -187,75 +199,88 @@ internal fun PlayerTransport(
     playMode: PlayMode,
     speed: Float,
     callbacks: PlayerCallbacks,
+    contentColor: Color,
 ) {
-    val onSurface = MaterialTheme.colorScheme.onSurface
     val accent = MaterialTheme.colorScheme.primary
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
+        Box(
             modifier =
                 Modifier
                     .weight(1f)
                     .testTag(PlayerTestTags.TRANSPORT_LEFT),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            contentAlignment = Alignment.CenterStart,
         ) {
             PlayerSpeedChip(
                 speed = speed,
                 onSetSpeed = callbacks.onSetSpeed,
+                labelColor = contentColor,
             )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
             LiliIconButton(
                 icon = Icons.Filled.SkipPrevious,
                 label = stringResource(R.string.player_previous_cd),
                 onClick = callbacks.onSkipPrevious,
                 modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
-                tint = onSurface,
+                tint = contentColor,
             )
             LiliIconButton(
                 icon = Icons.Filled.Replay5,
                 label = stringResource(R.string.player_rewind_cd),
                 onClick = callbacks.onSeekBack,
                 modifier = Modifier.testTag(PlayerTestTags.REWIND),
-                tint = onSurface,
+                tint = contentColor,
             )
-        }
-        LiliFilledIconButton(
-            icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-            label =
-                stringResource(
-                    if (isPlaying) R.string.player_pause else R.string.player_play,
-                ),
-            onClick = callbacks.onPlayPause,
-            modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
-        )
-        Row(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .testTag(PlayerTestTags.TRANSPORT_RIGHT),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(PlayerTransportLayout.PlayButtonSize)
+                        .testTag(PlayerTestTags.PLAY_PAUSE),
+                contentAlignment = Alignment.Center,
+            ) {
+                LiliFilledIconButton(
+                    icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    label =
+                        stringResource(
+                            if (isPlaying) R.string.player_pause else R.string.player_play,
+                        ),
+                    onClick = callbacks.onPlayPause,
+                    size = PlayerTransportLayout.PlayButtonSize,
+                )
+            }
             LiliIconButton(
                 icon = Icons.Filled.Forward5,
                 label = stringResource(R.string.player_forward_cd),
                 onClick = callbacks.onSeekForward,
                 modifier = Modifier.testTag(PlayerTestTags.FORWARD),
-                tint = onSurface,
+                tint = contentColor,
             )
             LiliIconButton(
                 icon = Icons.Filled.SkipNext,
                 label = stringResource(R.string.player_next_cd),
                 onClick = callbacks.onSkipNext,
                 modifier = Modifier.testTag(PlayerTestTags.NEXT),
-                tint = onSurface,
+                tint = contentColor,
             )
+        }
+        Box(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .testTag(PlayerTestTags.TRANSPORT_RIGHT),
+            contentAlignment = Alignment.CenterEnd,
+        ) {
             PlayModeButton(
                 playMode = playMode,
                 onClick = callbacks.onCyclePlayMode,
-                tint = if (playMode == PlayMode.SEQUENCE) onSurface else accent,
+                tint = if (playMode == PlayMode.SEQUENCE) contentColor else accent,
+                iconSize = PlayerTransportLayout.PlayModeIconSize,
             )
         }
     }
@@ -267,6 +292,7 @@ internal fun PlayModeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.onSurface,
+    iconSize: Dp = 28.dp,
 ) {
     val modeName =
         stringResource(
@@ -289,7 +315,7 @@ internal fun PlayModeButton(
                     PlayMode.REPEAT_ONE -> Icons.Filled.RepeatOne
                 },
             contentDescription = null,
-            modifier = Modifier.size(28.dp),
+            modifier = Modifier.size(iconSize),
             tint = tint,
         )
     }
@@ -299,6 +325,7 @@ internal fun PlayModeButton(
 internal fun PlayerSpeedChip(
     speed: Float,
     onSetSpeed: (Float) -> Unit,
+    labelColor: Color,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val label =
@@ -315,6 +342,7 @@ internal fun PlayerSpeedChip(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
+                color = labelColor,
                 maxLines = 1,
                 modifier = Modifier.testTag(PlayerTestTags.SPEED_VALUE),
             )

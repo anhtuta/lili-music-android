@@ -2,22 +2,24 @@ package com.anhtuta.lilimusic.feature.player
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,29 +27,34 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
-import com.anhtuta.lilimusic.core.ui.download.DownloadActionButton
 import com.anhtuta.lilimusic.core.ui.palette.CoverPalette
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import com.anhtuta.lilimusic.core.ui.text.MarqueeText
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,15 +68,16 @@ fun PlayerScreen(
     val loadedPalette = rememberCoverPalette(state.song?.imageUrl)
     val palette = coverPaletteOverride ?: loadedPalette
     var lyricsExpanded by remember { mutableStateOf(false) }
-    val dismissScroll = rememberNowPlayingDismissScroll(enabled = !lyricsExpanded, onDismiss = callbacks.onBack)
     BackHandler(enabled = lyricsExpanded) { lyricsExpanded = false }
     val isDark = !CoverPalette.isLight(MaterialTheme.colorScheme.background)
     val gradient = CoverPalette.nowPlayingGradient(palette?.background, isDark)
+    val chromeControlsColor =
+        NowPlayingChromeColors.controlsOnSurface(
+            darkTheme = isDark,
+            themeOnSurface = MaterialTheme.colorScheme.onSurface,
+        )
     Scaffold(
-        modifier =
-            modifier
-                .testTag(PlayerTestTags.SCREEN)
-                .nestedScroll(dismissScroll),
+        modifier = modifier.testTag(PlayerTestTags.SCREEN),
         containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f),
         contentColor = palette?.onBackground ?: MaterialTheme.colorScheme.onSurface,
         topBar = {
@@ -103,15 +111,11 @@ fun PlayerScreen(
                 lyrics = lyrics,
                 lyricsExpanded = lyricsExpanded,
                 onLyricsExpandedChange = { lyricsExpanded = it },
+                chromeControlsColor = chromeControlsColor,
                 modifier = Modifier.fillMaxSize(),
             )
         }
     }
-}
-
-internal object AppBarActionMetrics {
-    val IconSize = 20.dp
-    val ContainerSize = 40.dp
 }
 
 internal object NowPlayingAppBarStyle {
@@ -138,31 +142,11 @@ private fun NowPlayingTopBar(
             )
         },
         actions = {
-            if (state.song != null) {
-                DownloadActionButton(
-                    status = state.downloadStatus,
-                    progressPercent = state.downloadProgress,
-                    onClick = callbacks.onDownload,
-                    modifier = Modifier.testTag(PlayerTestTags.DOWNLOAD),
-                    iconSize = AppBarActionMetrics.IconSize,
-                    containerSize = AppBarActionMetrics.ContainerSize,
-                )
-                LiliIconButton(
-                    icon = Icons.Filled.Image,
-                    label = stringResource(R.string.player_lyric_card),
-                    onClick = callbacks.onLyricCard,
-                    modifier = Modifier.testTag(PlayerTestTags.LYRIC_CARD),
-                    iconSize = AppBarActionMetrics.IconSize,
-                    containerSize = AppBarActionMetrics.ContainerSize,
-                )
-            }
-            LiliIconButton(
-                icon = Icons.Filled.Settings,
-                label = stringResource(R.string.player_settings),
-                onClick = callbacks.onSettings,
-                modifier = Modifier.testTag(PlayerTestTags.SETTINGS),
-                iconSize = AppBarActionMetrics.IconSize,
-                containerSize = AppBarActionMetrics.ContainerSize,
+            NowPlayingOverflowMenu(
+                song = state.song,
+                downloadStatus = state.downloadStatus,
+                downloadProgress = state.downloadProgress,
+                callbacks = callbacks,
             )
         },
         colors =
@@ -236,6 +220,7 @@ private fun PlayerBody(
     lyrics: @Composable () -> Unit,
     lyricsExpanded: Boolean,
     onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
     modifier: Modifier = Modifier,
 ) {
     val song = state.song
@@ -257,6 +242,7 @@ private fun PlayerBody(
                 lyrics = lyrics,
                 lyricsExpanded = lyricsExpanded,
                 onLyricsExpandedChange = onLyricsExpandedChange,
+                chromeControlsColor = chromeControlsColor,
             )
         } else {
             ExpandedPlayerBody(
@@ -266,7 +252,79 @@ private fun PlayerBody(
                 lyrics = lyrics,
                 lyricsExpanded = lyricsExpanded,
                 onLyricsExpandedChange = onLyricsExpandedChange,
+                chromeControlsColor = chromeControlsColor,
             )
+        }
+    }
+}
+
+internal object PlayerControlsInsets {
+    val Horizontal = 16.dp
+    val ExtraBottom = 12.dp
+}
+
+@Composable
+private fun PlayerChromeFooter(
+    song: Song,
+    state: PlayerUiState,
+    callbacks: PlayerCallbacks,
+    lyricsExpanded: Boolean,
+    onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
+    horizontalPadding: Dp = PlayerControlsInsets.Horizontal,
+) {
+    val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    val slidePx = with(density) { LyricChromeExpansionAnimation.ControlsSlideDistance.toPx() }
+    val controlsExpansion =
+        remember {
+            Animatable(if (lyricsExpanded) 1f else 0f)
+        }
+    LaunchedEffect(lyricsExpanded) {
+        controlsExpansion.animateTo(
+            targetValue = if (lyricsExpanded) 1f else 0f,
+            animationSpec = LyricChromeExpansionAnimation.clickSpec(),
+        )
+    }
+    val showControls = controlsExpansion.value < 1f || controlsExpansion.isRunning
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding)
+                .padding(WindowInsets.navigationBars.asPaddingValues())
+                .padding(bottom = PlayerControlsInsets.ExtraBottom),
+    ) {
+        PlayerLyricHandle(
+            expanded = lyricsExpanded,
+            onExpandedChange = onLyricsExpandedChange,
+            onDragProgress = { progress ->
+                scope.launch {
+                    controlsExpansion.snapTo(progress)
+                }
+            },
+        )
+        if (showControls) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .graphicsLayer {
+                            val hidden = controlsExpansion.value
+                            alpha = 1f - hidden
+                            translationY = hidden * slidePx
+                            transformOrigin = TransformOrigin(0.5f, 0f)
+                        },
+            ) {
+                PlayerControlsBar(
+                    song = song,
+                    state = state,
+                    callbacks = callbacks,
+                    showHeadings = false,
+                    controlsContentColor = chromeControlsColor,
+                )
+            }
         }
     }
 }
@@ -279,12 +337,12 @@ private fun CompactPlayerBody(
     lyrics: @Composable () -> Unit,
     lyricsExpanded: Boolean,
     onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
 ) {
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
                 .animateContentSize(),
     ) {
         LyricSlot(
@@ -292,18 +350,14 @@ private fun CompactPlayerBody(
             expanded = lyricsExpanded,
             modifier = Modifier.weight(1f).fillMaxWidth(),
         )
-        PlayerLyricHandle(
-            expanded = lyricsExpanded,
-            onExpandedChange = onLyricsExpandedChange,
+        PlayerChromeFooter(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            lyricsExpanded = lyricsExpanded,
+            onLyricsExpandedChange = onLyricsExpandedChange,
+            chromeControlsColor = chromeControlsColor,
         )
-        if (!lyricsExpanded) {
-            PlayerControlsBar(
-                song = song,
-                state = state,
-                callbacks = callbacks,
-                showHeadings = false,
-            )
-        }
     }
 }
 
@@ -315,19 +369,20 @@ private fun ExpandedPlayerBody(
     lyrics: @Composable () -> Unit,
     lyricsExpanded: Boolean,
     onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
 ) {
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
                 .animateContentSize(),
     ) {
         Row(
             modifier =
                 Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(start = 24.dp),
         ) {
             if (!lyricsExpanded) {
                 Column(
@@ -348,18 +403,15 @@ private fun ExpandedPlayerBody(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
-        PlayerLyricHandle(
-            expanded = lyricsExpanded,
-            onExpandedChange = onLyricsExpandedChange,
+        PlayerChromeFooter(
+            song = song,
+            state = state,
+            callbacks = callbacks,
+            lyricsExpanded = lyricsExpanded,
+            onLyricsExpandedChange = onLyricsExpandedChange,
+            chromeControlsColor = chromeControlsColor,
+            horizontalPadding = 24.dp,
         )
-        if (!lyricsExpanded) {
-            PlayerControlsBar(
-                song = song,
-                state = state,
-                callbacks = callbacks,
-                showHeadings = false,
-            )
-        }
     }
 }
 
@@ -372,7 +424,6 @@ private fun LyricSlot(
     Box(
         modifier =
             modifier
-                .clip(RoundedCornerShape(LyricPaneShape.CornerRadius))
                 .testTag(PlayerTestTags.LYRICS),
     ) {
         if (expanded) {

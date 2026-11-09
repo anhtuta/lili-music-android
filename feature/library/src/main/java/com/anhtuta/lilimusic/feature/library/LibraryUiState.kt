@@ -18,6 +18,8 @@ data class LibraryUiState(
     val isOfflineError: Boolean = false,
     val downloads: Map<String, SongDownload> = emptyMap(),
     val isOnline: Boolean = true,
+    val nowPlayingPath: String? = null,
+    val isPlaying: Boolean = false,
 ) {
     fun status(path: String): DownloadStatus = downloads[path]?.status ?: DownloadStatus.NONE
 

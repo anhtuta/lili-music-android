@@ -40,8 +40,10 @@ internal fun LibrarySearchField(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(LibrarySearchHeight)
+                .padding(
+                    start = LibraryChromeInsets.Horizontal,
+                    end = LibraryChromeInsets.TrailingAction,
+                ).height(LibrarySearchHeight)
                 .testTag(LibraryTestTags.SEARCH),
         singleLine = true,
         textStyle =

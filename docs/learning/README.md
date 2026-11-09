@@ -25,6 +25,14 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [13 — Phase 7 web parity](13-phase7-web-parity.md) | Compact lyrics, transport icons, fonts, cancel download, download icons, smooth TRC karaoke, icon buttons + tooltips |
 | [14 — Now Playing polish](14-now-playing-polish.md) | Phase 8: cycling play mode, lyric fade/handle, one control row, offset overlay, palette gradient, karaoke contrast, swipe-down, status bar; follow-up wrap fill, line height, centered scroll, control-row symmetry, compact app-bar actions, marquee title/artist |
 | [15 — Library redesign](15-library-redesign.md) | Compact search, sort pill, slimmer rows, listens/soy row, song-info overflow menu |
+| [16 — Now Playing refinement](16-phase12-now-playing-refinement.md) | Overflow app bar, full-width lyrics, control insets, lyric font presets, listen-count tolerance |
+| [17 — Library chrome (Phase 13)](17-phase13-library-chrome.md) | MoreVert overflow, scrollable library header, scrollbar, shared chrome insets |
+| [18 — Library playback UX (Phase 14)](18-phase14-library-playback-ux.md) | No pull-dismiss, scrollbar/search inset, now-playing badges, scroll-to-current |
+| [19 — Scrollbar refinement (Phase 15)](19-phase15-scrollbar-refinement.md) | Wider half-pill library scrollbar thumb |
+| [20 — Auto-hide scrollbar](20-auto-hide-scrollbar.md) | Compact scrollbar visibility tied to active scrolling |
+| [21 — Responsive scrollbar](21-responsive-scrollbar.md) | Larger touch rail, end jumping, and stable thumb geometry |
+| [22 — Scrollbar drag visibility](22-scrollbar-drag-visibility.md) | Keeps the scrollbar visible during active dragging |
+| [23 — Listen count half duration](23-listen-count-half-duration.md) | Android-only ≥50% played threshold, session + WorkManager delay |
 
 ## Status of phases
 

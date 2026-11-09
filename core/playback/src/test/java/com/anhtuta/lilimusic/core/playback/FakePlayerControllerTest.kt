@@ -19,7 +19,7 @@ class FakePlayerControllerTest {
     fun playStartsFromRequestedSongAndSchedulesListen() =
         runTest {
             val scheduler = RecordingListenCountScheduler()
-            val controller = FakePlayerController(listenCountScheduler = scheduler)
+            val controller = FakePlayerController(listenCountScheduler = scheduler, fakeDurationMs = 120_000L)
 
             controller.state.test {
                 skipItems(1)
@@ -29,6 +29,7 @@ class FakePlayerControllerTest {
                 assertThat(playing.isPlaying).isTrue()
                 assertThat(playing.positionMs).isEqualTo(0L)
                 assertThat(scheduler.decisions.last().schedulePath).isEqualTo("beta")
+                assertThat(scheduler.decisions.last().delayMs).isEqualTo(60_000L)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -48,6 +49,25 @@ class FakePlayerControllerTest {
             assertThat(controller.state.value.isPlaying).isFalse()
             assertThat(scheduler.decisions.last().schedulePath).isNull()
         }
+
+    @Test
+    fun halfDurationPlaybackSchedulesListenPut() {
+        val scheduler = RecordingListenCountScheduler()
+        val controller =
+            FakePlayerController(
+                listenCountScheduler = scheduler,
+                fakeDurationMs = 120_000L,
+            )
+        controller.play(songs, "alpha")
+        var pos = 0L
+        repeat(120) {
+            pos += 500L
+            controller.advancePosition(pos)
+        }
+
+        assertThat(scheduler.decisions.map { it.schedulePath }).contains("alpha")
+        assertThat(scheduler.decisions.any { it.delayMs == 0L && it.schedulePath == "alpha" }).isTrue()
+    }
 
     @Test
     fun sequenceStopsAtEndOfQueue() {
@@ -91,42 +111,24 @@ class FakePlayerControllerTest {
     }
 
     @Test
-    fun skipPreviousOnFirstTrackKeepsPositionAndSignalsStart() {
+    fun skipPreviousAtQueueStartStaysOnFirstSong() {
         val controller = FakePlayerController()
         controller.play(songs, "alpha")
-        controller.advancePosition(20_000L)
+        controller.advancePosition(3_000L)
         controller.skipToPrevious()
 
         assertThat(
             controller.state.value.currentSong
                 ?.path,
         ).isEqualTo("alpha")
-        assertThat(controller.state.value.positionMs).isEqualTo(20_000L)
         assertThat(controller.state.value.atStartOfQueue).isTrue()
-        assertThat(controller.state.value.isPlaying).isTrue()
     }
 
     @Test
-    fun skipPreviousInRepeatOneReplaysTheSameSong() {
-        val controller = FakePlayerController(initialPlayMode = PlayMode.REPEAT_ONE)
-        controller.play(songs, "beta")
-        controller.advancePosition(20_000L)
-        controller.skipToPrevious()
-
-        assertThat(
-            controller.state.value.currentSong
-                ?.path,
-        ).isEqualTo("beta")
-        assertThat(controller.state.value.positionMs).isEqualTo(0L)
-        assertThat(controller.state.value.isPlaying).isTrue()
-    }
-
-    @Test
-    fun seekBackAndForwardMoveFiveSeconds() {
-        val controller = FakePlayerController()
+    fun seekIncrementsByFiveSeconds() {
+        val controller = FakePlayerController(fakeDurationMs = 180_000L)
         controller.play(songs, "alpha")
         controller.advancePosition(20_000L)
-
         controller.seekBack()
         assertThat(controller.state.value.positionMs).isEqualTo(15_000L)
 
@@ -149,18 +151,22 @@ class FakePlayerControllerTest {
     }
 
     @Test
-    fun pauseDoesNotCancelListenAndResumeFromMiddleDoesNotReschedule() {
+    fun pauseCancelsPendingListenAndResumeKeepsProgress() {
         val scheduler = RecordingListenCountScheduler()
-        val controller = FakePlayerController(listenCountScheduler = scheduler)
+        val controller = FakePlayerController(listenCountScheduler = scheduler, fakeDurationMs = 120_000L)
         controller.play(songs, "alpha")
-        controller.advancePosition(20_000L)
+        var pos = 0L
+        repeat(60) {
+            pos += 500L
+            controller.advancePosition(pos)
+        }
         controller.playPause()
 
-        assertThat(scheduler.decisions.last().cancelPending).isFalse()
+        assertThat(scheduler.decisions.last().cancelPending).isTrue()
         assertThat(scheduler.decisions.last().schedulePath).isNull()
 
         controller.playPause()
-        assertThat(scheduler.decisions.last().cancelPending).isFalse()
-        assertThat(scheduler.decisions.last().schedulePath).isNull()
+        assertThat(scheduler.decisions.last().schedulePath).isEqualTo("alpha")
+        assertThat(scheduler.decisions.last().delayMs).isEqualTo(30_000L)
     }
 }

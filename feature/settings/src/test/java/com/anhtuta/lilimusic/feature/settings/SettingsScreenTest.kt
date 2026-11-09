@@ -7,6 +7,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
@@ -28,6 +29,7 @@ class SettingsScreenTest {
         var karaoke: Boolean? = null
         var translate: Boolean? = null
         var appTheme: AppTheme? = null
+        var fontSize: LyricFontSize? = null
         var speedUp = 0
         var back = 0
         composeRule.setContent {
@@ -39,6 +41,7 @@ class SettingsScreenTest {
                             onBack = { back++ },
                             onLyricAlign = { align = it },
                             onLyricTheme = { theme = it },
+                            onLyricFontSize = { fontSize = it },
                             onKaraokeMode = { karaoke = it },
                             onBlurMode = {},
                             onWordAppear = {},
@@ -54,11 +57,13 @@ class SettingsScreenTest {
         }
 
         composeRule.onNodeWithTag(SettingsTestTags.SCREEN).assertIsDisplayed()
-        composeRule.onNodeWithTag(SettingsTestTags.ALIGN_LEFT).performClick()
+        composeRule.onNodeWithTag(SettingsTestTags.fontSize(LyricFontSize.LARGE)).performClick()
+        assertThat(fontSize).isEqualTo(LyricFontSize.LARGE)
+        composeRule.onNodeWithTag(SettingsTestTags.ALIGN_LEFT).performScrollTo().performClick()
         assertThat(align).isEqualTo(LyricAlign.LEFT)
-        composeRule.onNodeWithTag(SettingsTestTags.THEME_DARK).performClick()
+        composeRule.onNodeWithTag(SettingsTestTags.THEME_DARK).performScrollTo().performClick()
         assertThat(theme).isEqualTo(LyricTheme.DARK)
-        composeRule.onNodeWithTag(SettingsTestTags.KARAOKE).performClick()
+        composeRule.onNodeWithTag(SettingsTestTags.KARAOKE).performScrollTo().performClick()
         assertThat(karaoke).isFalse()
         composeRule.onNodeWithTag(SettingsTestTags.TRANSLATE).performScrollTo().performClick()
         assertThat(translate).isTrue()
@@ -81,6 +86,7 @@ class SettingsScreenTest {
                             onBack = {},
                             onLyricAlign = {},
                             onLyricTheme = {},
+                            onLyricFontSize = {},
                             onKaraokeMode = {},
                             onBlurMode = {},
                             onWordAppear = {},

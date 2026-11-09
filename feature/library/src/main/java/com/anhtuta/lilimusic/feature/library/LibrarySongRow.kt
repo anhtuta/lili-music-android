@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -47,10 +49,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.R as UiR
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
+
+private val PlaybackBadgeSize = 20.dp
 
 @Composable
 fun LibrarySongRow(
@@ -59,6 +64,8 @@ fun LibrarySongRow(
     onClick: () -> Unit,
     onCoverClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isNowPlaying: Boolean = false,
+    isPlaying: Boolean = false,
     coverUrl: String? = song.imageUrl,
     unavailableOffline: Boolean = false,
     downloadStatus: DownloadStatus = DownloadStatus.NONE,
@@ -67,17 +74,42 @@ fun LibrarySongRow(
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     var infoOpen by remember { mutableStateOf(false) }
+    val nowPlayingRowHighlight =
+        if (isNowPlaying) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+        } else {
+            null
+        }
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
-                .testTag(LibraryTestTags.song(song.id))
+                .then(
+                    if (nowPlayingRowHighlight != null) {
+                        Modifier
+                            .background(nowPlayingRowHighlight)
+                            .testTag(LibraryTestTags.nowPlayingRow(song.id))
+                    } else {
+                        Modifier
+                    },
+                ).testTag(LibraryTestTags.song(song.id))
                 .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(
+                    start = LibraryChromeInsets.Horizontal,
+                    end = LibraryChromeInsets.TrailingAction,
+                    top = 8.dp,
+                    bottom = 8.dp,
+                ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        SongCover(song = song, coverUrl = coverUrl, onCoverClick = onCoverClick)
+        SongCover(
+            song = song,
+            coverUrl = coverUrl,
+            onCoverClick = onCoverClick,
+            isNowPlaying = isNowPlaying,
+            isPlaying = isPlaying,
+        )
         Column(modifier = Modifier.weight(1f)) {
             Text(text = song.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(text = song.artist, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -210,35 +242,82 @@ private fun SongCover(
     song: Song,
     coverUrl: String?,
     onCoverClick: () -> Unit,
+    isNowPlaying: Boolean,
+    isPlaying: Boolean,
 ) {
-    if (coverUrl == null) {
-        val placeholderDescription = stringResource(R.string.library_cover_placeholder_cd, song.title)
-        Box(
-            modifier =
-                Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .testTag(LibraryTestTags.cover(song.id))
-                    .semantics { contentDescription = placeholderDescription },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = song.title.take(1),
-                style = MaterialTheme.typography.titleMedium,
+    Box(
+        modifier =
+            Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(8.dp)),
+    ) {
+        if (coverUrl == null) {
+            val placeholderDescription = stringResource(R.string.library_cover_placeholder_cd, song.title)
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .testTag(LibraryTestTags.cover(song.id))
+                        .semantics { contentDescription = placeholderDescription },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = song.title.take(1),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        } else {
+            AsyncImage(
+                model = coverUrl,
+                contentDescription = stringResource(R.string.library_cover_cd, song.title),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .testTag(LibraryTestTags.cover(song.id))
+                        .clickable(onClick = onCoverClick),
+                contentScale = ContentScale.Crop,
             )
         }
-    } else {
-        AsyncImage(
-            model = coverUrl,
-            contentDescription = stringResource(R.string.library_cover_cd, song.title),
-            modifier =
-                Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .testTag(LibraryTestTags.cover(song.id))
-                    .clickable(onClick = onCoverClick),
-            contentScale = ContentScale.Crop,
-        )
+        if (isNowPlaying) {
+            val badgeDescription =
+                if (isPlaying) {
+                    stringResource(R.string.library_now_playing_badge_cd, song.title)
+                } else {
+                    stringResource(R.string.library_paused_badge_cd, song.title)
+                }
+            val badgeModel =
+                if (isPlaying) {
+                    R.drawable.icon_playing_white
+                } else {
+                    R.drawable.icon_pause_white
+                }
+            val context = LocalContext.current
+            val gifLoader = rememberLibraryGifImageLoader()
+            val badgeRequest =
+                remember(badgeModel, context) {
+                    ImageRequest
+                        .Builder(context)
+                        .data(badgeModel)
+                        .allowHardware(false)
+                        .build()
+                }
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.4f))
+                        .testTag(LibraryTestTags.playbackBadge(song.id))
+                        .semantics { contentDescription = badgeDescription },
+                contentAlignment = Alignment.Center,
+            ) {
+                AsyncImage(
+                    model = badgeRequest,
+                    contentDescription = null,
+                    imageLoader = gifLoader,
+                    modifier = Modifier.size(PlaybackBadgeSize),
+                )
+            }
+        }
     }
 }
 

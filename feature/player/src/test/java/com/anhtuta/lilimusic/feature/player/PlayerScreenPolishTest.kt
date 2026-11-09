@@ -16,7 +16,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.PlayMode
-import com.anhtuta.lilimusic.core.ui.download.DownloadActionTags
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -113,11 +112,15 @@ class PlayerScreenPolishTest {
         composeRule.onNodeWithTag(PlayerTestTags.LYRIC_HANDLE).assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Expand lyrics").assertIsDisplayed().performClick()
         composeRule.onNodeWithTag(PlayerTestTags.LYRICS_EXPANDED).assertExists()
+        composeRule.mainClock.advanceTimeBy(LyricChromeExpansionAnimation.ClickTweenMs.toLong() + 50)
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag(PlayerTestTags.CONTROLS).assertDoesNotExist()
         composeRule.onNodeWithContentDescription("Restore lyrics").assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.BACK).performClick()
         assertThat(back).isEqualTo(0)
         composeRule.onNodeWithTag(PlayerTestTags.LYRICS_EXPANDED).assertDoesNotExist()
+        composeRule.mainClock.advanceTimeBy(LyricChromeExpansionAnimation.ClickTweenMs.toLong() + 50)
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag(PlayerTestTags.CONTROLS).assertIsDisplayed()
         composeRule.onNodeWithTag(PlayerTestTags.BACK).performClick()
         assertThat(back).isEqualTo(1)
@@ -221,9 +224,8 @@ class PlayerScreenPolishTest {
 
         composeRule.onNodeWithContentDescription("Back").performTouchInput { longClick() }
         composeRule.onNodeWithText("Back").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Create lyric card").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("More options").performTouchInput { longClick() }
+        composeRule.onNodeWithText("More options").assertIsDisplayed()
     }
 
     @Test
@@ -246,7 +248,7 @@ class PlayerScreenPolishTest {
         composeRule.onNodeWithContentDescription("Next song").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Play mode: Sequence").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Back").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("More options").assertIsDisplayed()
     }
 
     @Test
@@ -276,6 +278,11 @@ class PlayerScreenPolishTest {
         val playCenter = (play.left.value + play.right.value) / 2f
         val rowCenter = (controls.left.value + controls.right.value) / 2f
         assertThat(kotlin.math.abs(playCenter - rowCenter)).isLessThan(2f)
+        val rewind = composeRule.onNodeWithTag(PlayerTestTags.REWIND).getUnclippedBoundsInRoot()
+        val forward = composeRule.onNodeWithTag(PlayerTestTags.FORWARD).getUnclippedBoundsInRoot()
+        val gapBeforePlay = play.left.value - rewind.right.value
+        val gapAfterPlay = forward.left.value - play.right.value
+        assertThat(kotlin.math.abs(gapBeforePlay - gapAfterPlay)).isLessThan(2f)
         composeRule.onNodeWithContentDescription("Playback speed").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Play mode: Sequence").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Playback speed").performTouchInput { longClick() }
@@ -283,7 +290,7 @@ class PlayerScreenPolishTest {
     }
 
     @Test
-    fun appBarActionIconsAreCompactWithAccessibleTargets() {
+    fun overflowMenuHoldsDownloadLyricCardAndSettings() {
         composeRule.setContent {
             LiliTheme {
                 SizedPlayer(
@@ -299,19 +306,11 @@ class PlayerScreenPolishTest {
             }
         }
 
-        assertThat(AppBarActionMetrics.IconSize.value).isEqualTo(20f)
-        assertThat(AppBarActionMetrics.ContainerSize.value).isEqualTo(40f)
-        val downloadGlyph =
-            composeRule
-                .onNodeWithTag(DownloadActionTags.GLYPH, useUnmergedTree = true)
-                .getUnclippedBoundsInRoot()
-        assertThat(downloadGlyph.bottom.value - downloadGlyph.top.value).isWithin(1.5f).of(20f)
-        listOf(PlayerTestTags.DOWNLOAD, PlayerTestTags.LYRIC_CARD, PlayerTestTags.SETTINGS).forEach { tag ->
-            val bounds = composeRule.onNodeWithTag(tag).getUnclippedBoundsInRoot()
-            assertThat(bounds.bottom.value - bounds.top.value).isAtLeast(40f)
-        }
-        composeRule.onNodeWithContentDescription("Download").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Create lyric card").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Settings").assertIsDisplayed()
+        assertThat(NowPlayingOverflowMetrics.SettingsIconSize.value).isEqualTo(16f)
+        composeRule.onNodeWithContentDescription("More options").performClick()
+        composeRule.onNodeWithTag(PlayerTestTags.OVERFLOW_MENU).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.DOWNLOAD).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.LYRIC_CARD).assertIsDisplayed()
+        composeRule.onNodeWithTag(PlayerTestTags.SETTINGS_SCREEN).assertIsDisplayed()
     }
 }

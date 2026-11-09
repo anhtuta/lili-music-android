@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.anhtuta.lilimusic.core.data.repository.SettingsRepository
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlaybackSpeed
 import com.anhtuta.lilimusic.core.playback.PlayerController
@@ -41,6 +42,10 @@ class SettingsViewModel
 
         fun setLyricTheme(theme: LyricTheme) {
             viewModelScope.launch { settingsRepository.setLyricTheme(theme) }
+        }
+
+        fun setLyricFontSize(size: LyricFontSize) {
+            viewModelScope.launch { settingsRepository.setLyricFontSize(size) }
         }
 
         fun setKaraokeMode(enabled: Boolean) {

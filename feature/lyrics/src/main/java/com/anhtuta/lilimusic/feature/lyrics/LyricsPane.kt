@@ -82,7 +82,10 @@ fun LyricsPane(
             modifier
                 .fillMaxSize()
                 .testTag(LyricsTestTags.PANE)
-                .background(style.colors.background),
+                .background(style.colors.background)
+                .pointerInput(revealOffset) {
+                    detectTapGestures(onTap = { revealOffset() })
+                },
     ) {
         if (state.settings.lyricTheme == LyricTheme.PICTURE_BG && state.coverUrl != null) {
             PictureBackdrop(coverUrl = state.coverUrl, overlay = style.colors.overlay)
@@ -95,26 +98,30 @@ fun LyricsPane(
                         .weight(1f)
                         .fillMaxWidth()
                         .testTag(LyricsTestTags.EDGE_FADE)
-                        .lyricEdgeFade(),
+                        .lyricEdgeFade()
+                        .pointerInput(revealOffset) {
+                            detectTapGestures(onTap = { revealOffset() })
+                        },
                 contentAlignment = Alignment.Center,
             ) {
                 LyricsBody(
                     state = state,
                     style = style,
-                    onSeekToLine = { position ->
-                        revealOffset()
-                        onSeekToLine(position)
-                    },
+                    onSeekToLine = onSeekToLine,
                     onRevealOffset = revealOffset,
                 )
                 if (state.frame != null && offsetVisible) {
                     OffsetRow(
+                        offsetMs = state.userOffsetMs,
                         onNudgeOffset = { delta ->
                             revealOffset()
                             onNudgeOffset(delta)
                         },
                         textColor = style.colors.text,
-                        modifier = Modifier.align(Alignment.TopCenter),
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 12.dp),
                     )
                 }
             }
@@ -272,19 +279,30 @@ private fun MissingLyricMessage(style: LyricVisualStyle) {
 
 @Composable
 private fun OffsetRow(
+    offsetMs: Long,
     onNudgeOffset: (Long) -> Unit,
     textColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .testTag(LyricsTestTags.OFFSET_ROW),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
+        Text(
+            text = stringResource(R.string.lyrics_offset_value, offsetMs),
+            color = textColor,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.testTag(LyricsTestTags.OFFSET_VALUE),
+        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
         LiliIconButton(
             icon = Icons.Filled.Remove,
             label = stringResource(R.string.lyrics_offset_earlier),
@@ -299,6 +317,7 @@ private fun OffsetRow(
             modifier = Modifier.testTag(LyricsTestTags.OFFSET_LATER),
             tint = textColor.copy(alpha = 0.45f),
         )
+        }
     }
 }
 
@@ -313,6 +332,11 @@ private fun SyncedLyricList(
     val listState = rememberLazyListState()
     val displayPosition = rememberKaraokeDisplayPositionState(clock)
     val userDragging by listState.interactionSource.collectIsDraggedAsState()
+    LaunchedEffect(userDragging) {
+        if (LyricOffsetReveal.shouldRevealForListDrag(userDragging)) {
+            onRevealOffset()
+        }
+    }
     LaunchedEffect(frame.activeLineIndex) {
         if (frame.activeLineIndex < 0 || !LyricPaneScroll.shouldAutoScroll(userDragging)) {
             return@LaunchedEffect
@@ -325,6 +349,7 @@ private fun SyncedLyricList(
         modifier =
             Modifier
                 .fillMaxSize()
+                .testTag(LyricsTestTags.LIST)
                 .pointerInput(onRevealOffset) {
                     detectTapGestures(onTap = { onRevealOffset() })
                 },
@@ -340,7 +365,10 @@ private fun SyncedLyricList(
                 style = style,
                 displayPosition = displayPosition,
                 clock = clock,
-                onSeek = { onSeekToLine(line.seekPositionMs) },
+                onSeek = {
+                    onRevealOffset()
+                    onSeekToLine(line.seekPositionMs)
+                },
                 seekDescription = seekDescription,
                 modifier = Modifier.fillParentMaxWidth(),
             )
@@ -443,10 +471,16 @@ private fun LyricLineRow(
         )
         if (style.settings.translate) {
             line.translations.forEach { translation ->
+                val translationSize =
+                    LyricFontMetrics.bodyFontSize(
+                        typography = MaterialTheme.typography,
+                        settings = style.settings,
+                        giganticActive = false,
+                    )
                 Text(
                     text = translation.text,
                     color = style.colors.text.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = LyricFontMetrics.translationStyle(translationSize),
                     fontStyle = FontStyle.Italic,
                     textAlign = style.textAlign,
                     modifier = Modifier.testTag(LyricsTestTags.TRANSLATION),

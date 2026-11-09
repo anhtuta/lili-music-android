@@ -41,7 +41,7 @@ All listed endpoints are public (`Access-Control-Allow-Origin: *`). No auth requ
 | `GET` | `/api/song/all?sortBy=&sortOrder=` | Unpaged JSON **array** of songs. Live count ~152. Default `sortBy=title`, `sortOrder=ASC`. Invalid `sortBy` → HTTP **500** — send only the whitelist below. `page` / `per_page` / combined `sort=` are ignored (`sortBy` wins). |
 | `GET` | `/api/song/file?file=` | Audio (`audio/mp3`). Supports `Accept-Ranges: bytes`. Missing file → **404** JSON `Song doesn't exist!`. |
 | `GET` | `/api/lyric?file=` | Plain text when present (`text/plain`). Missing: HTTP **200**, body `Lyric doesn't exist!`, `Content-Type: text/html`. `file` may be repeated; first existing file wins. |
-| `PUT` | `/api/song/listens?path=` | Count a listen. Web fires this **60s after play starts from position 0**, only if still on the same song `path`. Legacy `?file=` still works; Android should use `path`. |
+| `PUT` | `/api/song/listens?path=` | Count a listen. **Web:** 60s after play from position 0 on the same `path`. **Android (v1):** after **≥ 50%** of track duration has been played on the same `path` (any start position; pause does not reset progress). Legacy `?file=` still works; Android uses `path`. |
 | `GET` | `/api/song/picture?file=` | Cover image (used when `image_url` is a relative picture path). |
 | `GET` | `/api/song/album?file=` | Alternate cover path still present on some `image_url`s; resolve whatever relative URL the song has. |
 
@@ -173,7 +173,7 @@ Kotlin, Jetpack Compose + Material 3, Navigation Compose, Hilt, Media3 (ExoPlaye
 
 ### Playback service
 
-Foreground `MediaSessionService`. App UI talks through a `PlayerConnector` / `PlaybackRepository` (MediaController). Notification and lock screen come from the session. Playback speed is a session command. Listen counting is a WorkManager one-shot scheduled 60s after play starts at **exactly position 0**, cancelled **only if the song `path` changes** (pause / resume / finishing do not cancel). Seek back/forward increments are 5 seconds.
+Foreground `MediaSessionService`. App UI talks through a `PlayerConnector` / `PlaybackRepository` (MediaController). Notification and lock screen come from the session. Playback speed is a session command. Listen counting (Android-only vs web) accumulates played media time on the current `path`; when **≥ 50%** of duration is reached, WorkManager runs `PUT /api/song/listens?path=`. Pause cancels the pending delay but keeps progress; **path change** or queue restart resets the session. Seek back/forward increments are 5 seconds.
 
 ### Data flow
 
@@ -307,31 +307,45 @@ Owner-picked web-matching follow-ups after PR #21. Task plans: [070](tasks/070-c
 | 075 | Smooth `.trc` karaoke fill (interpolate playback position between ExoPlayer samples; draw-phase fill). `.xtrc` stays out of v1 (web: “future”) | Done in PR #23 |
 | 076 | Replace remaining text action buttons with Material Icons + long-press `PlainTooltip` via a shared `LiliIconButton`. Keep non-button text (labels, `1.0×`, sort chips, switches) | Done in PR #23 |
 
-### Phase 8 — Now Playing polish *(this PR)*
+### Phase 8 — Now Playing polish (transport & pane)
 
-Owner review of compact Now Playing screenshots (dark + light phone). Task plan: [080–098](tasks/080-098-now-playing-polish.md). Web player remains `BaiHat.js` / `Player.js`.
+Owner review of compact Now Playing screenshots (dark + light phone). Tasks **080–089** are the first slice of [080–098](tasks/080-098-now-playing-polish.md). Web player remains `BaiHat.js` / `Player.js`.
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 080 | One cycling play-mode icon after Next: Sequence (`Repeat`) → Shuffle (`Shuffle`) → Repeat one (`RepeatOne`). Tooltip `Play mode: {current}`. Keep shuffle-current-first | This PR |
-| 081 | Keep `=====` lyric lines as plain lyric text (no chrome change) | This PR |
-| 082 | Fade top and bottom edges of the lyric pane (gradient mask) | This PR |
-| 083 | Drag handle between lyrics and controls: drag down expands lyrics fullscreen; drag up / Back / tap restores | This PR |
-| 084 | Single control row: speed chip, previous, −5s, play, +5s, next, play mode. Speed ±0.1 in 0.5–2.0 | This PR |
-| 085 | Large filled circular Play/Pause (~64.dp, primary container) | This PR |
-| 086 | Lyric offset hidden until pane tap; auto-hide; minus/plus icons only; session/per-song, never persisted | This PR |
-| 087 | Remove the in-pane lyric-card button; keep the app-bar one | This PR |
-| 088 | Hide album text everywhere on Now Playing | This PR |
-| 089 | Thinner seek bar (~4.dp track, small thumb, played vs remaining contrast) | This PR |
-| 090 | Subtle cover Palette **gradient** on Now Playing; theme-based gradient fallback; never flat grey | This PR |
-| 091 | Transport icons full `onSurface`; active state uses the accent | This PR |
-| 092 | Light effective theme uses `#2199F9` + dark-grey unsung + `#DFDFDF` pane; dark keeps `#FC0`. Sung words use full karaoke fill (dimming removed at owner request) | This PR |
-| 093 | App-bar back / download / lyric card / settings: contentDescription + long-press tooltip (`LiliIconButton`) | This PR |
-| 094 | Swipe down on Now Playing closes to the previous screen / mini player (no conflict with 083 or lyric scroll) | This PR |
-| 095 | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons | This PR |
-| 096 | `enableEdgeToEdge` + `SystemBarStyle` from **in-app** theme; light status-bar icons dark on light | This PR |
-| 097 | App bar shows cover thumbnail + title/artist; drop “Now playing” title and the duplicate block below lyrics | This PR |
-| 098 | ~16.dp corner radius on the lyric pane; clip content | This PR |
+| 080 | One cycling play-mode icon after Next: Sequence (`Repeat`) → Shuffle (`Shuffle`) → Repeat one (`RepeatOne`). Tooltip `Play mode: {current}`. Keep shuffle-current-first | Done in PR #24 |
+| 081 | Keep `=====` lyric lines as plain lyric text (no chrome change) | Done in PR #24 |
+| 082 | Fade top and bottom edges of the lyric pane (gradient mask) | Done in PR #24 |
+| 083 | Drag handle between lyrics and controls: drag down expands lyrics fullscreen; drag up / Back / tap restores | Done in PR #24 |
+| 084 | Single control row: speed chip, previous, −5s, play, +5s, next, play mode. Speed ±0.1 in 0.5–2.0 | Done in PR #24 |
+| 085 | Large filled circular Play/Pause (~64.dp, primary container) | Done in PR #24 |
+| 086 | Lyric offset hidden until pane tap; auto-hide; minus/plus icons only; session/per-song, never persisted | Done in PR #24 |
+| 087 | Remove the in-pane lyric-card button; keep the app-bar one | Done in PR #24 |
+| 088 | Hide album text everywhere on Now Playing | Done in PR #24 |
+| 089 | Thinner seek bar (~4.dp track, small thumb, played vs remaining contrast) | Done in PR #24 |
+
+### Phase 9 — Now Playing polish (chrome & app bar)
+
+Tasks **090–098** complete [080–098](tasks/080-098-now-playing-polish.md) (gradient, contrast, edge-to-edge, app-bar song info, rounded pane).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 090 | Subtle cover Palette **gradient** on Now Playing; theme-based gradient fallback; never flat grey | Done in PR #24 |
+| 091 | Transport icons full `onSurface`; active state uses the accent | Done in PR #24 |
+| 092 | Light effective theme uses `#2199F9` + dark-grey unsung + `#DFDFDF` pane; dark keeps `#FC0`. Sung words use full karaoke fill (dimming removed at owner request) | Done in PR #24 |
+| 093 | App-bar back / download / lyric card / settings: contentDescription + long-press tooltip (`LiliIconButton`) | Done in PR #24 |
+| 094 | Swipe down on Now Playing closes to the previous screen / mini player (no conflict with 083 or lyric scroll) | Done in PR #24 |
+| 095 | Audit library, now playing, downloads, settings, lyric card for dark-on-dark icons | Done in PR #24 |
+| 096 | `enableEdgeToEdge` + `SystemBarStyle` from **in-app** theme; light status-bar icons dark on light | Done in PR #24 |
+| 097 | App bar shows cover thumbnail + title/artist; drop “Now playing” title and the duplicate block below lyrics | Done in PR #24 |
+| 098 | ~16.dp corner radius on the lyric pane; clip content | Done in PR #24 |
+
+### Phase 10 — Now Playing lyrics & controls *(this PR)*
+
+Wrap/center/marquee lyric UI and symmetric transport row. Task plans: [099](tasks/099-wrapped-karaoke-fill.md)–[105](tasks/105-deemphasize-artist.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
 | 099 | Karaoke fill progresses across every wrapped visual line (not only the last). See [099](tasks/099-wrapped-karaoke-fill.md) | This PR |
 | 100 | Wrapped lyric lines use ~1.4× lineHeight (`LineHeightStyle` center, trim none). See [100](tasks/100-lyric-wrap-line-height.md) | This PR |
 | 101 | Auto-scroll centers the active lyric line in the pane (web `scrollLyric`). See [101](tasks/101-center-active-lyric.md) | This PR |
@@ -339,12 +353,86 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 | 103 | Compact Now Playing download / lyric-card / settings glyphs (~20.dp) with ≥40.dp touch targets. See [103](tasks/103-compact-app-bar-actions.md) | This PR |
 | 104 | Overflowing app-bar title and artist marquee slowly; drag to scroll; fitting text stays still. See [104](tasks/104-app-bar-marquee.md) | This PR |
 | 105 | App-bar artist is muted (`onSurface` ~0.65 alpha) so the title stands out. See [105](tasks/105-deemphasize-artist.md) | This PR |
+
+### Phase 11 — Library compact UI & test CI *(this PR)*
+
+Library search/sort/rows/overflow menu plus launcher unit-test hardening. Task plans: [106](tasks/106-compact-library-search.md)–[111](tasks/111-launcher-activity-test-ci.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
 | 106 | Compact Library search (~44–48.dp) with placeholder. See [106](tasks/106-compact-library-search.md) | This PR |
 | 107 | One sort pill + dropdown instead of chips. See [107](tasks/107-library-sort-pill.md) | This PR |
 | 108 | Library row: title, artist, listens, soy only (no type/date wrap). See [108](tasks/108-library-row-fields.md) | This PR |
 | 109 | Listens (icon) left, soy badge right on one row. See [109](tasks/109-listens-soy-row.md) | This PR |
 | 110 | Row overflow menu: song info dialog + 074 download states. See [110](tasks/110-song-more-menu.md) | This PR |
 | 111 | `LauncherActivityTest` launches `MainActivity` by class (`FLAG_ACTIVITY_NEW_TASK`); unit tests print full exception traces. See [111](tasks/111-launcher-activity-test-ci.md) | This PR |
+
+### Phase 12 — Now Playing refinement *(this run)*
+
+Owner follow-up screenshots: leaner app bar, edge-to-edge lyrics, control insets, lyric text size presets, listen-count fix. Task plans: [112](tasks/112-now-playing-overflow-menu.md)–[117](tasks/117-fix-listen-count-schedule.md) (no 116).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 112 | Download + Lyric card in gear overflow menu; smaller settings icon. See [112](tasks/112-now-playing-overflow-menu.md) | This run |
+| 113 | Full-width lyric area; drop outer rounded box; keep text padding aligned with chrome. See [113](tasks/113-full-width-lyric-pane.md) | This run |
+| 114 | Bottom inset / navigation padding on transport + seek. See [114](tasks/114-player-controls-bottom-inset.md) | This run |
+| 115 | Five lyric font sizes (default = level 2 Normal). See [115](tasks/115-lyric-font-size-levels.md) | This run |
+| 117 | Schedule listen count when playback starts even if first ExoPlayer position is slightly &gt; 0. See [117](tasks/117-fix-listen-count-schedule.md) | This run |
+
+### Phase 13 — Library chrome & overflow trigger *(done on `tuta`)*
+
+Owner screenshots: Now Playing ⋮ trigger; library sort left, scrollable chrome, scrollbar, row ⋮ alignment. Task plans: [118](tasks/118-now-playing-overflow-morevert.md)–[122](tasks/122-library-row-more-align.md). Learning: [17 — Library chrome](learning/17-phase13-library-chrome.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 118 | Now Playing overflow trigger uses ⋮ (`MoreVert`), not gear. See [118](tasks/118-now-playing-overflow-morevert.md) | Done |
+| 119 | Library sort pill start-aligned. See [119](tasks/119-library-sort-pill-start.md) | Done |
+| 120 | Library title, search, sort scroll with the list (not pinned). See [120](tasks/120-library-scrollable-chrome.md) | Done |
+| 121 | Vertical scrollbar on library list. See [121](tasks/121-library-scrollbar.md) | Done |
+| 122 | Row ⋮ aligns with search/settings right edge. See [122](tasks/122-library-row-more-align.md) | Done |
+
+### Phase 14 — Library playback chrome *(done on `tuta`)*
+
+Now Playing: no pull-dismiss. Library: search inset, thicker scrollbar, playing/pause cover badges, auto-scroll to current track. Task plans: [123](tasks/123-remove-now-playing-pull-dismiss.md)–[127](tasks/127-library-scroll-to-now-playing.md). Learning: [18 — Library playback UX](learning/18-phase14-library-playback-ux.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 123 | Remove Now Playing pull-down back gesture. See [123](tasks/123-remove-now-playing-pull-dismiss.md) | Done |
+| 124 | Search right edge clears scrollbar; align with settings. See [124](tasks/124-library-search-scrollbar-inset.md) | Done |
+| 125 | Thicker library scrollbar thumb. See [125](tasks/125-library-scrollbar-thumb-width.md) | Done |
+| 126 | Playing/pause GIF overlay on current song cover. See [126](tasks/126-library-now-playing-cover-badge.md) | Done |
+| 127 | Scroll library to now-playing song on show. See [127](tasks/127-library-scroll-to-now-playing.md) | Done |
+
+### Phase 15 — Library scrollbar refinement
+
+Refine the library scrollbar thumb shape, width, visibility, touch target, geometry, and drag lifecycle. Task plans: [128](tasks/128-library-scrollbar-half-pill.md)–[131](tasks/131-keep-scrollbar-visible-while-dragging.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | Done |
+| 129 | Compact scrollbar that auto-hides when the library is idle. See [129](tasks/129-auto-hide-scrollbar.md) | Done |
+| 130 | Responsive rail touch target, end jump, and stable thumb geometry. See [130](tasks/130-scrollbar-touch-and-stability.md) | Done |
+| 131 | Keep scrollbar visible for the complete drag gesture. See [131](tasks/131-keep-scrollbar-visible-while-dragging.md) | Done |
+
+### Phase 16 — Lyric offset UX
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 132 | Reveal offset controls on pane touch or scroll (not only line seek). See [132](tasks/132-lyrics-offset-reveal-scroll.md) | Done |
+| 133 | Move offset controls to bottom of lyric pane. See [133](tasks/133-lyrics-offset-bottom.md) | Done |
+| 134 | Show current offset ms after nudge. See [134](tasks/134-lyrics-offset-feedback.md) | Done |
+
+### Phase 17 — Lyric expand chrome
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 135 | Animate transport chrome on lyric handle tap/drag. See [135](tasks/135-lyric-chrome-expand-animation.md) | Done |
+
+### Phase 18 — Android listen threshold
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 136 | Count a listen after ≥ 50% of track duration played (any start position). See [136](tasks/136-listen-count-half-duration.md) | Done |
 
 ## 7. Workflow (mandatory)
 
@@ -372,7 +460,7 @@ Owner review of compact Now Playing screenshots (dark + light phone). Task plan:
 
 ## 9. This-run deliverable
 
-PR #24 merged Phase 8 **080–098** on main. This follow-up is **099–111**: Now Playing wrap/center/app-bar polish, Library search/sort/rows/menu, and a CI-hardening of `LauncherActivityTest`. See [099](tasks/099-wrapped-karaoke-fill.md)–[111](tasks/111-launcher-activity-test-ci.md).
+PR #24 merged Phases **8–9** (**080–098**) on main. Phases **10–11** (**099–111**) cover wrap/center/app-bar polish, Library compact UI, and launcher test CI. Phase **12** (**112–117**) is the current run: overflow app bar, full-width lyrics, control insets, lyric font levels, listen-count fix. See [112](tasks/112-now-playing-overflow-menu.md)–[117](tasks/117-fix-listen-count-schedule.md).
 
 Owner still must host Digital Asset Links, host the privacy policy URL, and create the Play upload keystore. The Lumen backend is unchanged.
 

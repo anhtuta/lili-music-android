@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
@@ -66,6 +67,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             AlignmentSection(align = settings.lyricAlign, onLyricAlign = callbacks.onLyricAlign)
+            LyricFontSizeSection(size = settings.lyricFontSize, onLyricFontSize = callbacks.onLyricFontSize)
             LyricThemeSection(theme = settings.lyricTheme, onLyricTheme = callbacks.onLyricTheme)
             ModeSection(state = settings, callbacks = callbacks)
             AppThemeSection(theme = settings.appTheme, onAppTheme = callbacks.onAppTheme)
@@ -77,6 +79,33 @@ fun SettingsScreen(
         }
     }
 }
+
+@Composable
+private fun LyricFontSizeSection(
+    size: LyricFontSize,
+    onLyricFontSize: (LyricFontSize) -> Unit,
+) {
+    SettingsLegend(text = stringResource(R.string.settings_lyric_font_size))
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LyricFontSize.entries.forEach { option ->
+            FilterChip(
+                selected = size == option,
+                onClick = { onLyricFontSize(option) },
+                label = { Text(text = stringResource(lyricFontSizeLabelRes(option))) },
+                modifier = Modifier.testTag(SettingsTestTags.fontSize(option)),
+            )
+        }
+    }
+}
+
+private fun lyricFontSizeLabelRes(size: LyricFontSize): Int =
+    when (size) {
+        LyricFontSize.COMPACT -> R.string.settings_font_compact
+        LyricFontSize.NORMAL -> R.string.settings_font_normal
+        LyricFontSize.COMFORTABLE -> R.string.settings_font_comfortable
+        LyricFontSize.LARGE -> R.string.settings_font_large
+        LyricFontSize.EXTRA_LARGE -> R.string.settings_font_extra_large
+    }
 
 @Composable
 private fun AlignmentSection(

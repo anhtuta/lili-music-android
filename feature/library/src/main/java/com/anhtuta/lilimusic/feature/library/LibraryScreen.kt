@@ -9,22 +9,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DownloadForOffline
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -32,9 +33,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,31 +56,6 @@ fun LibraryScreen(
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.library_title)) },
-                actions = {
-                    LiliIconButton(
-                        icon = Icons.Filled.Refresh,
-                        label = stringResource(R.string.library_refresh),
-                        onClick = onRefresh,
-                        modifier = Modifier.testTag(LibraryTestTags.REFRESH),
-                    )
-                    LiliIconButton(
-                        icon = Icons.Filled.DownloadForOffline,
-                        label = stringResource(R.string.library_downloads),
-                        onClick = onDownloadsClick,
-                        modifier = Modifier.testTag(LibraryTestTags.DOWNLOADS),
-                    )
-                    LiliIconButton(
-                        icon = Icons.Filled.Settings,
-                        label = stringResource(R.string.library_settings),
-                        onClick = onSettingsClick,
-                        modifier = Modifier.testTag(LibraryTestTags.SETTINGS),
-                    )
-                },
-            )
-        },
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
@@ -92,6 +72,8 @@ fun LibraryScreen(
                 onRefresh = onRefresh,
                 onSongClick = onSongClick,
                 onDownloadAction = onDownloadAction,
+                onSettingsClick = onSettingsClick,
+                onDownloadsClick = onDownloadsClick,
             )
         }
     }
@@ -105,6 +87,8 @@ private fun LibraryContent(
     onRefresh: () -> Unit,
     onSongClick: (Song) -> Unit,
     onDownloadAction: (Song) -> Unit,
+    onSettingsClick: () -> Unit,
+    onDownloadsClick: () -> Unit,
 ) {
     when {
         state.isLoading -> LibraryLoading()
@@ -118,6 +102,9 @@ private fun LibraryContent(
                 onSortFieldChosen = onSortFieldChosen,
                 onSongClick = onSongClick,
                 onDownloadAction = onDownloadAction,
+                onRefresh = onRefresh,
+                onSettingsClick = onSettingsClick,
+                onDownloadsClick = onDownloadsClick,
             )
     }
 }
@@ -168,45 +155,86 @@ private fun LibraryCatalog(
     onSortFieldChosen: (SongSort) -> Unit,
     onSongClick: (Song) -> Unit,
     onDownloadAction: (Song) -> Unit,
+    onRefresh: () -> Unit,
+    onSettingsClick: () -> Unit,
+    onDownloadsClick: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        if (state.isOfflineError) {
-            Text(
-                text = stringResource(R.string.library_error),
-                color = MaterialTheme.colorScheme.error,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .testTag(LibraryTestTags.ERROR_BANNER)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+    val soyYears =
+        remember(state.songs) {
+            SongOfTheYearPalette.uniqueYearsDescending(state.songs.map { it.songOfTheYear })
         }
-        LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
-        LibrarySortPill(
-            selected = state.sort,
-            sortOrder = state.sortOrder,
-            onSortFieldChosen = onSortFieldChosen,
-        )
-        if (state.songs.isEmpty()) {
-            LibraryEmpty(query = state.query)
-        } else {
-            val soyYears =
-                remember(state.songs) {
-                    SongOfTheYearPalette.uniqueYearsDescending(state.songs.map { it.songOfTheYear })
+    var previewSong by remember { mutableStateOf<Song?>(null) }
+    val listState = rememberLazyListState()
+    val latestState by rememberUpdatedState(state)
+    LaunchedEffect(state.nowPlayingPath, state.songs, state.isOfflineError) {
+        if (state.nowPlayingPath == null) return@LaunchedEffect
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }
+            .filter { it }
+            .first()
+        listState.scrollToNowPlayingSong(state)
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        snapshotFlow { lifecycleOwner.lifecycle.currentState }
+            .filter { it == Lifecycle.State.RESUMED }
+            .collect {
+                listState.scrollToNowPlayingSong(latestState)
+            }
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .testTag(LibraryTestTags.LIST),
+            contentPadding =
+                PaddingValues(
+                    bottom = 8.dp,
+                    end = LibraryChromeInsets.ScrollbarTrack,
+                ),
+        ) {
+            if (state.isOfflineError) {
+                item(key = "offline-banner") {
+                    Text(
+                        text = stringResource(R.string.library_error),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .testTag(LibraryTestTags.ERROR_BANNER)
+                                .padding(horizontal = LibraryChromeInsets.Horizontal, vertical = 8.dp),
+                    )
                 }
-            var previewSong by remember { mutableStateOf<Song?>(null) }
-            LazyColumn(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .testTag(LibraryTestTags.LIST),
-                contentPadding = PaddingValues(vertical = 8.dp),
-            ) {
+            }
+            item(key = "header") {
+                LibraryScrollableHeader(
+                    onRefresh = onRefresh,
+                    onDownloadsClick = onDownloadsClick,
+                    onSettingsClick = onSettingsClick,
+                )
+            }
+            item(key = "search") {
+                LibrarySearchField(query = state.query, onQueryChange = onQueryChange)
+            }
+            item(key = "sort") {
+                LibrarySortPill(
+                    selected = state.sort,
+                    sortOrder = state.sortOrder,
+                    onSortFieldChosen = onSortFieldChosen,
+                )
+            }
+            if (state.songs.isEmpty()) {
+                item(key = "empty") {
+                    LibraryEmpty(query = state.query)
+                }
+            } else {
                 items(state.songs, key = { it.id }) { song ->
                     LibrarySongRow(
                         song = song,
                         soyYears = soyYears,
+                        isNowPlaying = state.nowPlayingPath == song.path,
+                        isPlaying = state.isPlaying,
                         coverUrl = state.coverUrl(song),
                         unavailableOffline = state.isUnavailableOffline(song.path),
                         downloadStatus = state.status(song.path),
@@ -221,14 +249,18 @@ private fun LibraryCatalog(
                     )
                 }
             }
-            previewSong?.let { preview ->
-                CoverPreviewDialog(
-                    song = preview,
-                    coverUrl = state.coverUrl(preview),
-                    onDismiss = { previewSong = null },
-                )
-            }
         }
+        LibraryLazyScrollbar(
+            listState = listState,
+            modifier = Modifier.align(Alignment.CenterEnd),
+        )
+    }
+    previewSong?.let { preview ->
+        CoverPreviewDialog(
+            song = preview,
+            coverUrl = state.coverUrl(preview),
+            onDismiss = { previewSong = null },
+        )
     }
 }
 
@@ -243,7 +275,8 @@ private fun LibraryEmpty(query: String) {
     Box(
         modifier =
             Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .padding(vertical = 48.dp)
                 .testTag(LibraryTestTags.EMPTY),
         contentAlignment = Alignment.Center,
     ) {

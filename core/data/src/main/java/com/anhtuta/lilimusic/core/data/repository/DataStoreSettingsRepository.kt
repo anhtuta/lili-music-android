@@ -3,6 +3,7 @@ package com.anhtuta.lilimusic.core.data.repository
 import com.anhtuta.lilimusic.core.datastore.SettingsPreferences
 import com.anhtuta.lilimusic.core.model.AppTheme
 import com.anhtuta.lilimusic.core.model.LyricAlign
+import com.anhtuta.lilimusic.core.model.LyricFontSize
 import com.anhtuta.lilimusic.core.model.LyricTheme
 import com.anhtuta.lilimusic.core.model.PlayerSettings
 import javax.inject.Inject
@@ -51,5 +52,9 @@ class DataStoreSettingsRepository
 
         override suspend fun setAppTheme(theme: AppTheme) {
             settingsPreferences.setAppTheme(theme)
+        }
+
+        override suspend fun setLyricFontSize(size: LyricFontSize) {
+            settingsPreferences.setLyricFontSize(size)
         }
     }

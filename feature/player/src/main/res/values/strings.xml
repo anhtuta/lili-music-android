@@ -3,6 +3,7 @@
     <string name="player_title">Now playing</string>
     <string name="player_back">Back</string>
     <string name="player_settings">Settings</string>
+    <string name="player_more_options">More options</string>
     <string name="player_lyric_card">Create lyric card</string>
     <string name="player_play">Play</string>
     <string name="player_pause">Pause</string>

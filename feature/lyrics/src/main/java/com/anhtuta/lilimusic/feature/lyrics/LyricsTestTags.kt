@@ -5,6 +5,7 @@ import com.anhtuta.lilimusic.core.model.LyricTheme
 
 object LyricsTestTags {
     const val PANE = "lyrics-pane"
+    const val LIST = "lyrics-list"
     const val FETCHING = "lyrics-fetching"
     const val MISSING = "lyrics-missing"
     const val MISSING_MAIL = "lyrics-missing-mail"

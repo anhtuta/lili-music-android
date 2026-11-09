@@ -24,7 +24,7 @@ class WorkListenCountScheduler
                 workManager.cancelUniqueWork(UNIQUE_WORK_NAME)
             }
             val path = decision.schedulePath ?: return
-            val request = RecordListenWorkRequests.create(path)
+            val request = RecordListenWorkRequests.create(path, decision.delayMs)
             workManager.enqueueUniqueWork(UNIQUE_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
         }
 

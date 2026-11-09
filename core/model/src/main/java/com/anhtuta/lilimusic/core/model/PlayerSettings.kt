@@ -14,4 +14,5 @@ data class PlayerSettings(
     val lineAppear: Boolean = false,
     val translate: Boolean = false,
     val appTheme: AppTheme = AppTheme.LIGHT,
+    val lyricFontSize: LyricFontSize = LyricFontSize.NORMAL,
 )
