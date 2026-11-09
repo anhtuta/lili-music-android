@@ -14,9 +14,12 @@ object RecordListenWorkRequests {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-    fun create(path: String): OneTimeWorkRequest =
+    fun create(
+        path: String,
+        delayMs: Long,
+    ): OneTimeWorkRequest =
         OneTimeWorkRequestBuilder<RecordListenWorker>()
-            .setInitialDelay(ListenCountPolicy.DELAY_MS, TimeUnit.MILLISECONDS)
+            .setInitialDelay(delayMs.coerceAtLeast(0L), TimeUnit.MILLISECONDS)
             .setConstraints(constraints())
             .setInputData(workDataOf(RecordListenWorker.KEY_PATH to path))
             .build()

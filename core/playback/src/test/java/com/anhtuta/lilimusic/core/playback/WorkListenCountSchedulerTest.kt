@@ -29,7 +29,7 @@ class WorkListenCountSchedulerTest {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val scheduler = WorkListenCountScheduler(context)
 
-        scheduler.apply(ListenCountDecision(cancelPending = false, schedulePath = "hello artist"))
+        scheduler.apply(ListenCountDecision(cancelPending = false, schedulePath = "hello artist", delayMs = 30_000L))
 
         val infos =
             WorkManager

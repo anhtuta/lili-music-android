@@ -53,6 +53,8 @@ class Media3PlayerController
         private var lastReportedPositionMs = Long.MIN_VALUE
         private var lastReportedPlaying = false
         private var positionSampledAtElapsedMs = 0L
+        private val listenCountSession = ListenCountSession()
+        private var queueRestartPending = false
 
         private val listener =
             object : Player.Listener {
@@ -227,6 +229,7 @@ class Media3PlayerController
             applyRepeatMode(mediaController, queueState.playMode)
             mediaController.prepare()
             mediaController.playWhenReady = playWhenReady
+            queueRestartPending = true
             persistLastSong()
             publishFromPlayer(mediaController)
         }
@@ -264,13 +267,13 @@ class Media3PlayerController
                     atStartOfQueue = atStartOfQueue,
                 )
             _state.value = next
+            val restart = queueRestartPending
+            queueRestartPending = false
             listenCountScheduler.apply(
-                ListenCountPolicy.decide(
-                    previousPath = previous.currentSong?.path,
-                    previousPlaying = previous.isPlaying,
-                    currentPath = next.currentSong?.path,
-                    currentPlaying = next.isPlaying,
-                    positionMs = next.positionMs,
+                listenCountSession.onPlaybackTransition(
+                    previous = previous,
+                    next = next,
+                    queueRestart = restart,
                 ),
             )
         }
@@ -289,12 +292,22 @@ class Media3PlayerController
                         val mediaController = controller
                         if (mediaController != null && mediaController.isPlaying) {
                             val sampled = samplePlayerPosition(mediaController)
-                            _state.value =
-                                _state.value.copy(
+                            val previous = _state.value
+                            val durationMs = PlaybackDuration.fromMedia3(mediaController.duration)
+                            val next =
+                                previous.copy(
                                     positionMs = sampled.positionMs,
                                     positionSampledAtElapsedMs = sampled.sampledAtElapsedMs,
-                                    durationMs = PlaybackDuration.fromMedia3(mediaController.duration),
+                                    durationMs = durationMs,
                                 )
+                            _state.value = next
+                            listenCountSession
+                                .onPlayingTick(
+                                    positionMs = sampled.positionMs,
+                                    previousPositionMs = previous.positionMs,
+                                    durationMs = durationMs,
+                                    path = next.currentSong?.path,
+                                )?.let(listenCountScheduler::apply)
                         }
                     }
                 }

@@ -22,12 +22,15 @@ class FakePlayerController(
     override val state: StateFlow<PlaybackState> = _state.asStateFlow()
 
     private var queueState = PlaybackQueueState(playMode = initialPlayMode)
+    private val listenCountSession = ListenCountSession()
+    private var queueRestartPending = false
 
     override fun play(
         queue: List<Song>,
         startPath: String,
     ) {
         queueState = PlayQueue.start(queue, startPath, queueState.playMode, random)
+        queueRestartPending = true
         publish(playing = true, positionMs = 0L)
     }
 
@@ -36,6 +39,7 @@ class FakePlayerController(
         startPath: String,
     ) {
         queueState = PlayQueue.start(queue, startPath, queueState.playMode, random)
+        queueRestartPending = true
         publish(playing = false, positionMs = 0L)
     }
 
@@ -126,13 +130,13 @@ class FakePlayerController(
                 atStartOfQueue = atStartOfQueue,
             )
         _state.value = next
+        val restart = queueRestartPending
+        queueRestartPending = false
         listenCountScheduler.apply(
-            ListenCountPolicy.decide(
-                previousPath = previous.currentSong?.path,
-                previousPlaying = previous.isPlaying,
-                currentPath = next.currentSong?.path,
-                currentPlaying = next.isPlaying,
-                positionMs = next.positionMs,
+            listenCountSession.onPlaybackTransition(
+                previous = previous,
+                next = next,
+                queueRestart = restart,
             ),
         )
     }

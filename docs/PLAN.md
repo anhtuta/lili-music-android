@@ -432,7 +432,7 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, geome
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 136 | Count a listen after ≥ 50% of track duration played (any start position). See [136](tasks/136-listen-count-half-duration.md) | This run |
+| 136 | Count a listen after ≥ 50% of track duration played (any start position). See [136](tasks/136-listen-count-half-duration.md) | Done |
 
 ## 7. Workflow (mandatory)
 
