@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Forward5
 import androidx.compose.material.icons.filled.Pause
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.PlayMode
 import com.anhtuta.lilimusic.core.model.PlaybackSpeed
@@ -181,6 +183,11 @@ internal fun PlayerSeekBar(
     }
 }
 
+internal object PlayerTransportLayout {
+    val PlayButtonSize = 64.dp
+    val PlayModeIconSize = 22.dp
+}
+
 @Composable
 internal fun PlayerTransport(
     isPlaying: Boolean,
@@ -190,72 +197,85 @@ internal fun PlayerTransport(
 ) {
     val onSurface = MaterialTheme.colorScheme.onSurface
     val accent = MaterialTheme.colorScheme.primary
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .testTag(PlayerTestTags.TRANSPORT_LEFT),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            PlayerSpeedChip(
-                speed = speed,
-                onSetSpeed = callbacks.onSetSpeed,
-            )
-            LiliIconButton(
-                icon = Icons.Filled.SkipPrevious,
-                label = stringResource(R.string.player_previous_cd),
-                onClick = callbacks.onSkipPrevious,
-                modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
-                tint = onSurface,
-            )
-            LiliIconButton(
-                icon = Icons.Filled.Replay5,
-                label = stringResource(R.string.player_rewind_cd),
-                onClick = callbacks.onSeekBack,
-                modifier = Modifier.testTag(PlayerTestTags.REWIND),
-                tint = onSurface,
-            )
+            Row(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .testTag(PlayerTestTags.TRANSPORT_LEFT),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+            ) {
+                PlayerSpeedChip(
+                    speed = speed,
+                    onSetSpeed = callbacks.onSetSpeed,
+                )
+                LiliIconButton(
+                    icon = Icons.Filled.SkipPrevious,
+                    label = stringResource(R.string.player_previous_cd),
+                    onClick = callbacks.onSkipPrevious,
+                    modifier = Modifier.testTag(PlayerTestTags.PREVIOUS),
+                    tint = onSurface,
+                )
+                LiliIconButton(
+                    icon = Icons.Filled.Replay5,
+                    label = stringResource(R.string.player_rewind_cd),
+                    onClick = callbacks.onSeekBack,
+                    modifier = Modifier.testTag(PlayerTestTags.REWIND),
+                    tint = onSurface,
+                )
+            }
+            Spacer(modifier = Modifier.width(PlayerTransportLayout.PlayButtonSize))
+            Row(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .testTag(PlayerTestTags.TRANSPORT_RIGHT),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                LiliIconButton(
+                    icon = Icons.Filled.Forward5,
+                    label = stringResource(R.string.player_forward_cd),
+                    onClick = callbacks.onSeekForward,
+                    modifier = Modifier.testTag(PlayerTestTags.FORWARD),
+                    tint = onSurface,
+                )
+                LiliIconButton(
+                    icon = Icons.Filled.SkipNext,
+                    label = stringResource(R.string.player_next_cd),
+                    onClick = callbacks.onSkipNext,
+                    modifier = Modifier.testTag(PlayerTestTags.NEXT),
+                    tint = onSurface,
+                )
+                PlayModeButton(
+                    playMode = playMode,
+                    onClick = callbacks.onCyclePlayMode,
+                    tint = if (playMode == PlayMode.SEQUENCE) onSurface else accent,
+                    iconSize = PlayerTransportLayout.PlayModeIconSize,
+                )
+            }
         }
-        LiliFilledIconButton(
-            icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-            label =
-                stringResource(
-                    if (isPlaying) R.string.player_pause else R.string.player_play,
-                ),
-            onClick = callbacks.onPlayPause,
-            modifier = Modifier.testTag(PlayerTestTags.PLAY_PAUSE),
-        )
-        Row(
+        Box(
             modifier =
                 Modifier
-                    .weight(1f)
-                    .testTag(PlayerTestTags.TRANSPORT_RIGHT),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
+                    .align(Alignment.Center)
+                    .size(PlayerTransportLayout.PlayButtonSize)
+                    .testTag(PlayerTestTags.PLAY_PAUSE),
+            contentAlignment = Alignment.Center,
         ) {
-            LiliIconButton(
-                icon = Icons.Filled.Forward5,
-                label = stringResource(R.string.player_forward_cd),
-                onClick = callbacks.onSeekForward,
-                modifier = Modifier.testTag(PlayerTestTags.FORWARD),
-                tint = onSurface,
-            )
-            LiliIconButton(
-                icon = Icons.Filled.SkipNext,
-                label = stringResource(R.string.player_next_cd),
-                onClick = callbacks.onSkipNext,
-                modifier = Modifier.testTag(PlayerTestTags.NEXT),
-                tint = onSurface,
-            )
-            PlayModeButton(
-                playMode = playMode,
-                onClick = callbacks.onCyclePlayMode,
-                tint = if (playMode == PlayMode.SEQUENCE) onSurface else accent,
+            LiliFilledIconButton(
+                icon = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                label =
+                    stringResource(
+                        if (isPlaying) R.string.player_pause else R.string.player_play,
+                    ),
+                onClick = callbacks.onPlayPause,
+                size = PlayerTransportLayout.PlayButtonSize,
             )
         }
     }
@@ -267,6 +287,7 @@ internal fun PlayModeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.onSurface,
+    iconSize: Dp = 28.dp,
 ) {
     val modeName =
         stringResource(
@@ -289,7 +310,7 @@ internal fun PlayModeButton(
                     PlayMode.REPEAT_ONE -> Icons.Filled.RepeatOne
                 },
             contentDescription = null,
-            modifier = Modifier.size(28.dp),
+            modifier = Modifier.size(iconSize),
             tint = tint,
         )
     }
