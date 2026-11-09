@@ -10,5 +10,5 @@ internal object LibraryChromeInsets {
     val TrailingAction = 4.dp
 
     /** Space reserved for the catalog scrollbar track at the list's trailing edge. */
-    val ScrollbarTrack = 28.dp
+    val ScrollbarTrack = 12.dp
 }
