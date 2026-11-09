@@ -411,7 +411,7 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, and g
 | --- | --- | --- |
 | 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | Done |
 | 129 | Compact scrollbar that auto-hides when the library is idle. See [129](tasks/129-auto-hide-scrollbar.md) | Done |
-| 130 | Responsive rail touch target, end jump, and stable thumb geometry. See [130](tasks/130-scrollbar-touch-and-stability.md) | In progress |
+| 130 | Responsive rail touch target, end jump, and stable thumb geometry. See [130](tasks/130-scrollbar-touch-and-stability.md) | Done |
 
 ## 7. Workflow (mandatory)
 
