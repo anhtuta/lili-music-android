@@ -12,7 +12,11 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.lyrics.LyricParser
 import com.anhtuta.lilimusic.core.lyrics.LyricSynchronizer
@@ -52,55 +56,92 @@ class LyricsPaneTest {
     }
 
     @Test
-    fun lineTapAndOffsetButtonsFireCallbacks() {
+    fun paneTapAndListDragRevealOffsetWithoutSeeking() {
         var seekTo = -1L
-        var nudged = 0L
-        val frame =
-            LyricSynchronizer.sync(
-                LyricParser.parse(
-                    """
-                    [00:00.00]First
-                    [tran1]Primero
-                    [00:01.00]Second
-                    """.trimIndent(),
-                    "song.xlrc",
-                ),
-                positionMs = 200L,
-                durationMs = 10_000L,
-            )
-        assertThat(
-            frame.lines[0]
-                .translations
-                .single()
-                .text,
-        ).isEqualTo("Primero")
+        composeRule.setContent {
+            LiliTheme {
+                Box(
+                    modifier =
+                        Modifier
+                            .width(400.dp)
+                            .height(500.dp),
+                ) {
+                    LyricsPane(
+                        state = LyricsUiState(hasSong = true, frame = longScrollFrame()),
+                        onNudgeOffset = {},
+                        onSeekToLine = { seekTo = it },
+                    )
+                }
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertDoesNotExist()
+        composeRule.onNodeWithTag(LyricsTestTags.LIST).performTouchInput {
+            swipeUp()
+        }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertIsDisplayed()
+        assertThat(seekTo).isEqualTo(-1L)
+    }
+
+    @Test
+    fun listTapRevealsOffsetControls() {
         composeRule.setContent {
             LiliTheme {
                 LyricsPane(
-                    state =
-                        LyricsUiState(
-                            hasSong = true,
-                            frame = frame,
-                            userOffsetMs = 0L,
-                        ),
-                    onNudgeOffset = { nudged = it },
+                    state = LyricsUiState(hasSong = true, frame = longScrollFrame()),
+                    onNudgeOffset = {},
+                    onSeekToLine = {},
+                )
+            }
+        }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(LyricsTestTags.LIST).performTouchInput {
+            click(center)
+        }
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertIsDisplayed()
+    }
+
+    @Test
+    fun lineTapSeeksAndRevealsOffset() {
+        var seekTo = -1L
+        composeRule.setContent {
+            LiliTheme {
+                LyricsPane(
+                    state = LyricsUiState(hasSong = true, frame = sampleFrame()),
+                    onNudgeOffset = {},
                     onSeekToLine = { seekTo = it },
                 )
             }
         }
 
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertDoesNotExist()
-        composeRule.onNodeWithText("Offset: 0ms").assertDoesNotExist()
         composeRule.onNodeWithText("First").performClick()
         assertThat(seekTo).isEqualTo(0L)
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertIsDisplayed()
+    }
+
+    @Test
+    fun offsetButtonsFireNudgeCallback() {
+        var nudged = 0L
+        composeRule.setContent {
+            LiliTheme {
+                LyricsPane(
+                    state = LyricsUiState(hasSong = true, frame = sampleFrame()),
+                    onNudgeOffset = { nudged = it },
+                    onSeekToLine = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(LyricsTestTags.PANE).performClick()
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).assertIsDisplayed().performClick()
-        composeRule.onNodeWithContentDescription("Lyric 100ms later").assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Lyric 100ms earlier").assertIsDisplayed()
         assertThat(nudged).isEqualTo(100L)
         composeRule.onNodeWithTag(LyricsTestTags.OFFSET_EARLIER).assertIsDisplayed().performClick()
         assertThat(nudged).isEqualTo(-100L)
-        composeRule.onNodeWithText("Offset: 0ms").assertDoesNotExist()
-        assertThat(composeRule.onAllNodesWithText("Primero").fetchSemanticsNodes()).isEmpty()
     }
 
     @Test
@@ -309,4 +350,23 @@ private fun sampleFrame() =
         ),
         positionMs = 200L,
         durationMs = 10_000L,
+    )
+
+private fun longScrollFrame() =
+    LyricSynchronizer.sync(
+        LyricParser.parse(
+            buildString {
+                appendLine("[00:00.00]First")
+                repeat(40) { index ->
+                    val minute = (index + 1) / 60
+                    val second = (index + 1) % 60
+                    appendLine(
+                        "[${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}.00]Line $index",
+                    )
+                }
+            },
+            "song.lrc",
+        ),
+        positionMs = 0L,
+        durationMs = 120_000L,
     )

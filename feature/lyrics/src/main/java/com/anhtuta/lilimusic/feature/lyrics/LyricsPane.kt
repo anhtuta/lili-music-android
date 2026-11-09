@@ -82,7 +82,10 @@ fun LyricsPane(
             modifier
                 .fillMaxSize()
                 .testTag(LyricsTestTags.PANE)
-                .background(style.colors.background),
+                .background(style.colors.background)
+                .pointerInput(revealOffset) {
+                    detectTapGestures(onTap = { revealOffset() })
+                },
     ) {
         if (state.settings.lyricTheme == LyricTheme.PICTURE_BG && state.coverUrl != null) {
             PictureBackdrop(coverUrl = state.coverUrl, overlay = style.colors.overlay)
@@ -95,16 +98,16 @@ fun LyricsPane(
                         .weight(1f)
                         .fillMaxWidth()
                         .testTag(LyricsTestTags.EDGE_FADE)
-                        .lyricEdgeFade(),
+                        .lyricEdgeFade()
+                        .pointerInput(revealOffset) {
+                            detectTapGestures(onTap = { revealOffset() })
+                        },
                 contentAlignment = Alignment.Center,
             ) {
                 LyricsBody(
                     state = state,
                     style = style,
-                    onSeekToLine = { position ->
-                        revealOffset()
-                        onSeekToLine(position)
-                    },
+                    onSeekToLine = onSeekToLine,
                     onRevealOffset = revealOffset,
                 )
                 if (state.frame != null && offsetVisible) {
@@ -313,6 +316,11 @@ private fun SyncedLyricList(
     val listState = rememberLazyListState()
     val displayPosition = rememberKaraokeDisplayPositionState(clock)
     val userDragging by listState.interactionSource.collectIsDraggedAsState()
+    LaunchedEffect(userDragging) {
+        if (LyricOffsetReveal.shouldRevealForListDrag(userDragging)) {
+            onRevealOffset()
+        }
+    }
     LaunchedEffect(frame.activeLineIndex) {
         if (frame.activeLineIndex < 0 || !LyricPaneScroll.shouldAutoScroll(userDragging)) {
             return@LaunchedEffect
@@ -325,6 +333,7 @@ private fun SyncedLyricList(
         modifier =
             Modifier
                 .fillMaxSize()
+                .testTag(LyricsTestTags.LIST)
                 .pointerInput(onRevealOffset) {
                     detectTapGestures(onTap = { onRevealOffset() })
                 },
@@ -340,7 +349,10 @@ private fun SyncedLyricList(
                 style = style,
                 displayPosition = displayPosition,
                 clock = clock,
-                onSeek = { onSeekToLine(line.seekPositionMs) },
+                onSeek = {
+                    onRevealOffset()
+                    onSeekToLine(line.seekPositionMs)
+                },
                 seekDescription = seekDescription,
                 modifier = Modifier.fillParentMaxWidth(),
             )
