@@ -9,8 +9,9 @@ class LazyListScrollbarMathTest {
         val metrics =
             LazyListScrollbarMath.thumbMetrics(
                 totalItems = 50,
-                firstVisibleIndex = 0,
-                lastVisibleIndex = 8,
+                firstVisibleItemIndex = 0,
+                firstVisibleItemScrollOffset = 0,
+                firstVisibleItemSize = 72,
                 canScrollForward = true,
                 canScrollBackward = false,
             )
@@ -20,20 +21,47 @@ class LazyListScrollbarMathTest {
     }
 
     @Test
-    fun thumbHeightAndBoundsStayStableAtListEnd() {
+    fun thumbTracksPartialItemScrollOffset() {
+        val atStart =
+            LazyListScrollbarMath.thumbMetrics(
+                totalItems = 50,
+                firstVisibleItemIndex = 5,
+                firstVisibleItemScrollOffset = 0,
+                firstVisibleItemSize = 80,
+                canScrollForward = true,
+                canScrollBackward = true,
+            )
+        val midItem =
+            LazyListScrollbarMath.thumbMetrics(
+                totalItems = 50,
+                firstVisibleItemIndex = 5,
+                firstVisibleItemScrollOffset = 40,
+                firstVisibleItemSize = 80,
+                canScrollForward = true,
+                canScrollBackward = true,
+            )
+
+        assertThat(midItem.topFraction).isGreaterThan(atStart.topFraction)
+        assertThat(midItem.heightFraction).isWithin(0.001f).of(atStart.heightFraction)
+    }
+
+    @Test
+    fun thumbHeightStaysStableAcrossPositions() {
         val middle =
             LazyListScrollbarMath.thumbMetrics(
                 totalItems = 50,
-                firstVisibleIndex = 20,
-                lastVisibleIndex = 28,
+                firstVisibleItemIndex = 20,
+                firstVisibleItemScrollOffset = 24,
+                firstVisibleItemSize = 72,
                 canScrollForward = true,
                 canScrollBackward = true,
             )
         val end =
             LazyListScrollbarMath.thumbMetrics(
                 totalItems = 50,
-                firstVisibleIndex = 41,
-                lastVisibleIndex = 49,
+                firstVisibleItemIndex = 49,
+                firstVisibleItemScrollOffset = 0,
+                firstVisibleItemSize = 72,
                 canScrollForward = false,
                 canScrollBackward = true,
             )
@@ -49,12 +77,13 @@ class LazyListScrollbarMathTest {
     }
 
     @Test
-    fun thumbHiddenWhenEverythingFits() {
+    fun thumbHiddenWhenNothingScrolls() {
         val metrics =
             LazyListScrollbarMath.thumbMetrics(
                 totalItems = 3,
-                firstVisibleIndex = 0,
-                lastVisibleIndex = 2,
+                firstVisibleItemIndex = 0,
+                firstVisibleItemScrollOffset = 0,
+                firstVisibleItemSize = 72,
                 canScrollForward = false,
                 canScrollBackward = false,
             )

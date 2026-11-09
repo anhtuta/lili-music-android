@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
@@ -12,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +23,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -51,18 +54,27 @@ internal fun LibraryLazyScrollbar(
                 }
             }
     }
-    val layoutInfo = listState.layoutInfo
-    val metrics =
-        LazyListScrollbarMath.thumbMetrics(
-            layoutInfo = layoutInfo,
-            canScrollForward = listState.canScrollForward,
-            canScrollBackward = listState.canScrollBackward,
-        )
+    val metrics by remember {
+        derivedStateOf {
+            LazyListScrollbarMath.thumbMetrics(
+                layoutInfo = listState.layoutInfo,
+                firstVisibleItemIndex = listState.firstVisibleItemIndex,
+                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+                canScrollForward = listState.canScrollForward,
+                canScrollBackward = listState.canScrollBackward,
+            )
+        }
+    }
     if (!metrics.visible || (!scrollbarVisible && !scrollbarGestureActive)) {
         return
     }
-    val viewportPx = layoutInfo.viewportSize.height.toFloat()
+    val viewportPx = listState.layoutInfo.viewportSize.height.toFloat()
     val thumbTopPx = metrics.topFraction * viewportPx
+    val thumbHeightDp =
+        with(LocalDensity.current) {
+            (viewportPx * metrics.heightFraction).toDp()
+        }
+    val layoutInfo = listState.layoutInfo
     val scope = rememberCoroutineScope()
 
     fun scrollToFraction(fraction: Float) {
@@ -89,7 +101,7 @@ internal fun LibraryLazyScrollbar(
                 Modifier
                     .offset { IntOffset(0, thumbTopPx.roundToInt()) }
                     .width(LibraryChromeInsets.ScrollbarTrack)
-                    .fillMaxHeight(metrics.heightFraction),
+                    .height(thumbHeightDp),
             contentAlignment = Alignment.CenterEnd,
         ) {
             Box(
