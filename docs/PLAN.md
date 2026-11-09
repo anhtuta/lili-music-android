@@ -403,6 +403,14 @@ Now Playing: no pull-dismiss. Library: search inset, thicker scrollbar, playing/
 | 126 | Playing/pause GIF overlay on current song cover. See [126](tasks/126-library-now-playing-cover-badge.md) | Done |
 | 127 | Scroll library to now-playing song on show. See [127](tasks/127-library-scroll-to-now-playing.md) | Done |
 
+### Phase 15 — Library scrollbar refinement
+
+Refine the library scrollbar thumb shape and width to match the supplied visual reference. Task plan: [128](tasks/128-library-scrollbar-half-pill.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | In progress |
+
 ## 7. Workflow (mandatory)
 
 1. Write/update the overall plan in `docs/` when scope changes.
