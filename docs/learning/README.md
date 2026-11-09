@@ -28,6 +28,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [16 — Now Playing refinement](16-phase12-now-playing-refinement.md) | Overflow app bar, full-width lyrics, control insets, lyric font presets, listen-count tolerance |
 | [17 — Library chrome (Phase 13)](17-phase13-library-chrome.md) | MoreVert overflow, scrollable library header, scrollbar, shared chrome insets |
 | [18 — Library playback UX (Phase 14)](18-phase14-library-playback-ux.md) | No pull-dismiss, scrollbar/search inset, now-playing badges, scroll-to-current |
+| [19 — Scrollbar refinement (Phase 15)](19-phase15-scrollbar-refinement.md) | Wider half-pill library scrollbar thumb |
 
 ## Status of phases
 
