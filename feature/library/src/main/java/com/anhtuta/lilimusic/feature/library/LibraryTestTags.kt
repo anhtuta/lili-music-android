@@ -30,6 +30,8 @@ object LibraryTestTags {
 
     fun playbackBadge(id: Long): String = "library-playback-badge-$id"
 
+    fun nowPlayingRow(id: Long): String = "library-now-playing-row-$id"
+
     fun listens(id: Long): String = "library-listens-$id"
 
     fun soy(id: Long): String = "library-soy-$id"

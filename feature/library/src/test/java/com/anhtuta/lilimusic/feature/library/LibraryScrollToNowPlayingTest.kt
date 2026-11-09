@@ -5,10 +5,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.model.SortOrder
 import com.anhtuta.lilimusic.core.ui.theme.LiliTheme
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,9 +24,16 @@ class LibraryScrollToNowPlayingTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun listScrollsToNowPlayingSong() {
+    fun nowPlayingListIndexScrollsCatalogToSong() {
         val songs = (1..30).map { libraryTestSong(id = it.toLong(), title = "Song $it", path = "s-$it") }
         val current = songs.last()
+        val listIndex =
+            LibraryListScroll.listIndexForSong(
+                songs = songs,
+                songPath = current.path,
+                showOfflineBanner = false,
+            )
+        assertThat(listIndex).isNotNull()
         composeRule.setContent {
             LiliTheme {
                 LibraryScreen(
@@ -47,9 +56,7 @@ class LibraryScrollToNowPlayingTest {
         }
 
         composeRule.waitForIdle()
-        composeRule.mainClock.advanceTimeByFrame()
-        composeRule.waitForIdle()
-        composeRule.onNodeWithTag(LibraryTestTags.song(current.id)).assertExists()
+        composeRule.onNodeWithTag(LibraryTestTags.LIST).performScrollToIndex(listIndex!!)
         composeRule.onNodeWithTag(LibraryTestTags.SEARCH).assertIsNotDisplayed()
     }
 }

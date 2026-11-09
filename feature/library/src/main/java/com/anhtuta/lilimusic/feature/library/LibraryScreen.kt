@@ -39,6 +39,7 @@ import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.model.SongSort
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -166,6 +167,10 @@ private fun LibraryCatalog(
     val listState = rememberLazyListState()
     val latestState by rememberUpdatedState(state)
     LaunchedEffect(state.nowPlayingPath, state.songs, state.isOfflineError) {
+        if (state.nowPlayingPath == null) return@LaunchedEffect
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }
+            .filter { it }
+            .first()
         listState.scrollToNowPlayingSong(state)
     }
     val lifecycleOwner = LocalLifecycleOwner.current

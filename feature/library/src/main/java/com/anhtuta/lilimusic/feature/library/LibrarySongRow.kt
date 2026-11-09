@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -48,10 +49,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.anhtuta.lilimusic.core.model.DownloadStatus
 import com.anhtuta.lilimusic.core.model.Song
 import com.anhtuta.lilimusic.core.ui.R as UiR
 import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
+
+private val PlaybackBadgeSize = 20.dp
 
 @Composable
 fun LibrarySongRow(
@@ -70,11 +74,25 @@ fun LibrarySongRow(
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     var infoOpen by remember { mutableStateOf(false) }
+    val nowPlayingRowHighlight =
+        if (isNowPlaying) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+        } else {
+            null
+        }
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
-                .testTag(LibraryTestTags.song(song.id))
+                .then(
+                    if (nowPlayingRowHighlight != null) {
+                        Modifier
+                            .background(nowPlayingRowHighlight)
+                            .testTag(LibraryTestTags.nowPlayingRow(song.id))
+                    } else {
+                        Modifier
+                    },
+                ).testTag(LibraryTestTags.song(song.id))
                 .clickable(onClick = onClick)
                 .padding(
                     start = LibraryChromeInsets.Horizontal,
@@ -273,6 +291,16 @@ private fun SongCover(
                 } else {
                     R.drawable.icon_pause_white
                 }
+            val context = LocalContext.current
+            val gifLoader = rememberLibraryGifImageLoader()
+            val badgeRequest =
+                remember(badgeModel, context) {
+                    ImageRequest
+                        .Builder(context)
+                        .data(badgeModel)
+                        .allowHardware(false)
+                        .build()
+                }
             Box(
                 modifier =
                     Modifier
@@ -283,9 +311,10 @@ private fun SongCover(
                 contentAlignment = Alignment.Center,
             ) {
                 AsyncImage(
-                    model = badgeModel,
+                    model = badgeRequest,
                     contentDescription = null,
-                    modifier = Modifier.size(28.dp),
+                    imageLoader = gifLoader,
+                    modifier = Modifier.size(PlaybackBadgeSize),
                 )
             }
         }

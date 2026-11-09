@@ -2,7 +2,6 @@ package com.anhtuta.lilimusic.feature.library
 
 import androidx.compose.foundation.lazy.LazyListState
 import com.anhtuta.lilimusic.core.model.Song
-import kotlinx.coroutines.delay
 
 internal object LibraryListScroll {
     private const val HEADER_ITEMS = 3
@@ -31,6 +30,5 @@ internal suspend fun LazyListState.scrollToNowPlayingSong(state: LibraryUiState)
             songPath = path,
             showOfflineBanner = state.isOfflineError,
         ) ?: return
-    delay(1)
     scrollToItem(index)
 }

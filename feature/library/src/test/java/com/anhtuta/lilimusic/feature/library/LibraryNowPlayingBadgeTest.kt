@@ -34,6 +34,7 @@ class LibraryNowPlayingBadgeTest {
         }
 
         composeRule.onNodeWithContentDescription("Now playing: Playing").assertExists()
+        composeRule.onNodeWithTag(LibraryTestTags.nowPlayingRow(playing.id)).assertExists()
     }
 
     @Test
@@ -54,5 +55,6 @@ class LibraryNowPlayingBadgeTest {
         }
 
         composeRule.onNodeWithTag(LibraryTestTags.playbackBadge(other.id)).assertDoesNotExist()
+        composeRule.onNodeWithTag(LibraryTestTags.nowPlayingRow(other.id)).assertDoesNotExist()
     }
 }
