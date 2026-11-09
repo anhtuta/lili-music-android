@@ -405,11 +405,12 @@ Now Playing: no pull-dismiss. Library: search inset, thicker scrollbar, playing/
 
 ### Phase 15 — Library scrollbar refinement
 
-Refine the library scrollbar thumb shape and width to match the supplied visual reference. Task plan: [128](tasks/128-library-scrollbar-half-pill.md).
+Refine the library scrollbar thumb shape, width, and visibility to match the supplied visual reference. Task plans: [128](tasks/128-library-scrollbar-half-pill.md)–[129](tasks/129-auto-hide-scrollbar.md).
 
 | ID | Task | Status |
 | --- | --- | --- |
 | 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | Done |
+| 129 | Compact scrollbar that auto-hides when the library is idle. See [129](tasks/129-auto-hide-scrollbar.md) | In progress |
 
 ## 7. Workflow (mandatory)
 
