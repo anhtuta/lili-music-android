@@ -10,16 +10,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.click
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import com.anhtuta.lilimusic.core.lyrics.LyricParser
@@ -153,11 +151,15 @@ class LyricsPaneTest {
         composeRule.setContent {
             LiliTheme {
                 var userOffset by remember { mutableLongStateOf(0L) }
+                val frame =
+                    remember(userOffset) {
+                        sampleFrame(userOffsetMs = userOffset)
+                    }
                 LyricsPane(
                     state =
                         LyricsUiState(
                             hasSong = true,
-                            frame = sampleFrame(),
+                            frame = frame,
                             userOffsetMs = userOffset,
                         ),
                     onNudgeOffset = { userOffset += it },
@@ -171,6 +173,33 @@ class LyricsPaneTest {
         composeRule.onNodeWithText("Offset: 100ms").assertIsDisplayed()
         composeRule.onNodeWithTag(LyricsTestTags.OFFSET_EARLIER).performClick()
         composeRule.onNodeWithText("Offset: 0ms").assertIsDisplayed()
+    }
+
+    @Test
+    fun fileMetaOffsetIncludedInVisibleLabel() {
+        composeRule.setContent {
+            LiliTheme {
+                var userOffset by remember { mutableLongStateOf(0L) }
+                val frame =
+                    remember(userOffset) {
+                        sampleFrame(userOffsetMs = userOffset, metaOffsetMs = -200L)
+                    }
+                LyricsPane(
+                    state =
+                        LyricsUiState(
+                            hasSong = true,
+                            frame = frame,
+                            userOffsetMs = userOffset,
+                        ),
+                    onNudgeOffset = { userOffset += it },
+                    onSeekToLine = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag(LyricsTestTags.PANE).performClick()
+        composeRule.onNodeWithText("Offset: -200ms").assertIsDisplayed()
+        composeRule.onNodeWithTag(LyricsTestTags.OFFSET_LATER).performClick()
+        composeRule.onNodeWithText("Offset: -100ms").assertIsDisplayed()
     }
 
     @Test
@@ -394,19 +423,25 @@ class LyricsPaneTest {
     }
 }
 
-private fun sampleFrame() =
-    LyricSynchronizer.sync(
-        LyricParser.parse(
-            """
-            [00:00.00]First
-            [tran1]Primero
-            [00:01.00]Second
-            """.trimIndent(),
-            "song.xlrc",
-        ),
-        positionMs = 200L,
-        durationMs = 10_000L,
-    )
+private fun sampleFrame(
+    userOffsetMs: Long = 0L,
+    metaOffsetMs: Long = 0L,
+) = LyricSynchronizer.sync(
+    LyricParser.parse(
+        buildString {
+            if (metaOffsetMs != 0L) {
+                appendLine("[offset:$metaOffsetMs]")
+            }
+            appendLine("[00:00.00]First")
+            appendLine("[tran1]Primero")
+            appendLine("[00:01.00]Second")
+        },
+        "song.xlrc",
+    ),
+    positionMs = 200L,
+    durationMs = 10_000L,
+    userOffsetMs = userOffsetMs,
+)
 
 private fun longScrollFrame() =
     LyricSynchronizer.sync(

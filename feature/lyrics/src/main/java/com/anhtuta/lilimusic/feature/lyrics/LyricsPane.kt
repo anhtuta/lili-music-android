@@ -112,7 +112,7 @@ fun LyricsPane(
                 )
                 if (state.frame != null && offsetVisible) {
                     OffsetRow(
-                        offsetMs = state.userOffsetMs,
+                        offsetMs = state.frame.combinedOffsetMs,
                         onNudgeOffset = { delta ->
                             revealOffset()
                             onNudgeOffset(delta)
@@ -303,20 +303,20 @@ private fun OffsetRow(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-        LiliIconButton(
-            icon = Icons.Filled.Remove,
-            label = stringResource(R.string.lyrics_offset_earlier),
-            onClick = { onNudgeOffset(-LyricSynchronizer.USER_OFFSET_STEP_MS) },
-            modifier = Modifier.testTag(LyricsTestTags.OFFSET_EARLIER),
-            tint = textColor.copy(alpha = 0.45f),
-        )
-        LiliIconButton(
-            icon = Icons.Filled.Add,
-            label = stringResource(R.string.lyrics_offset_later),
-            onClick = { onNudgeOffset(LyricSynchronizer.USER_OFFSET_STEP_MS) },
-            modifier = Modifier.testTag(LyricsTestTags.OFFSET_LATER),
-            tint = textColor.copy(alpha = 0.45f),
-        )
+            LiliIconButton(
+                icon = Icons.Filled.Remove,
+                label = stringResource(R.string.lyrics_offset_earlier),
+                onClick = { onNudgeOffset(-LyricSynchronizer.USER_OFFSET_STEP_MS) },
+                modifier = Modifier.testTag(LyricsTestTags.OFFSET_EARLIER),
+                tint = textColor.copy(alpha = 0.45f),
+            )
+            LiliIconButton(
+                icon = Icons.Filled.Add,
+                label = stringResource(R.string.lyrics_offset_later),
+                onClick = { onNudgeOffset(LyricSynchronizer.USER_OFFSET_STEP_MS) },
+                modifier = Modifier.testTag(LyricsTestTags.OFFSET_LATER),
+                tint = textColor.copy(alpha = 0.45f),
+            )
         }
     }
 }
