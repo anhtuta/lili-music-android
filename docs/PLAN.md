@@ -405,13 +405,14 @@ Now Playing: no pull-dismiss. Library: search inset, thicker scrollbar, playing/
 
 ### Phase 15 — Library scrollbar refinement
 
-Refine the library scrollbar thumb shape, width, visibility, touch target, and geometry. Task plans: [128](tasks/128-library-scrollbar-half-pill.md)–[130](tasks/130-scrollbar-touch-and-stability.md).
+Refine the library scrollbar thumb shape, width, visibility, touch target, geometry, and drag lifecycle. Task plans: [128](tasks/128-library-scrollbar-half-pill.md)–[131](tasks/131-keep-scrollbar-visible-while-dragging.md).
 
 | ID | Task | Status |
 | --- | --- | --- |
 | 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | Done |
 | 129 | Compact scrollbar that auto-hides when the library is idle. See [129](tasks/129-auto-hide-scrollbar.md) | Done |
 | 130 | Responsive rail touch target, end jump, and stable thumb geometry. See [130](tasks/130-scrollbar-touch-and-stability.md) | Done |
+| 131 | Keep scrollbar visible for the complete drag gesture. See [131](tasks/131-keep-scrollbar-visible-while-dragging.md) | In progress |
 
 ## 7. Workflow (mandatory)
 
