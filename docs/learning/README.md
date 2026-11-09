@@ -30,6 +30,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [18 — Library playback UX (Phase 14)](18-phase14-library-playback-ux.md) | No pull-dismiss, scrollbar/search inset, now-playing badges, scroll-to-current |
 | [19 — Scrollbar refinement (Phase 15)](19-phase15-scrollbar-refinement.md) | Wider half-pill library scrollbar thumb |
 | [20 — Auto-hide scrollbar](20-auto-hide-scrollbar.md) | Compact scrollbar visibility tied to active scrolling |
+| [21 — Responsive scrollbar](21-responsive-scrollbar.md) | Larger touch rail, end jumping, and stable thumb geometry |
 
 ## Status of phases
 
