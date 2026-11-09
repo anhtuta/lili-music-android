@@ -421,7 +421,7 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, geome
 | 132 | Reveal offset controls on pane touch or scroll (not only line seek). See [132](tasks/132-lyrics-offset-reveal-scroll.md) | Done |
 | 133 | Move offset controls to bottom of lyric pane. See [133](tasks/133-lyrics-offset-bottom.md) | Done |
 | 134 | Show current offset ms after nudge. See [134](tasks/134-lyrics-offset-feedback.md) | Done |
-| 137 | Offset overlay shows meta + user ms (file tag included). See [137](tasks/137-lyrics-offset-combined-label.md) | In progress |
+| 137 | Offset overlay shows meta + user ms (file tag included). See [137](tasks/137-lyrics-offset-combined-label.md) | Done |
 
 ### Phase 17 — Lyric expand chrome
 
