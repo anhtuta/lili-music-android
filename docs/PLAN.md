@@ -41,7 +41,7 @@ All listed endpoints are public (`Access-Control-Allow-Origin: *`). No auth requ
 | `GET` | `/api/song/all?sortBy=&sortOrder=` | Unpaged JSON **array** of songs. Live count ~152. Default `sortBy=title`, `sortOrder=ASC`. Invalid `sortBy` → HTTP **500** — send only the whitelist below. `page` / `per_page` / combined `sort=` are ignored (`sortBy` wins). |
 | `GET` | `/api/song/file?file=` | Audio (`audio/mp3`). Supports `Accept-Ranges: bytes`. Missing file → **404** JSON `Song doesn't exist!`. |
 | `GET` | `/api/lyric?file=` | Plain text when present (`text/plain`). Missing: HTTP **200**, body `Lyric doesn't exist!`, `Content-Type: text/html`. `file` may be repeated; first existing file wins. |
-| `PUT` | `/api/song/listens?path=` | Count a listen. Web fires this **60s after play starts from position 0**, only if still on the same song `path`. Legacy `?file=` still works; Android should use `path`. |
+| `PUT` | `/api/song/listens?path=` | Count a listen. **Web:** 60s after play from position 0 on the same `path`. **Android (v1):** after **≥ 50%** of track duration has been played on the same `path` (any start position; pause does not reset progress). Legacy `?file=` still works; Android uses `path`. |
 | `GET` | `/api/song/picture?file=` | Cover image (used when `image_url` is a relative picture path). |
 | `GET` | `/api/song/album?file=` | Alternate cover path still present on some `image_url`s; resolve whatever relative URL the song has. |
 
@@ -173,7 +173,7 @@ Kotlin, Jetpack Compose + Material 3, Navigation Compose, Hilt, Media3 (ExoPlaye
 
 ### Playback service
 
-Foreground `MediaSessionService`. App UI talks through a `PlayerConnector` / `PlaybackRepository` (MediaController). Notification and lock screen come from the session. Playback speed is a session command. Listen counting is a WorkManager one-shot scheduled 60s after play starts at **exactly position 0**, cancelled **only if the song `path` changes** (pause / resume / finishing do not cancel). Seek back/forward increments are 5 seconds.
+Foreground `MediaSessionService`. App UI talks through a `PlayerConnector` / `PlaybackRepository` (MediaController). Notification and lock screen come from the session. Playback speed is a session command. Listen counting (Android-only vs web) accumulates played media time on the current `path`; when **≥ 50%** of duration is reached, WorkManager runs `PUT /api/song/listens?path=`. Pause cancels the pending delay but keeps progress; **path change** or queue restart resets the session. Seek back/forward increments are 5 seconds.
 
 ### Data flow
 
@@ -427,6 +427,12 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, geome
 | ID | Task | Status |
 | --- | --- | --- |
 | 135 | Animate transport chrome on lyric handle tap/drag. See [135](tasks/135-lyric-chrome-expand-animation.md) | Done |
+
+### Phase 18 — Android listen threshold
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 136 | Count a listen after ≥ 50% of track duration played (any start position). See [136](tasks/136-listen-count-half-duration.md) | This run |
 
 ## 7. Workflow (mandatory)
 
