@@ -414,6 +414,14 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, geome
 | 130 | Responsive rail touch target, end jump, and stable thumb geometry. See [130](tasks/130-scrollbar-touch-and-stability.md) | Done |
 | 131 | Keep scrollbar visible for the complete drag gesture. See [131](tasks/131-keep-scrollbar-visible-while-dragging.md) | Done |
 
+### Phase 16 — Lyric offset UX
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 132 | Reveal offset controls on pane touch or scroll (not only line seek). See [132](tasks/132-lyrics-offset-reveal-scroll.md) | Planned |
+| 133 | Move offset controls to bottom of lyric pane. See [133](tasks/133-lyrics-offset-bottom.md) | Planned |
+| 134 | Show current offset ms after nudge. See [134](tasks/134-lyrics-offset-feedback.md) | Planned |
+
 ## 7. Workflow (mandatory)
 
 1. Write/update the overall plan in `docs/` when scope changes.
