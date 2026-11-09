@@ -61,6 +61,12 @@ class LibraryScrollbarTest {
         composeRule
             .onNodeWithTag(LibraryTestTags.SCROLLBAR_THUMB)
             .assertWidthIsAtLeast(8.dp)
+        composeRule.onNodeWithTag(LibraryTestTags.SCROLLBAR).performTouchInput {
+            down(center)
+            moveBy(Offset(0f, -100f))
+        }
+        composeRule.onNodeWithTag(LibraryTestTags.SCROLLBAR).assertIsDisplayed()
+        composeRule.onNodeWithTag(LibraryTestTags.SCROLLBAR).performTouchInput { up() }
         composeRule.mainClock.advanceTimeBy(700)
         composeRule.waitForIdle()
         composeRule.onAllNodesWithTag(LibraryTestTags.SCROLLBAR).assertCountEquals(0)

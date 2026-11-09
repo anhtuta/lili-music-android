@@ -39,6 +39,7 @@ internal fun LibraryLazyScrollbar(
     modifier: Modifier = Modifier,
 ) {
     var scrollbarVisible by remember { mutableStateOf(false) }
+    var scrollbarGestureActive by remember { mutableStateOf(false) }
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }
             .collectLatest { isScrolling ->
@@ -57,7 +58,7 @@ internal fun LibraryLazyScrollbar(
             canScrollForward = listState.canScrollForward,
             canScrollBackward = listState.canScrollBackward,
         )
-    if (!metrics.visible || !scrollbarVisible) {
+    if (!metrics.visible || (!scrollbarVisible && !scrollbarGestureActive)) {
         return
     }
     val viewportPx = layoutInfo.viewportSize.height.toFloat()
@@ -120,8 +121,11 @@ internal fun LibraryLazyScrollbar(
                     .pointerInput(listState, layoutInfo.totalItemsCount) {
                         detectDragGestures(
                             onDragStart = { position ->
+                                scrollbarGestureActive = true
                                 scrollToFraction(position.y / viewportPx)
                             },
+                            onDragEnd = { scrollbarGestureActive = false },
+                            onDragCancel = { scrollbarGestureActive = false },
                         ) { change, _ ->
                             change.consume()
                             scrollToFraction(change.position.y / viewportPx)
