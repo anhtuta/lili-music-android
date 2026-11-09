@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
-private val ScrollbarThumbWidth = 10.dp
+private val ScrollbarThumbWidth = 28.dp
 
 @Composable
 internal fun LibraryLazyScrollbar(
@@ -77,9 +77,14 @@ internal fun LibraryLazyScrollbar(
                     Modifier
                         .width(ScrollbarThumbWidth)
                         .fillMaxHeight()
+                        .testTag(LibraryTestTags.SCROLLBAR_THUMB)
                         .background(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
-                            shape = RoundedCornerShape(5.dp),
+                            shape =
+                                RoundedCornerShape(
+                                    topStartPercent = 50,
+                                    bottomStartPercent = 50,
+                                ),
                         ),
             )
         }
