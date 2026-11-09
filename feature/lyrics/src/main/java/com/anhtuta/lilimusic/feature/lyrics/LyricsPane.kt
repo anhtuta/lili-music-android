@@ -117,7 +117,10 @@ fun LyricsPane(
                             onNudgeOffset(delta)
                         },
                         textColor = style.colors.text,
-                        modifier = Modifier.align(Alignment.TopCenter),
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 12.dp),
                     )
                 }
             }

@@ -259,6 +259,33 @@ class LyricsPaneTest {
     }
 
     @Test
+    fun offsetRowSitsNearBottomOfPane() {
+        composeRule.setContent {
+            LiliTheme {
+                Box(
+                    modifier =
+                        Modifier
+                            .width(360.dp)
+                            .height(480.dp),
+                ) {
+                    LyricsPane(
+                        state = LyricsUiState(hasSong = true, frame = sampleFrame()),
+                        onNudgeOffset = {},
+                        onSeekToLine = {},
+                    )
+                }
+            }
+        }
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(LyricsTestTags.PANE).performClick()
+        val pane = composeRule.onNodeWithTag(LyricsTestTags.EDGE_FADE).getUnclippedBoundsInRoot()
+        val offsetRow = composeRule.onNodeWithTag(LyricsTestTags.OFFSET_ROW).getUnclippedBoundsInRoot()
+        val paneMid = (pane.top.value + pane.bottom.value) / 2f
+        val rowMid = (offsetRow.top.value + offsetRow.bottom.value) / 2f
+        assertThat(rowMid).isGreaterThan(paneMid)
+    }
+
+    @Test
     fun lyricListUsesEdgeFadeMask() {
         composeRule.setContent {
             LiliTheme {
