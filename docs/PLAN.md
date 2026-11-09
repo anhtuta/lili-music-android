@@ -409,7 +409,7 @@ Refine the library scrollbar thumb shape and width to match the supplied visual 
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | In progress |
+| 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | Done |
 
 ## 7. Workflow (mandatory)
 
