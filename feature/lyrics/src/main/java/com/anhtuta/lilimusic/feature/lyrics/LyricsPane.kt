@@ -112,6 +112,7 @@ fun LyricsPane(
                 )
                 if (state.frame != null && offsetVisible) {
                     OffsetRow(
+                        offsetMs = state.userOffsetMs,
                         onNudgeOffset = { delta ->
                             revealOffset()
                             onNudgeOffset(delta)
@@ -278,19 +279,30 @@ private fun MissingLyricMessage(style: LyricVisualStyle) {
 
 @Composable
 private fun OffsetRow(
+    offsetMs: Long,
     onNudgeOffset: (Long) -> Unit,
     textColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .testTag(LyricsTestTags.OFFSET_ROW),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
+        Text(
+            text = stringResource(R.string.lyrics_offset_value, offsetMs),
+            color = textColor,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.testTag(LyricsTestTags.OFFSET_VALUE),
+        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
         LiliIconButton(
             icon = Icons.Filled.Remove,
             label = stringResource(R.string.lyrics_offset_earlier),
@@ -305,6 +317,7 @@ private fun OffsetRow(
             modifier = Modifier.testTag(LyricsTestTags.OFFSET_LATER),
             tint = textColor.copy(alpha = 0.45f),
         )
+        }
     }
 }
 
