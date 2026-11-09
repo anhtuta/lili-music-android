@@ -64,6 +64,11 @@ fun PlayerScreen(
     BackHandler(enabled = lyricsExpanded) { lyricsExpanded = false }
     val isDark = !CoverPalette.isLight(MaterialTheme.colorScheme.background)
     val gradient = CoverPalette.nowPlayingGradient(palette?.background, isDark)
+    val chromeControlsColor =
+        NowPlayingChromeColors.controlsOnSurface(
+            darkTheme = isDark,
+            themeOnSurface = MaterialTheme.colorScheme.onSurface,
+        )
     Scaffold(
         modifier = modifier.testTag(PlayerTestTags.SCREEN),
         containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f),
@@ -99,6 +104,7 @@ fun PlayerScreen(
                 lyrics = lyrics,
                 lyricsExpanded = lyricsExpanded,
                 onLyricsExpandedChange = { lyricsExpanded = it },
+                chromeControlsColor = chromeControlsColor,
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -207,6 +213,7 @@ private fun PlayerBody(
     lyrics: @Composable () -> Unit,
     lyricsExpanded: Boolean,
     onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
     modifier: Modifier = Modifier,
 ) {
     val song = state.song
@@ -228,6 +235,7 @@ private fun PlayerBody(
                 lyrics = lyrics,
                 lyricsExpanded = lyricsExpanded,
                 onLyricsExpandedChange = onLyricsExpandedChange,
+                chromeControlsColor = chromeControlsColor,
             )
         } else {
             ExpandedPlayerBody(
@@ -237,6 +245,7 @@ private fun PlayerBody(
                 lyrics = lyrics,
                 lyricsExpanded = lyricsExpanded,
                 onLyricsExpandedChange = onLyricsExpandedChange,
+                chromeControlsColor = chromeControlsColor,
             )
         }
     }
@@ -254,6 +263,7 @@ private fun PlayerChromeFooter(
     callbacks: PlayerCallbacks,
     lyricsExpanded: Boolean,
     onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
     horizontalPadding: Dp = PlayerControlsInsets.Horizontal,
 ) {
     Column(
@@ -274,6 +284,7 @@ private fun PlayerChromeFooter(
                 state = state,
                 callbacks = callbacks,
                 showHeadings = false,
+                controlsContentColor = chromeControlsColor,
             )
         }
     }
@@ -287,6 +298,7 @@ private fun CompactPlayerBody(
     lyrics: @Composable () -> Unit,
     lyricsExpanded: Boolean,
     onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
 ) {
     Column(
         modifier =
@@ -305,6 +317,7 @@ private fun CompactPlayerBody(
             callbacks = callbacks,
             lyricsExpanded = lyricsExpanded,
             onLyricsExpandedChange = onLyricsExpandedChange,
+            chromeControlsColor = chromeControlsColor,
         )
     }
 }
@@ -317,6 +330,7 @@ private fun ExpandedPlayerBody(
     lyrics: @Composable () -> Unit,
     lyricsExpanded: Boolean,
     onLyricsExpandedChange: (Boolean) -> Unit,
+    chromeControlsColor: Color,
 ) {
     Column(
         modifier =
@@ -356,6 +370,7 @@ private fun ExpandedPlayerBody(
             callbacks = callbacks,
             lyricsExpanded = lyricsExpanded,
             onLyricsExpandedChange = onLyricsExpandedChange,
+            chromeControlsColor = chromeControlsColor,
             horizontalPadding = 24.dp,
         )
     }

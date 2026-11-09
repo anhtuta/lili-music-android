@@ -274,6 +274,11 @@ class PlayerScreenPolishTest {
         val playCenter = (play.left.value + play.right.value) / 2f
         val rowCenter = (controls.left.value + controls.right.value) / 2f
         assertThat(kotlin.math.abs(playCenter - rowCenter)).isLessThan(2f)
+        val rewind = composeRule.onNodeWithTag(PlayerTestTags.REWIND).getUnclippedBoundsInRoot()
+        val forward = composeRule.onNodeWithTag(PlayerTestTags.FORWARD).getUnclippedBoundsInRoot()
+        val gapBeforePlay = play.left.value - rewind.right.value
+        val gapAfterPlay = forward.left.value - play.right.value
+        assertThat(kotlin.math.abs(gapBeforePlay - gapAfterPlay)).isLessThan(2f)
         composeRule.onNodeWithContentDescription("Playback speed").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Play mode: Sequence").assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Playback speed").performTouchInput { longClick() }
