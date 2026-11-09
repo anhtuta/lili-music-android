@@ -32,6 +32,7 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [20 — Auto-hide scrollbar](20-auto-hide-scrollbar.md) | Compact scrollbar visibility tied to active scrolling |
 | [21 — Responsive scrollbar](21-responsive-scrollbar.md) | Larger touch rail, end jumping, and stable thumb geometry |
 | [22 — Scrollbar drag visibility](22-scrollbar-drag-visibility.md) | Keeps the scrollbar visible during active dragging |
+| [23 — Listen count half duration](23-listen-count-half-duration.md) | Android-only ≥50% played threshold, session + WorkManager delay |
 
 ## Status of phases
 
