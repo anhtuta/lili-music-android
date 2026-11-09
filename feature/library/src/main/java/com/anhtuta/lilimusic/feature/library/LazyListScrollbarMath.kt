@@ -1,8 +1,11 @@
 package com.anhtuta.lilimusic.feature.library
 
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
+import kotlin.math.roundToInt
 
 internal object LazyListScrollbarMath {
+    private const val StableThumbHeightFraction = 0.1f
+
     data class ThumbMetrics(
         val topFraction: Float,
         val heightFraction: Float,
@@ -33,15 +36,27 @@ internal object LazyListScrollbarMath {
             return ThumbMetrics(topFraction = 0f, heightFraction = 0f, visible = false)
         }
         val visibleSpan = (lastVisibleIndex - firstVisibleIndex + 1).coerceAtLeast(1)
-        val heightFraction = (visibleSpan.toFloat() / totalItems.toFloat()).coerceIn(0.08f, 1f)
+        val heightFraction = StableThumbHeightFraction
+        val maxFirstVisibleIndex = (totalItems - visibleSpan).coerceAtLeast(1)
         val topFraction =
-            (firstVisibleIndex.toFloat() / totalItems.toFloat())
-                .coerceIn(0f, 1f - heightFraction)
+            when {
+                !canScrollBackward -> 0f
+                !canScrollForward -> 1f - heightFraction
+                else -> {
+                    (firstVisibleIndex.toFloat() / maxFirstVisibleIndex.toFloat())
+                        .coerceIn(0f, 1f - heightFraction)
+                }
+            }
         val scrollable = canScrollForward || canScrollBackward
         return ThumbMetrics(
             topFraction = topFraction,
             heightFraction = heightFraction,
             visible = scrollable && totalItems > visibleSpan,
         )
+    }
+
+    fun targetIndexForFraction(totalItems: Int, fraction: Float): Int {
+        val maxIndex = (totalItems - 1).coerceAtLeast(0)
+        return (fraction.coerceIn(0f, 1f) * maxIndex).roundToInt()
     }
 }

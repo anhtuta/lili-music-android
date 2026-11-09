@@ -56,6 +56,9 @@ class LibraryScrollbarTest {
         }
         composeRule.onNodeWithTag(LibraryTestTags.SCROLLBAR).assertIsDisplayed()
         composeRule
+            .onNodeWithTag(LibraryTestTags.SCROLLBAR)
+            .assertWidthIsAtLeast(48.dp)
+        composeRule
             .onNodeWithTag(LibraryTestTags.SCROLLBAR_THUMB)
             .assertWidthIsAtLeast(8.dp)
         composeRule.mainClock.advanceTimeBy(700)

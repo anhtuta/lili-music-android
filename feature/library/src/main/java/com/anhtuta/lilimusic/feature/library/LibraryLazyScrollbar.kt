@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.library
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 private val ScrollbarThumbWidth = 10.dp
+private val ScrollbarTouchTargetWidth = 48.dp
 private const val ScrollbarHideDelayMillis = 600L
 
 @Composable
@@ -59,14 +61,25 @@ internal fun LibraryLazyScrollbar(
         return
     }
     val viewportPx = layoutInfo.viewportSize.height.toFloat()
-    val thumbHeightPx = metrics.heightFraction * viewportPx
     val thumbTopPx = metrics.topFraction * viewportPx
     val scope = rememberCoroutineScope()
+
+    fun scrollToFraction(fraction: Float) {
+        scope.launch {
+            listState.scrollToItem(
+                LazyListScrollbarMath.targetIndexForFraction(
+                    totalItems = layoutInfo.totalItemsCount,
+                    fraction = fraction,
+                ),
+            )
+        }
+    }
+
     Box(
         modifier =
             modifier
                 .fillMaxHeight()
-                .width(LibraryChromeInsets.ScrollbarTrack)
+                .width(ScrollbarTouchTargetWidth)
                 .testTag(LibraryTestTags.SCROLLBAR),
         contentAlignment = Alignment.TopEnd,
     ) {
@@ -75,22 +88,7 @@ internal fun LibraryLazyScrollbar(
                 Modifier
                     .offset { IntOffset(0, thumbTopPx.roundToInt()) }
                     .width(LibraryChromeInsets.ScrollbarTrack)
-                    .fillMaxHeight(metrics.heightFraction)
-                    .pointerInput(listState, layoutInfo.totalItemsCount) {
-                        detectDragGestures { change, dragAmount ->
-                            change.consume()
-                            val deltaIndex =
-                                (dragAmount.y / viewportPx * layoutInfo.totalItemsCount).roundToInt()
-                            if (deltaIndex != 0) {
-                                val target =
-                                    (listState.firstVisibleItemIndex + deltaIndex)
-                                        .coerceIn(0, (layoutInfo.totalItemsCount - 1).coerceAtLeast(0))
-                                scope.launch {
-                                    listState.scrollToItem(target)
-                                }
-                            }
-                        }
-                    },
+                    .fillMaxHeight(metrics.heightFraction),
             contentAlignment = Alignment.CenterEnd,
         ) {
             Box(
@@ -109,5 +107,26 @@ internal fun LibraryLazyScrollbar(
                         ),
             )
         }
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .width(ScrollbarTouchTargetWidth)
+                    .pointerInput(listState, layoutInfo.totalItemsCount) {
+                        detectTapGestures { position ->
+                            scrollToFraction(position.y / viewportPx)
+                        }
+                    }
+                    .pointerInput(listState, layoutInfo.totalItemsCount) {
+                        detectDragGestures(
+                            onDragStart = { position ->
+                                scrollToFraction(position.y / viewportPx)
+                            },
+                        ) { change, _ ->
+                            change.consume()
+                            scrollToFraction(change.position.y / viewportPx)
+                        }
+                    },
+        )
     }
 }
