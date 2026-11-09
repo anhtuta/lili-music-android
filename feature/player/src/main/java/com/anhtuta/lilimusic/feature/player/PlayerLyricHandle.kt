@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 fun PlayerLyricHandle(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
+    onDragProgress: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val label =
@@ -62,12 +63,18 @@ fun PlayerLyricHandle(
                             onVerticalDrag = { change, amount ->
                                 change.consume()
                                 dragY += amount
+                                onDragProgress(LyricPaneExpansion.dragProgress(expanded, dragY))
                             },
                             onDragEnd = {
-                                onExpandedChange(LyricPaneExpansion.afterVerticalDrag(expanded, dragY))
+                                val nextExpanded = LyricPaneExpansion.afterVerticalDrag(expanded, dragY)
+                                onExpandedChange(nextExpanded)
+                                onDragProgress(if (nextExpanded) 1f else 0f)
                                 dragY = 0f
                             },
-                            onDragCancel = { dragY = 0f },
+                            onDragCancel = {
+                                dragY = 0f
+                                onDragProgress(if (expanded) 1f else 0f)
+                            },
                         )
                     }.clickable { onExpandedChange(!expanded) },
             contentAlignment = Alignment.Center,

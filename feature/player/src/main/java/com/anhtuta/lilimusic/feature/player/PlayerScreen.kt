@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.player
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,14 +27,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -48,6 +54,7 @@ import com.anhtuta.lilimusic.core.ui.button.LiliIconButton
 import com.anhtuta.lilimusic.core.ui.palette.CoverPalette
 import com.anhtuta.lilimusic.core.ui.palette.CoverPaletteColors
 import com.anhtuta.lilimusic.core.ui.text.MarqueeText
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -266,6 +273,21 @@ private fun PlayerChromeFooter(
     chromeControlsColor: Color,
     horizontalPadding: Dp = PlayerControlsInsets.Horizontal,
 ) {
+    val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    val slidePx = with(density) { LyricChromeExpansionAnimation.ControlsSlideDistance.toPx() }
+    val controlsExpansion =
+        remember {
+            Animatable(if (lyricsExpanded) 1f else 0f)
+        }
+    LaunchedEffect(lyricsExpanded) {
+        controlsExpansion.animateTo(
+            targetValue = if (lyricsExpanded) 1f else 0f,
+            animationSpec = LyricChromeExpansionAnimation.clickSpec(),
+        )
+    }
+    val showControls = controlsExpansion.value < 1f || controlsExpansion.isRunning
+
     Column(
         modifier =
             Modifier
@@ -277,15 +299,32 @@ private fun PlayerChromeFooter(
         PlayerLyricHandle(
             expanded = lyricsExpanded,
             onExpandedChange = onLyricsExpandedChange,
+            onDragProgress = { progress ->
+                scope.launch {
+                    controlsExpansion.snapTo(progress)
+                }
+            },
         )
-        if (!lyricsExpanded) {
-            PlayerControlsBar(
-                song = song,
-                state = state,
-                callbacks = callbacks,
-                showHeadings = false,
-                controlsContentColor = chromeControlsColor,
-            )
+        if (showControls) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .graphicsLayer {
+                            val hidden = controlsExpansion.value
+                            alpha = 1f - hidden
+                            translationY = hidden * slidePx
+                            transformOrigin = TransformOrigin(0.5f, 0f)
+                        },
+            ) {
+                PlayerControlsBar(
+                    song = song,
+                    state = state,
+                    callbacks = callbacks,
+                    showHeadings = false,
+                    controlsContentColor = chromeControlsColor,
+                )
+            }
         }
     }
 }
