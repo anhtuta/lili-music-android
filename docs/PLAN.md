@@ -422,6 +422,12 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, geome
 | 133 | Move offset controls to bottom of lyric pane. See [133](tasks/133-lyrics-offset-bottom.md) | Done |
 | 134 | Show current offset ms after nudge. See [134](tasks/134-lyrics-offset-feedback.md) | Done |
 
+### Phase 17 — Lyric expand chrome
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 135 | Animate transport chrome on lyric handle tap/drag. See [135](tasks/135-lyric-chrome-expand-animation.md) | Planned |
+
 ## 7. Workflow (mandatory)
 
 1. Write/update the overall plan in `docs/` when scope changes.
