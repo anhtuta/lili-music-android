@@ -426,7 +426,7 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, geome
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 135 | Animate transport chrome on lyric handle tap/drag. See [135](tasks/135-lyric-chrome-expand-animation.md) | Planned |
+| 135 | Animate transport chrome on lyric handle tap/drag. See [135](tasks/135-lyric-chrome-expand-animation.md) | Done |
 
 ## 7. Workflow (mandatory)
 
