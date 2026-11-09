@@ -410,7 +410,7 @@ Refine the library scrollbar thumb shape, width, and visibility to match the sup
 | ID | Task | Status |
 | --- | --- | --- |
 | 128 | Wider half-pill scrollbar thumb; preserve row overflow actions. See [128](tasks/128-library-scrollbar-half-pill.md) | Done |
-| 129 | Compact scrollbar that auto-hides when the library is idle. See [129](tasks/129-auto-hide-scrollbar.md) | In progress |
+| 129 | Compact scrollbar that auto-hides when the library is idle. See [129](tasks/129-auto-hide-scrollbar.md) | Done |
 
 ## 7. Workflow (mandatory)
 
