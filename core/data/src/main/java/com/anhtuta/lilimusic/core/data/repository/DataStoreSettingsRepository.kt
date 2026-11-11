@@ -57,4 +57,8 @@ class DataStoreSettingsRepository
         override suspend fun setLyricFontSize(size: LyricFontSize) {
             settingsPreferences.setLyricFontSize(size)
         }
+
+        override suspend fun setKeepScreenOnWhileLyrics(enabled: Boolean) {
+            settingsPreferences.setKeepScreenOnWhileLyrics(enabled)
+        }
     }

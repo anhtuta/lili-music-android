@@ -15,4 +15,5 @@ data class PlayerSettings(
     val translate: Boolean = false,
     val appTheme: AppTheme = AppTheme.LIGHT,
     val lyricFontSize: LyricFontSize = LyricFontSize.NORMAL,
+    val keepScreenOnWhileLyrics: Boolean = false,
 )

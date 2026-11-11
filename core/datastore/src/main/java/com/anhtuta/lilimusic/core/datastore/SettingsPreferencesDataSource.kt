@@ -37,6 +37,8 @@ interface SettingsPreferences {
     suspend fun setAppTheme(theme: AppTheme)
 
     suspend fun setLyricFontSize(size: LyricFontSize)
+
+    suspend fun setKeepScreenOnWhileLyrics(enabled: Boolean)
 }
 
 @Singleton
@@ -59,6 +61,7 @@ class SettingsPreferencesDataSource
                         translate = prefs[TRANSLATE],
                         appTheme = prefs[APP_THEME],
                         lyricFontSize = prefs[LYRIC_FONT_SIZE],
+                        keepScreenOnWhileLyrics = prefs[KEEP_SCREEN_ON_WHILE_LYRICS],
                     ),
                 )
             }
@@ -103,6 +106,10 @@ class SettingsPreferencesDataSource
             dataStore.edit { prefs -> prefs[LYRIC_FONT_SIZE] = size.storageValue }
         }
 
+        override suspend fun setKeepScreenOnWhileLyrics(enabled: Boolean) {
+            dataStore.edit { prefs -> prefs[KEEP_SCREEN_ON_WHILE_LYRICS] = enabled }
+        }
+
         private companion object {
             val LYRIC_ALIGN = stringPreferencesKey("settings_lyric_align")
             val LYRIC_THEME = stringPreferencesKey("settings_lyric_theme")
@@ -114,5 +121,6 @@ class SettingsPreferencesDataSource
             val TRANSLATE = booleanPreferencesKey("settings_translate")
             val APP_THEME = stringPreferencesKey("settings_app_theme")
             val LYRIC_FONT_SIZE = stringPreferencesKey("settings_lyric_font_size")
+            val KEEP_SCREEN_ON_WHILE_LYRICS = booleanPreferencesKey("settings_keep_screen_on_while_lyrics")
         }
     }

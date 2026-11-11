@@ -31,6 +31,7 @@ class SettingsScreenTest {
         var appTheme: AppTheme? = null
         var fontSize: LyricFontSize? = null
         var speedUp = 0
+        var keepScreenOn: Boolean? = null
         var back = 0
         composeRule.setContent {
             LiliTheme {
@@ -48,6 +49,7 @@ class SettingsScreenTest {
                             onLineAppear = {},
                             onGiganticLine = {},
                             onTranslate = { translate = it },
+                            onKeepScreenOnWhileLyrics = { keepScreenOn = it },
                             onAppTheme = { appTheme = it },
                             onIncreaseSpeed = { speedUp++ },
                             onDecreaseSpeed = {},
@@ -67,6 +69,15 @@ class SettingsScreenTest {
         assertThat(karaoke).isFalse()
         composeRule.onNodeWithTag(SettingsTestTags.TRANSLATE).performScrollTo().performClick()
         assertThat(translate).isTrue()
+        composeRule
+            .onNodeWithTag(SettingsTestTags.KEEP_SCREEN_ON_WHILE_LYRICS)
+            .performScrollTo()
+            .performClick()
+        assertThat(keepScreenOn).isTrue()
+        composeRule
+            .onNodeWithTag(SettingsTestTags.KEEP_SCREEN_ON_WHILE_LYRICS_NOTE)
+            .performScrollTo()
+            .assertIsDisplayed()
         composeRule.onNodeWithTag(SettingsTestTags.APP_THEME_DARK).performScrollTo().performClick()
         assertThat(appTheme).isEqualTo(AppTheme.DARK)
         composeRule.onNodeWithTag(SettingsTestTags.SPEED_UP).performScrollTo().performClick()
@@ -93,6 +104,7 @@ class SettingsScreenTest {
                             onLineAppear = {},
                             onGiganticLine = {},
                             onTranslate = {},
+                            onKeepScreenOnWhileLyrics = {},
                             onAppTheme = {},
                             onIncreaseSpeed = {},
                             onDecreaseSpeed = {},

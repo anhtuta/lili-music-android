@@ -33,6 +33,8 @@ For Tú: what each merged phase built, Android/Kotlin terms mapped to Java and w
 | [21 — Responsive scrollbar](21-responsive-scrollbar.md) | Larger touch rail, end jumping, and stable thumb geometry |
 | [22 — Scrollbar drag visibility](22-scrollbar-drag-visibility.md) | Keeps the scrollbar visible during active dragging |
 | [23 — Listen count half duration](23-listen-count-half-duration.md) | Android-only ≥50% played threshold, session + WorkManager delay |
+| [24 — Combined offset label](24-combined-offset-label.md) | Overlay shows file meta offset plus client nudge (task 137) |
+| [25 — Keep screen on lyrics](25-keep-screen-on-lyrics.md) | Settings toggle, 10 min cap on Now Playing (task 139) |
 
 ## Status of phases
 

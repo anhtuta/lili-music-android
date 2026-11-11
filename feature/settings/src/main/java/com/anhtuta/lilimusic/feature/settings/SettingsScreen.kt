@@ -205,6 +205,14 @@ private fun ModeSection(
         onCheckedChange = callbacks.onTranslate,
         testTag = SettingsTestTags.TRANSLATE,
     )
+    SettingsSwitchWithNote(
+        label = stringResource(R.string.settings_keep_screen_on_while_lyrics),
+        note = stringResource(R.string.settings_keep_screen_on_while_lyrics_note),
+        checked = state.keepScreenOnWhileLyrics,
+        onCheckedChange = callbacks.onKeepScreenOnWhileLyrics,
+        switchTestTag = SettingsTestTags.KEEP_SCREEN_ON_WHILE_LYRICS,
+        noteTestTag = SettingsTestTags.KEEP_SCREEN_ON_WHILE_LYRICS_NOTE,
+    )
 }
 
 @Composable
@@ -270,6 +278,37 @@ private fun SettingsLegend(text: String) {
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.primary,
     )
+}
+
+@Composable
+private fun SettingsSwitchWithNote(
+    label: String,
+    note: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    switchTestTag: String,
+    noteTestTag: String,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(text = label, modifier = Modifier.weight(1f))
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                modifier = Modifier.testTag(switchTestTag),
+            )
+        }
+        Text(
+            text = note,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.testTag(noteTestTag),
+        )
+    }
 }
 
 @Composable

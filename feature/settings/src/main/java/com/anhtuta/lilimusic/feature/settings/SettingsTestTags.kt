@@ -17,6 +17,8 @@ object SettingsTestTags {
     const val LINE_APPEAR = "settings-line-appear"
     const val GIGANTIC = "settings-gigantic"
     const val TRANSLATE = "settings-translate"
+    const val KEEP_SCREEN_ON_WHILE_LYRICS = "settings-keep-screen-on-while-lyrics"
+    const val KEEP_SCREEN_ON_WHILE_LYRICS_NOTE = "settings-keep-screen-on-while-lyrics-note"
     const val APP_THEME_LIGHT = "settings-app-theme-light"
     const val APP_THEME_DARK = "settings-app-theme-dark"
     const val SPEED_UP = "settings-speed-up"

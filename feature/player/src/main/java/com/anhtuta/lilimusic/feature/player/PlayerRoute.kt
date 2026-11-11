@@ -12,6 +12,7 @@ fun PlayerRoute(
     onBack: () -> Unit,
     viewModel: PlayerViewModel = hiltViewModel(),
     lyrics: @Composable () -> Unit = {},
+    keepScreenOn: Boolean = false,
     onSettingsClick: () -> Unit = {},
     onLyricCardClick: () -> Unit = {},
 ) {
@@ -41,5 +42,6 @@ fun PlayerRoute(
                 onLyricCard = onLyricCardClick,
             ),
         lyrics = lyrics,
+        keepScreenOn = keepScreenOn,
     )
 }

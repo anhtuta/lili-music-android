@@ -115,6 +115,10 @@ class FakeSettingsRepository(
         state.value = state.value.copy(lyricFontSize = size)
     }
 
+    override suspend fun setKeepScreenOnWhileLyrics(enabled: Boolean) {
+        state.value = state.value.copy(keepScreenOnWhileLyrics = enabled)
+    }
+
     fun emit(value: PlayerSettings) {
         state.value = value
     }

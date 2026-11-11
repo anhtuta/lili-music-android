@@ -29,4 +29,6 @@ interface SettingsRepository {
     suspend fun setAppTheme(theme: AppTheme)
 
     suspend fun setLyricFontSize(size: LyricFontSize)
+
+    suspend fun setKeepScreenOnWhileLyrics(enabled: Boolean)
 }

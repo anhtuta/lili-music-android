@@ -16,6 +16,7 @@ data class SettingsCallbacks(
     val onLineAppear: (Boolean) -> Unit,
     val onGiganticLine: (Boolean) -> Unit,
     val onTranslate: (Boolean) -> Unit,
+    val onKeepScreenOnWhileLyrics: (Boolean) -> Unit,
     val onAppTheme: (AppTheme) -> Unit,
     val onIncreaseSpeed: () -> Unit,
     val onDecreaseSpeed: () -> Unit,

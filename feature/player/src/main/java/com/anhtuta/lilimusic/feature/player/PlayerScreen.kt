@@ -39,8 +39,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -63,6 +63,7 @@ fun PlayerScreen(
     callbacks: PlayerCallbacks,
     modifier: Modifier = Modifier,
     lyrics: @Composable () -> Unit = {},
+    keepScreenOn: Boolean = false,
     coverPaletteOverride: CoverPaletteColors? = null,
 ) {
     val loadedPalette = rememberCoverPalette(state.song?.imageUrl)
@@ -76,6 +77,7 @@ fun PlayerScreen(
             darkTheme = isDark,
             themeOnSurface = MaterialTheme.colorScheme.onSurface,
         )
+    KeepScreenOnEffect(active = keepScreenOn)
     Scaffold(
         modifier = modifier.testTag(PlayerTestTags.SCREEN),
         containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0f),

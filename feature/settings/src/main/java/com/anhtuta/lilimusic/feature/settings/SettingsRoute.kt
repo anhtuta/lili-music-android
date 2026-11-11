@@ -25,6 +25,7 @@ fun SettingsRoute(
                 onLineAppear = viewModel::setLineAppear,
                 onGiganticLine = viewModel::setGiganticLine,
                 onTranslate = viewModel::setTranslate,
+                onKeepScreenOnWhileLyrics = viewModel::setKeepScreenOnWhileLyrics,
                 onAppTheme = viewModel::setAppTheme,
                 onIncreaseSpeed = viewModel::increaseSpeed,
                 onDecreaseSpeed = viewModel::decreaseSpeed,
