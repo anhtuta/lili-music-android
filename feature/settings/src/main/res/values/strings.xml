@@ -23,6 +23,8 @@
     <string name="settings_line_appear">Line appear</string>
     <string name="settings_gigantic">Gigantic line</string>
     <string name="settings_translate">Show translation</string>
+    <string name="settings_keep_screen_on_while_lyrics">Keep screen on while lyrics play</string>
+    <string name="settings_keep_screen_on_while_lyrics_note">On Now Playing only, up to 10 minutes per session while synced lyrics are playing.</string>
     <string name="settings_app_theme">App theme</string>
     <string name="settings_app_light">Light</string>
     <string name="settings_app_dark">Dark</string>

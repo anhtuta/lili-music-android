@@ -72,6 +72,10 @@ class SettingsViewModel
             viewModelScope.launch { settingsRepository.setTranslate(enabled) }
         }
 
+        fun setKeepScreenOnWhileLyrics(enabled: Boolean) {
+            viewModelScope.launch { settingsRepository.setKeepScreenOnWhileLyrics(enabled) }
+        }
+
         fun setAppTheme(theme: AppTheme) {
             viewModelScope.launch { settingsRepository.setAppTheme(theme) }
         }

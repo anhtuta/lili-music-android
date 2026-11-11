@@ -54,4 +54,8 @@ class FakeSettingsPreferences(
     override suspend fun setLyricFontSize(size: LyricFontSize) {
         state.value = state.value.copy(lyricFontSize = size)
     }
+
+    override suspend fun setKeepScreenOnWhileLyrics(enabled: Boolean) {
+        state.value = state.value.copy(keepScreenOnWhileLyrics = enabled)
+    }
 }

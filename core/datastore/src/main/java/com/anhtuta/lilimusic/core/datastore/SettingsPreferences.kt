@@ -17,6 +17,7 @@ data class SettingsPreferenceSnapshot(
     val translate: Boolean? = null,
     val appTheme: String? = null,
     val lyricFontSize: String? = null,
+    val keepScreenOnWhileLyrics: Boolean? = null,
 )
 
 object SettingsPreferencesParser {
@@ -33,6 +34,7 @@ object SettingsPreferencesParser {
             translate = raw.translate ?: defaults.translate,
             appTheme = AppTheme.fromStorage(raw.appTheme),
             lyricFontSize = LyricFontSize.fromStorage(raw.lyricFontSize),
+            keepScreenOnWhileLyrics = raw.keepScreenOnWhileLyrics ?: defaults.keepScreenOnWhileLyrics,
         )
     }
 }

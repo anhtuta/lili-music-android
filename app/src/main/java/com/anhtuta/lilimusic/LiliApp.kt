@@ -36,9 +36,7 @@ import com.anhtuta.lilimusic.feature.downloads.DownloadsViewModel
 import com.anhtuta.lilimusic.feature.library.LibraryRoute
 import com.anhtuta.lilimusic.feature.lyrics.LyricCardRoute
 import com.anhtuta.lilimusic.feature.lyrics.LyricCardViewModel
-import com.anhtuta.lilimusic.feature.lyrics.LyricsRoute
 import com.anhtuta.lilimusic.feature.player.MiniPlayerBar
-import com.anhtuta.lilimusic.feature.player.PlayerRoute
 import com.anhtuta.lilimusic.feature.player.PlayerViewModel
 import com.anhtuta.lilimusic.feature.settings.SettingsRoute
 import com.anhtuta.lilimusic.feature.settings.SettingsViewModel
@@ -83,13 +81,12 @@ fun LiliApp(
                             )
                         },
                         playerContent = { path, onBack, onSettings ->
-                            PlayerRoute(
+                            NowPlayingEntry(
                                 path = path,
                                 onBack = onBack,
-                                viewModel = playerViewModel,
-                                lyrics = { LyricsRoute() },
                                 onSettingsClick = onSettings,
                                 onLyricCardClick = lyricCardViewModel::open,
+                                playerViewModel = playerViewModel,
                             )
                         },
                         settingsContent = { onBack ->

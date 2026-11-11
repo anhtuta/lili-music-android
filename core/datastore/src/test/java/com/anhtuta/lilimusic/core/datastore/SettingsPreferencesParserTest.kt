@@ -15,6 +15,17 @@ class SettingsPreferencesParserTest {
     }
 
     @Test
+    fun keepScreenOnWhileLyricsDefaultsOff() {
+        assertThat(
+            SettingsPreferencesParser.parse(
+                SettingsPreferenceSnapshot(keepScreenOnWhileLyrics = true),
+            ).keepScreenOnWhileLyrics,
+        ).isTrue()
+        assertThat(SettingsPreferencesParser.parse(SettingsPreferenceSnapshot()).keepScreenOnWhileLyrics)
+            .isFalse()
+    }
+
+    @Test
     fun unknownThemeFallsBackToPictureBg() {
         val parsed =
             SettingsPreferencesParser.parse(
