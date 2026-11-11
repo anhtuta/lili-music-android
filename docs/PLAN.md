@@ -435,7 +435,7 @@ Persist client-only ±100 ms nudges per song (task 137 still shows combined ms i
 
 | ID | Task | Status |
 | --- | --- | --- |
-| 139 | Keep screen on while synced lyrics play (settings toggle, 10 min cap). See [139](tasks/139-now-playing-keep-screen-on.md) | In progress |
+| 139 | Keep screen on while synced lyrics play (settings toggle, 10 min cap). See [139](tasks/139-now-playing-keep-screen-on.md) | Done |
 
 ### Phase 17 — Lyric expand chrome
 
