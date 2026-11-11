@@ -423,6 +423,14 @@ Refine the library scrollbar thumb shape, width, visibility, touch target, geome
 | 134 | Show current offset ms after nudge. See [134](tasks/134-lyrics-offset-feedback.md) | Done |
 | 137 | Offset overlay shows meta + user ms (file tag included). See [137](tasks/137-lyrics-offset-combined-label.md) | Done |
 
+### Phase 19 — Lyric user offset persistence
+
+Persist client-only ±100 ms nudges per song (task 137 still shows combined ms in the overlay). **Storage: DataStore vs Room not decided** — see [138](tasks/138-persist-lyric-user-offset.md).
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 138 | Persist per-song user lyric offset locally. See [138](tasks/138-persist-lyric-user-offset.md) | Planned (storage TBD) |
+
 ### Phase 17 — Lyric expand chrome
 
 | ID | Task | Status |
