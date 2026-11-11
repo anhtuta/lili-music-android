@@ -431,6 +431,12 @@ Persist client-only ±100 ms nudges per song (task 137 still shows combined ms i
 | --- | --- | --- |
 | 138 | Persist per-song user lyric offset locally. See [138](tasks/138-persist-lyric-user-offset.md) | Planned (storage TBD) |
 
+### Phase 20 — Now Playing display while lyrics
+
+| ID | Task | Status |
+| --- | --- | --- |
+| 139 | Keep screen on while synced lyrics play (settings toggle, 10 min cap). See [139](tasks/139-now-playing-keep-screen-on.md) | In progress |
+
 ### Phase 17 — Lyric expand chrome
 
 | ID | Task | Status |
