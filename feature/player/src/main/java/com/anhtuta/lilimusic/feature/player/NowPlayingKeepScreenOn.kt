@@ -4,15 +4,19 @@ import android.os.SystemClock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
+/**
+ * Up to [NowPlayingKeepScreenOnPolicy.MAX_ELIGIBLE_DURATION_MS] of keep-on per **Now Playing visit**
+ * (leaving the route clears the cap). Skipping to another song does not reset the timer.
+ */
 @Composable
 fun rememberNowPlayingKeepScreenOn(
-    songPath: String?,
     settingEnabled: Boolean,
     songHasLyricFile: Boolean,
     syncedLyricsActive: Boolean,
@@ -25,14 +29,18 @@ fun rememberNowPlayingKeepScreenOn(
             syncedLyricsActive = syncedLyricsActive,
             isPlaying = isPlaying,
         )
+    var visitCapStartMs by remember { mutableLongStateOf(-1L) }
     var keepOn by remember { mutableStateOf(false) }
-    LaunchedEffect(songPath, eligible) {
+    LaunchedEffect(eligible) {
         if (!eligible) {
             keepOn = false
             return@LaunchedEffect
         }
-        val sessionStartMs = SystemClock.elapsedRealtime()
-        keepOn = true
+        if (visitCapStartMs < 0L) {
+            visitCapStartMs = SystemClock.elapsedRealtime()
+        }
+        val sessionStartMs = visitCapStartMs
+        keepOn = NowPlayingKeepScreenOnPolicy.withinCap(SystemClock.elapsedRealtime() - sessionStartMs)
         while (isActive) {
             delay(NowPlayingKeepScreenOnPolicy.CAP_TICK_MS)
             val elapsed = SystemClock.elapsedRealtime() - sessionStartMs

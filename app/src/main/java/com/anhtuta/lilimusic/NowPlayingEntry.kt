@@ -23,7 +23,6 @@ fun NowPlayingEntry(
     val lyricsState by lyricsViewModel.uiState.collectAsStateWithLifecycle()
     val keepScreenOn =
         rememberNowPlayingKeepScreenOn(
-            songPath = playerState.song?.path,
             settingEnabled = lyricsState.settings.keepScreenOnWhileLyrics,
             songHasLyricFile = playerState.song?.lyric != null,
             syncedLyricsActive = lyricsState.frame != null,
