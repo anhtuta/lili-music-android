@@ -2,7 +2,7 @@
 
 ## What changed
 
-Settings includes **Keep screen on while lyrics play** (default off). On Now Playing, when the toggle is on, the song has a lyric file, synced lyrics are loaded (`LyricSyncFrame` present), and playback is **playing**, the window sets `FLAG_KEEP_SCREEN_ON` via `view.keepScreenOn`. Each continuous eligible stretch is capped at **10 minutes**; pause or leaving the route resets the cap.
+Settings includes **Keep screen on while lyrics play** (default off). On Now Playing, when the toggle is on, the song has a lyric file, synced lyrics are loaded (`LyricSyncFrame` present), and playback is **playing**, the window sets `FLAG_KEEP_SCREEN_ON` via `view.keepScreenOn`. Each song gets up to **10 minutes** of keep-on while eligible (`song.path` change, pause, or leaving the route starts a fresh window).
 
 ## Terms
 

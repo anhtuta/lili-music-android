@@ -2,6 +2,7 @@ package com.anhtuta.lilimusic.feature.player
 
 object NowPlayingKeepScreenOnPolicy {
     const val MAX_ELIGIBLE_DURATION_MS = 10 * 60 * 1000L
+    const val CAP_TICK_MS = 1_000L
 
     fun isEligible(
         settingEnabled: Boolean,
